@@ -19,12 +19,12 @@ public interface Script {
     public boolean load(Context cx, Scriptable scope) throws IOException;
     
     /**
-     * Forces this script to be reloaded.
+     * Forces this script to be evaluated.
      * @param cx  The JavaScript Context
      * @param scope  The JavaScript Scope
      * @throws IOException if there is a problem loading the script.
      */
-    public void reload(Context cx, Scriptable scope) throws IOException;
+    public void evaluate(Context cx, Scriptable scope) throws IOException;
 
     
     /**

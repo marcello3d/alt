@@ -11,16 +11,16 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import cello.alt.server.RhinoServer;
+import cello.alt.server.RhinoServlet;
 
 public class SharedScriptableObject extends ImporterTopLevel {
 
     /** For Eclipse warning */
     private static final long serialVersionUID = 3328680909322034652L;
     
-    private RhinoServer server;
+    private RhinoServlet server;
 
-    public SharedScriptableObject(RhinoServer server) {
+    public SharedScriptableObject(RhinoServlet server) {
         this.server = server;
         Context cx = Context.enter();
         cx.initStandardObjects(this,true);
@@ -46,8 +46,8 @@ public class SharedScriptableObject extends ImporterTopLevel {
             cascadeReload = true;
 
         // Require the script
-        RhinoServer.getServer(cx).requireScript(cx, funObj.getParentScope(), scriptName, cascadeReload);
-        return null;
+        RhinoServlet.getServer(cx).requireScript(cx, funObj.getParentScope(), scriptName, cascadeReload);
+        return false;
     }
     public void classpath(String path) throws IOException {
         server.addClassPath(path);

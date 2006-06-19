@@ -10,8 +10,6 @@ import java.io.IOException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
-import cello.alt.server.RhinoServer;
-
 public class FileScript extends AbstractScript {
     private File file;
     private long lastModified = 0;
@@ -20,34 +18,14 @@ public class FileScript extends AbstractScript {
             throw new IOException("Cannot read "+file);
         this.file = file;
     }
-    public boolean load(Context cx, Scriptable scope) throws IOException {
-        // If file has not been modified, check dependencies.
-        //  If any of the dependencies require this file to be reloaded, 
-        //  checkDependencies will return true.
-        if (!isModified())
-            if (!checkDependencies(cx,scope))
-                return false;
-        
-        reload(cx, scope);
-        return true;
-    }
-    public void reload(Context cx, Scriptable scope) throws IOException {
-        // Set current script
-        Script previousScript = RhinoServer.setCurrentScript(cx,this);
-        
-        resetDependencies();
-        
+    protected void doevaluate(Context cx, Scriptable scope) throws IOException {
         // update last modified
         lastModified = file.lastModified();
         
         // Load file
-        cx.evaluateReader(scope,new FileReader(file),file.getPath(),1,null);
-        
-        // Restore previous current script
-        RhinoServer.setCurrentScript(cx,previousScript);
-
-        // Reload child classes
-        //reloadChildren(cx, scope);
+        FileReader reader = new FileReader(file);
+        cx.evaluateReader(scope,reader,file.getPath(),1,null);
+        reader.close();
     }
     public boolean isModified() {
         return lastModified != file.lastModified();
