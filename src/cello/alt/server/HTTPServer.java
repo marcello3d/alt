@@ -6,7 +6,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
 
-public class Main {
+public class HTTPServer {
 
     /**
      * @param args
