@@ -2,6 +2,9 @@
 <classpath>
 	<classpathentry path="src" kind="src"/>
 	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
-	<classpathentry path="/rhinocvs" combineaccessrules="false" kind="src"/>
+	<classpathentry sourcepath="/rhinocvs" path="lib/rhino.jar" kind="lib"/>
+	<classpathentry sourcepath="C:/java/jetty-5.1.11RC0/src" path="lib/org.mortbay.jetty.jar" kind="lib"/>
+	<classpathentry path="lib/commons-logging.jar" kind="lib"/>
+	<classpathentry path="lib/javax.servlet.jar" kind="lib"/>
 	<classpathentry path="bin" kind="output"/>
 </classpath>
