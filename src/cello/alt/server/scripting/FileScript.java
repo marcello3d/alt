@@ -21,33 +21,27 @@ public class FileScript extends AbstractScript {
         this.file = file;
     }
     public boolean load(Context cx, Scriptable scope) throws IOException {
-
-        System.out.println("Checking "+this+"...");
-        // If file has not been modified, check parents, if none of them 
-        //  updated, then return false.
+        // If file has not been modified, check dependencies.
+        //  If any of the dependencies require this file to be reloaded, 
+        //  checkDependencies will return true.
         if (!isModified())
-            if (!checkParents(cx,scope))
+            if (!checkDependencies(cx,scope))
                 return false;
         
         reload(cx, scope);
         return true;
     }
     public void reload(Context cx, Scriptable scope) throws IOException {
-        System.out.println("Loading "+this+"...");
         // Set current script
         Script previousScript = RhinoServer.setCurrentScript(cx,this);
         
-        // Clear previous requires (so we can remove children if necessary) 
-        resetParents();
+        resetDependencies();
         
         // update last modified
         lastModified = file.lastModified();
         
         // Load file
         cx.evaluateReader(scope,new FileReader(file),file.getPath(),1,null);
-        
-        // Unhook orphaned parents
-        synchronizeParents();
         
         // Restore previous current script
         RhinoServer.setCurrentScript(cx,previousScript);

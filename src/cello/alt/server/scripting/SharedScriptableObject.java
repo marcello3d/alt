@@ -41,12 +41,12 @@ public class SharedScriptableObject extends ImporterTopLevel {
         // Read arguments
         if (args.length==0) return false;
         String scriptName = (String)args[0];
-        boolean extend = false;
+        boolean cascadeReload = false;
         if (args.length>=2 && args[1].equals(Boolean.TRUE))
-            extend = true;
+            cascadeReload = true;
 
         // Require the script
-        RhinoServer.getServer(cx).requireScript(cx, funObj.getParentScope(), scriptName, extend);
+        RhinoServer.getServer(cx).requireScript(cx, funObj.getParentScope(), scriptName, cascadeReload);
         return null;
     }
     public void classpath(String path) throws IOException {

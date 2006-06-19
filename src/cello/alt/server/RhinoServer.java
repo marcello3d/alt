@@ -73,7 +73,7 @@ public class RhinoServer {
             cx.putThreadLocal("currentScript",script);
         return oldScript;
     }
-    public void requireScript(Context cx, Scriptable scope, String scriptName, boolean extend) throws IOException {
+    public void requireScript(Context cx, Scriptable scope, String scriptName, boolean cascadeReload) throws IOException {
         Script s = null;
         // Check if we've loaded this file already
         if (scripts.containsKey(scriptName)) {
@@ -96,14 +96,11 @@ public class RhinoServer {
         // Get the current script (the one that called require())
         Script currentScript = getCurrentScript(cx);
         
-        // If we are extending and the current script is not already a child
-        //  of the required script, then add the current script as a child, 
-        //  and add the required script as a parent of the current script. 
-        if (currentScript!=null) {
-            s.addChild(currentScript);
-            currentScript.addParent(s);
-        }
-        // Finally, load the required file (if necessary)
+        // Add the dependency (if there is a currentScript) 
+        if (currentScript!=null)
+            currentScript.addDependency(s, cascadeReload);
+        
+        // Load the required file
         s.load(cx, scope);
     }
     
