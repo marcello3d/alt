@@ -4,7 +4,6 @@ Built-By: Marcello Bastea-Forte
 Extension-Name: rhinoservlet
 Specification-Vendor: Cellosoft
 Implementation-Vendor: Cellosoft
-Implementation-Title: RhinoServlet Launcher
+Implementation-Title: RhinoServlet
 Implementation-Version: 0.01 alpha
-Main-Class: cello.alt.launcher.Launcher
 
