@@ -22,7 +22,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.SimpleAttributeSet;
@@ -136,8 +135,6 @@ public class ServerGUI extends JFrame {
     private PipedInputStream piErr;
     private PipedOutputStream poOut;
     private PipedOutputStream poErr;
-    private String lastColor = null;
-    private Object colorMutex = new Object();
 
     class ReaderThread extends Thread {
         private PipedInputStream pi;

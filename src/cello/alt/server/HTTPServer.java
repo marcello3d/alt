@@ -19,7 +19,7 @@ public class HTTPServer {
         ServletHandler handler=new ServletHandler();
 
         server.setHandler(handler);
-        ServletHolder holder = handler.addServletWithMapping("cello.alt.server.RhinoServlet", "/");
+        ServletHolder holder = handler.addServletWithMapping("cello.alt.servlet.RhinoServlet", "/");
         holder.setInitParameter("scriptpath", scriptpath);
         
         server.start();
@@ -32,7 +32,7 @@ public class HTTPServer {
     public static void main(String[] args) {
         try {
             String flag = null;
-            String scriptpath = ".";
+            String scriptpath = "javascript/";
             int port = 4500;
             boolean gui = true;
             for (String arg : args)
