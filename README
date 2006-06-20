@@ -1,5 +1,9 @@
 --------------------------------------------------------------------------------
+
 RhinoServlet for the Alt Framework
+
+by Marcello Bastea-Forte
+
 --------------------------------------------------------------------------------
 
 Website: http://marcello.cellosoft.com/projects/alt/
@@ -13,9 +17,116 @@ applications.
 The primary purpose is a basis for the the Alt Framework, but it is not limited
 to this.
 
+A jetty6-based (http://jetty.mortbay.org/jetty6/) wrapper is used to run the
+HTTP server.
+
+--------------------------------------------------------------------------------
+
+Let's jump in!
+
+Double click altlauncher.jar (or execute java -jar altlauncher.jar) to open the 
+ GUI, click the "Start Server" button.
+
+Point your web browser to http://localhost:4500/ and enjoy!
+
+You can open up the javascript/Main.js file in your favorite text editor, any
+ changes you make to the file will automatically be applied the next time you
+ refresh http://localhost:4500/ in your browser.
+ 
+That's it!
+
+--------------------------------------------------------------------------------
+
 The RhinoServlet is made up of several components:
 
-cello.alt.server.RhinoServlet
+	cello.alt.servlet.RhinoServlet
+		This is a the main HttpServlet used to serve up HTTP pages
+
+	cello.alt.server.HTTPServer
+		This uses Jetty to run a HTTP server with RhinoServlet on the root
+		It has command line options and an optional GUI.
+		
+	cello.alt.launcher.Launcher
+		This provides an automatic Jar Classloader for the HTTPServer, it is
+		used by altlauncher.jar to allow you to start the server by 
+		double-clicking on OSs that support it. (java -jar altlauncher.jar)
+		
+
+--------------------------------------------------------------------------------
+
+RhinoServlet is a standard HttpServlet, and essentially provides all the glue
+for writing a JavaScript-based Servlet.
+
+It looks for a Main.js file in the scriptpath (defaults to the javascript/ 
+directory with HTTPServer) and loads that file.
+
+After that file is loaded (and any of its dependencies), it looks for a 
+javascript function:
+
+    function handle(request, response) {
+      ...					
+    }
+
+and executes it with the HttpServletRequest and HttpServletResponse objects from
+the Java Servlet engine.
+
+Because HTTPServer uses Jetty to power its servlet engine, I recommend reading
+its documentation on these two objects:
+
+  http://jetty.mortbay.org/jetty6/servlet-api-2.5/javax/servlet/http/HttpServletRequest.html
+  http://jetty.mortbay.org/jetty6/servlet-api-2.5/javax/servlet/http/HttpServletResponse.html
+
+It should be noted that Rhino can access all and any Java class/method, it even
+can do some extra tricks, you can read about it here:
+
+  http://www.mozilla.org/rhino/ScriptingJava.html
 
 
+--------------------------------------------------------------------------------
 
+JavaScript notes:
+
+The RhinoServlet implements two methods at the moment:
+
+  require(scriptname, cascadeDependency)
+
+    Creates a dependency on the current file.  That is, if Main.js requires
+    "module.Test", RhinoServlet will look for a Test.js in a module/ directory
+    in the script path.  Then, every time Main.js is used, it will first check
+    if module/Test.js has been updated before continuing.
+    
+    If cascadeDependency is true, then every time the dependency is reloaded,
+    the depender will also reload, even if it has not changed.  This is 
+    necessary if you intend to extend classes.
+
+  
+  scriptpath(pathname)
+  
+    Adds a script path to the list of script paths.  This can be a folder or
+    a .jar/.zip file.
+
+
+RhinoServlet implements a form of dynamic scope.  This means that separate 
+requests will have their own scope that prototypes the shared scope.  You can 
+read more about Rhino's dynamic scope features here:
+
+  http://www.mozilla.org/rhino/scopes.html
+
+--------------------------------------------------------------------------------
+
+
+History:
+
+Version 0.01 alpha (2007.06.19):
+  - initial featureset
+
+--------------------------------------------------------------------------------
+
+Contact:
+
+  marcello@cellosoft.com
+  
+  http://marcello.cellosoft.com/
+  
+--------------------------------------------------------------------------------
+  

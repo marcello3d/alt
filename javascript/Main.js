@@ -20,7 +20,7 @@ function handle(req, resp) {
 	println("r="+r++);
 	println("session = "+session);
 	println("date = "+new Date());
-	for (var i=0; i<10; i++) {
+	for (var i=0; i<20; i++) {
 		println("hey hey! "+i);
 		o.flush();
 	}
