@@ -18,7 +18,6 @@ function handle(req, resp) {
 	o.println("<html>");
 	o.println("<body>");
 	println("r="+r++);
-	println("o="+o);
 	println("session = "+session);
 	println("date = "+new Date());
 	for (var i=0; i<10; i++) {
