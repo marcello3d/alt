@@ -35,6 +35,8 @@ public class RhinoServlet extends HttpServlet {
     private List<ScriptPath> scriptpaths;
    
     private SharedScriptableObject sharedScope;
+    
+    public static final String VERSION = "RhinoServlet v0.01 alpha";
 
     /**
      * Constructs a new RhinoServer
@@ -177,7 +179,7 @@ public class RhinoServlet extends HttpServlet {
         
         // Load the required file
         try {
-            s.load(cx, scope);
+            s.update(cx, scope);
         } catch (IOException ex) {
             // Perhaps file was removed?  Try reloading...
             scripts.remove(scriptName);

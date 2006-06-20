@@ -26,8 +26,8 @@ public abstract class AbstractScript implements Script {
      * @returns true if the script was actually reloaded
      * @throws IOException  if there was an error loading
      */
-    public boolean load(Context cx, Scriptable scope) throws IOException {
-        System.out.println("load : "+this);
+    public boolean update(Context cx, Scriptable scope) throws IOException {
+        System.out.println("update : "+this);
         // If file has not been modified, check dependencies.
         //  If any of the dependencies require this file to be reloaded, 
         //  checkDependencies will return true.
@@ -87,11 +87,11 @@ public abstract class AbstractScript implements Script {
             throws IOException {
         // Check the regular dependencies
         for (Script s : dependencies)
-            s.load(cx, scope);
+            s.update(cx, scope);
         // Check cascading dependencies
         boolean loadedSomething = false;
         for (Script s : cascadeDependencies)
-            if (s.load(cx, scope))
+            if (s.update(cx, scope))
                 loadedSomething = true;
         return loadedSomething;
     }
