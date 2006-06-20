@@ -1,0 +1,21 @@
+--------------------------------------------------------------------------------
+RhinoServlet for the Alt Framework
+--------------------------------------------------------------------------------
+
+Website: http://marcello.cellosoft.com/projects/alt/
+
+--------------------------------------------------------------------------------
+
+The RhinoServlet is a Rhino-based (http://www.mozilla.org/rhino/) servlet
+intended to create a solid platform for developing JavaScript-based web
+applications.
+
+The primary purpose is a basis for the the Alt Framework, but it is not limited
+to this.
+
+The RhinoServlet is made up of several components:
+
+cello.alt.server.RhinoServlet
+
+
+
