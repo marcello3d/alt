@@ -127,6 +127,7 @@ public class GlobalScope extends ImporterTopLevel {
                     new String[] {  "require",
                                     "evaluate", 
                                     "addScriptPath",
+                                    "getResource",
                                     "log"},
                                     RhinoClass.class,
                                     RhinoServlet.PROTECTED);
@@ -230,6 +231,40 @@ public class GlobalScope extends ImporterTopLevel {
             
             return false;
         }
+        
+
+        /**
+         * JavaScript function "getResource".  In order to access the current 
+         *  JavaScript scope and Context, this static form needs to be used.
+         * <ul>
+         *  <li>getResource(resourcename)</li>
+         * </ul> 
+         * @param cx  javascript Context
+         * @param thisObj  javascript "this" object
+         * @param args  the arguments passed to the function
+         * @param funObj  the function object associated with this method
+         * @return  the return value of the JavaScript function
+         * @see ScriptableObject#defineFunctionProperties(String[], Class, int)
+         */
+        public static Object getResource(Context cx, Scriptable thisObj, 
+                Object[] args, Function funObj) {
+
+            // Read arguments
+            String resourceName = (String)args[0];
+            
+            // Get the current script (the one that called require())
+            JavaScript currentScript = RhinoServlet.getCurrentScript(cx);
+
+            // This should only be null if this method is called from outside of
+            // a JavaScript evaluate() method
+            if (currentScript == null)
+                throw new RuntimeException("Current script is undefined!");
+            
+            // Get its loader and then the resource
+            ScriptLoader loader = currentScript.getScriptLoader();
+            
+            return loader.getResource(resourceName);
+        }        
         /**
          * The JavaScript function "addScriptPath" has two formats:
          * <ul>
