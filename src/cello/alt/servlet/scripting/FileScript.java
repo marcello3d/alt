@@ -52,10 +52,12 @@ public class FileScript extends AbstractJavaScript {
         
         // Compile file
         FileReader reader = new FileReader(file);
-        Script script = cx.compileReader(reader, file.getPath(),1,null);
-        reader.close();
+        try {
+            return cx.compileReader(reader, file.getPath(),1,null);
+        } finally {
+            reader.close();
+        }
         
-        return script;
     }
     /**
      * Returns whether or not this file has been modified.

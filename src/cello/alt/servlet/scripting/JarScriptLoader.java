@@ -150,11 +150,12 @@ public class JarScriptLoader extends ScriptLoader {
             lastModified = JarScriptLoader.this.lastModified;
             
             // evaluate
-            InputStream is = zipFile.getInputStream(zipFile.getEntry(path));
-            Script script = cx.compileReader(new InputStreamReader(is),file.getPath()+"!"+path,1,null);
-            closeZip();
-            
-            return script;
+            try {
+                InputStream is = zipFile.getInputStream(zipFile.getEntry(path));
+                return cx.compileReader(new InputStreamReader(is),file.getPath()+"!"+path,1,null);
+            } finally {
+                closeZip();
+            }
         }
 
         /**
