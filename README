@@ -22,6 +22,10 @@ HTTP server.
 
 --------------------------------------------------------------------------------
 
+Please Note!  RhinoServlet requires Java 1.5.0 (aka Java 5.0).
+
+--------------------------------------------------------------------------------
+
 Let's jump in!
 
 Double click altlauncher.jar (or execute java -jar altlauncher.jar) to open the 
@@ -117,8 +121,19 @@ read more about Rhino's dynamic scope features here:
 
 History:
 
-Version 0.01 alpha (2007.06.19):
+Version 0.02 alpha (2006.06.22):
+  - reworked module system from scratch
+  - added module scope for execution
+  - got rid of "handle" method
+  - added Rhino static class with:
+    - require method
+    - evaluate method
+    - addScriptPath method
+
+Version 0.01 alpha (2006.06.19):
   - initial featureset
+  
+  
 
 --------------------------------------------------------------------------------
 
