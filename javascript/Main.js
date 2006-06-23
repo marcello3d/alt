@@ -1,31 +1,58 @@
-java.lang.System.out.println("inside Main.js...");
-
-require("module.Test");
-
-
-var r = 0;
+require("test.*");
+require("test.test2.*");
 
 
-var o = null;
-function println(s) {
+Rhino.log("inside Main.js...");
+
+
+var o = response.writer;
+
+if (!global.r) global.r = 0;
+
+function writeln(s) {
 	o.println(s+"<br>");
 }
 
-function handle(req, resp) {
-	o = resp.writer;
-	var session = req.session;
-	resp.contentType = "text/html; charset=UTF-8";
-	o.println("<html>");
-	o.println("<body>");
-	println("r="+r++);
-	println("session = "+session);
-	println("date = "+new Date());
-	for (var i=0; i<20; i++) {
-		println("hey hey! "+i);
-		o.flush();
-	}
-	o.println("</body>");
-	o.println("</html>");
-	java.lang.System.out.println("OK..........done handling!");
+var balance1 = 100;
+var balance2 = 100;
+
+var session = request.session;
+
+response.contentType = "text/html; charset=UTF-8";
+response.status = response.SC_OK;
+o.println("<html>");
+o.println("<body>");
+
+o.println("<pre>"+request+"</pre>");
+
+writeln(request.getRequestURI());
+
+var sleep = java.lang.Thread.sleep;
+
+var b1 = balance1 - 50;
+sleep(100);
+var b2 = balance2 + 50;
+sleep(100);
+balance1 = b1;
+sleep(100);
+balance2 = b2;
+
+writeln("balance1 = "+balance1);
+writeln("balance2 = "+balance2);
+
+test.foo(this);
+test.test2.foo(this);
+
+writeln("r="+global.r++);
+writeln("session = "+session);
+writeln("date = "+new Date());
+for (var i=0; i<10; i++) {
+	writeln("hey hey! "+i);
+	java.lang.Thread.sleep(100);
+	o.flush();
 }
+o.println("</body>");
+o.println("</html>");
+
+Rhino.log("OK..........done handling!");
 
