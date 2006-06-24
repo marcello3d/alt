@@ -10,6 +10,7 @@ import java.util.Map;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -50,7 +51,16 @@ public class GlobalScope extends ImporterTopLevel {
         defineProperty("require", rhinoClass.get("require",rhinoClass),
                 RhinoServlet.PROTECTED);
     }
-    
+    /**
+     * Converts wrapped Java objects to their native object. 
+     * @param o 
+     * @return the potentially unwrapped object, or the object itself
+     */
+    public static Object getJavaObject(Object o) {
+        if (o instanceof NativeJavaObject)
+            return ((NativeJavaObject)o).unwrap();
+        return o;
+    }
 
     /**
      * Each module has its own scope from which its scripts are executed. This
@@ -163,7 +173,7 @@ public class GlobalScope extends ImporterTopLevel {
                 IOException {
 
             // Read arguments
-            String scriptName = (String)args[0];
+            String scriptName = (String)getJavaObject(args[0]);
             
             boolean cascade = false;
             if (args.length>=2)
@@ -210,10 +220,10 @@ public class GlobalScope extends ImporterTopLevel {
 
             // Read arguments
             if (args.length==0) return false;
-            String scriptName = (String)args[0];
+            String scriptName = (String)getJavaObject(args[0]);
             
             // Get scope
-            Scriptable scope = thisObj;
+            Scriptable scope = funObj.getPrototype();
             if (args.length>=2 && args[1] instanceof Scriptable)
                 scope = (Scriptable)args[1];
 

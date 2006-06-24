@@ -54,7 +54,8 @@ public class RhinoServlet extends HttpServlet {
      * Constructs a new RhinoServer
      */
     public RhinoServlet() {
-        ContextFactory.initGlobal(new DynamicFactory());
+        if (!ContextFactory.hasExplicitGlobal())
+            ContextFactory.initGlobal(new DynamicFactory());
         globalScope = new GlobalScope(this);
     }
     

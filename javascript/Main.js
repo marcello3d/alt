@@ -1,3 +1,7 @@
+
+
+
+
 require("test.*");
 require("test.test2.*");
 
@@ -19,11 +23,23 @@ var balance2 = 100;
 var session = request.session;
 
 response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_OK;
+response.status = (response.SC_OK);
 o.println("<html>");
 o.println("<body>");
 
 o.println("<pre>"+request+"</pre>");
+
+
+
+var url = ""+request.requestURI.substring(1).replace('/','.').replace('.js','');
+try {
+	Rhino.evaluate(url);
+	writeln("success?");
+} catch (ex) {
+	writeln("failure?" + ex);
+    //writeln("error:"+ex.toString());
+}
+
 
 writeln(request.getRequestURI());
 
@@ -55,4 +71,5 @@ o.println("</body>");
 o.println("</html>");
 
 Rhino.log("OK..........done handling!");
+
 
