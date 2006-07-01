@@ -15,6 +15,8 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.tools.debugger.Main;
+import org.mozilla.javascript.tools.debugger.ScopeProvider;
 
 import cello.alt.servlet.scripting.DirectoryScriptLoader;
 import cello.alt.servlet.scripting.DynamicFactory;
@@ -31,7 +33,7 @@ import cello.alt.servlet.scripting.ScriptLoader;
  *
  */
 
-public class RhinoServlet extends HttpServlet {
+public class RhinoServlet extends HttpServlet implements ScopeProvider {
     
     private static final long serialVersionUID = 2280866936332806360L;
     private ScriptLoader loader = null;
@@ -39,7 +41,7 @@ public class RhinoServlet extends HttpServlet {
     private GlobalScope globalScope;
     
     /** Version string */
-    public static final String VERSION = "RhinoServlet v0.02 alpha";
+    public static final String NAME_VERSION = "RhinoServlet v0.02 alpha";
     
     private String entryPoint = "Main";
     /** 
@@ -59,6 +61,21 @@ public class RhinoServlet extends HttpServlet {
         globalScope = new GlobalScope(this);
     }
     
+
+    /**
+     * @see org.mozilla.javascript.tools.debugger.ScopeProvider#getScope()
+     */
+    public Scriptable getScope() {
+        return globalScope;
+    }
+
+    /**
+     * Initializes the rhino debugger
+     *
+     */
+    public void startDebugger() {
+        Main.mainEmbedded(ContextFactory.getGlobal(),this,"RhinoServlet");
+    }
 
     /**
      * Initialize this RhinoServlet.
@@ -183,7 +200,7 @@ public class RhinoServlet extends HttpServlet {
                 ex.printStackTrace(out);
             }
             out.println("</pre></blockquote>");
-            out.println(" <p><address>Powered by Alt Framework</address></p>");
+            out.println(" <p><address>"+NAME_VERSION+"</address></p>");
             out.println(" </body>");
             out.println("</html>");
         } catch (IOException ex2) {
@@ -226,8 +243,9 @@ public class RhinoServlet extends HttpServlet {
     @Override
     public void service(HttpServletRequest request, 
             HttpServletResponse response) {
+        long startTime = System.nanoTime();
         Context cx = Context.enter();
-        //cx.setOptimizationLevel(-1);
+        cx.setOptimizationLevel(-1);
         cx.putThreadLocal("rhinoServer",RhinoServlet.this);
         try {
 
@@ -249,6 +267,8 @@ public class RhinoServlet extends HttpServlet {
         } finally {
             Context.exit();
         }
+        long time = System.nanoTime() - startTime;
+        System.out.println("handled in "+(time*1e-9)+"sec");
     }
 
 

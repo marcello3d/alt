@@ -5,6 +5,7 @@ package cello.alt.servlet.scripting;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -52,7 +53,7 @@ public class DirectoryScript implements JavaScript {
      * @return true if something was loaded
      */
     public boolean update(Context cx, GlobalScope global)  {
-        if (!isModified()) 
+        if (fileCount>0 && !AbstractJavaScript.AUTO_UPDATES || !isModified()) 
             return false;
         // update last modified
         lastModified = directory.lastModified();
@@ -80,7 +81,14 @@ public class DirectoryScript implements JavaScript {
         }
         return somethingLoaded;
     }
-    
+
+    /**
+     * @see cello.alt.servlet.scripting.JavaScript#getReader()
+     */
+    public Reader getReader() {
+        return null;
+    }
+
 
     /**
      * Checks if the directory has been modified (files added/removed).

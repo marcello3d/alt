@@ -2,8 +2,8 @@ package cello.alt.servlet.scripting;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -151,11 +151,16 @@ public class JarScriptLoader extends ScriptLoader {
             
             // evaluate
             try {
-                InputStream is = zipFile.getInputStream(zipFile.getEntry(path));
-                return cx.compileReader(new InputStreamReader(is),file.getPath()+"!"+path,1,null);
+                return cx.compileReader(getReader(),file.getPath()+"!"+path,1,null);
             } finally {
                 closeZip();
             }
+        }
+        /**
+         * @see cello.alt.servlet.scripting.JavaScript#getReader()
+         */
+        public Reader getReader() throws IOException {
+            return new InputStreamReader(zipFile.getInputStream(zipFile.getEntry(path)));
         }
 
         /**

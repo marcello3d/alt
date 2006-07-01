@@ -5,8 +5,9 @@
 require("test.*");
 require("test.test2.*");
 
+//Rhino.debug();
 
-Rhino.log("inside Main.js...");
+//Rhino.log("inside Main.js...");
 
 
 var o = response.writer;
@@ -29,7 +30,7 @@ o.println("<body>");
 
 o.println("<pre>"+request+"</pre>");
 
-
+/*
 
 var url = ""+request.requestURI.substring(1).replace('/','.').replace('.js','');
 try {
@@ -40,21 +41,21 @@ try {
     //writeln("error:"+ex.toString());
 }
 
+*/
+var sleep = java.lang.Thread.sleep;
+if (!global.lock) global.lock = {};
+if (!global.blah) global.blah = 0;
+Rhino.synchronize(lock, function() { 
+	writeln("blah="+global.blah); 
+	o.flush();
+	global.blah += 50;
+	writeln("blah="+global.blah);
+	o.flush();
+	//sleep(4000);
+	writeln("blah="+global.blah);
+});
 
 writeln(request.getRequestURI());
-
-var sleep = java.lang.Thread.sleep;
-
-var b1 = balance1 - 50;
-sleep(100);
-var b2 = balance2 + 50;
-sleep(100);
-balance1 = b1;
-sleep(100);
-balance2 = b2;
-
-writeln("balance1 = "+balance1);
-writeln("balance2 = "+balance2);
 
 test.foo(this);
 test.test2.foo(this);
@@ -64,12 +65,12 @@ writeln("session = "+session);
 writeln("date = "+new Date());
 for (var i=0; i<10; i++) {
 	writeln("hey hey! "+i);
-	java.lang.Thread.sleep(100);
+	//java.lang.Thread.sleep(100);
 	o.flush();
 }
 o.println("</body>");
 o.println("</html>");
 
-Rhino.log("OK..........done handling!");
+//Rhino.log("OK..........done handling!");
 
 

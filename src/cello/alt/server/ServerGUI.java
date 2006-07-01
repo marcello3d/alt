@@ -58,7 +58,7 @@ public class ServerGUI extends JFrame {
      * 
      * @param port default port
      * @param scriptpath  default scriptpath
-     * @param entryPoint TODO
+     * @param entryPoint the entry point javascript file
      */
     public ServerGUI(int port, String scriptpath, String entryPoint) {
         super(HTTPServer.VERSION);

@@ -138,6 +138,8 @@ public class GlobalScope extends ImporterTopLevel {
                                     "evaluate", 
                                     "addScriptPath",
                                     "getResource",
+                                    "synchronize",
+                                    "debug",
                                     "log"},
                                     RhinoClass.class,
                                     RhinoServlet.PROTECTED);
@@ -293,6 +295,9 @@ public class GlobalScope extends ImporterTopLevel {
                 throw new IOException("Invalid ScriptLoader "+path);
         }
         
+        public void debug() {
+            server.startDebugger();
+        }
         /**
          * The JavaScript function "log"
          * @param msg
@@ -300,6 +305,26 @@ public class GlobalScope extends ImporterTopLevel {
         public void log(Object msg) {
             System.out.println("Rhino.log: "+msg.toString());
         }
+        
+        /**
+         * The JavaScript function "log"
+         * @param cx 
+         * @param thisObj 
+         * @param args 
+         * @param funObj 
+         * @return the lock object
+         */
+        public static Object synchronize(Context cx, Scriptable thisObj, 
+                Object[] args, Function funObj) {
+            Object lock = args[0];
+            Function func = (Function)args[1];
+            synchronized (lock) {
+                func.call(cx, func.getParentScope(), thisObj, new Object[]{cx,lock,func,funObj,thisObj});
+            }
+            return lock;
+            //System.out.println("Rhino.synchronize: "+msg.toString()+" "+msg.getClass().getName());
+        }
+
 
     }
     

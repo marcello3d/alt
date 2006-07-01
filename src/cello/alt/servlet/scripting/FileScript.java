@@ -6,6 +6,7 @@ package cello.alt.servlet.scripting;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
@@ -51,13 +52,20 @@ public class FileScript extends AbstractJavaScript {
         lastModified = file.lastModified();
         
         // Compile file
-        FileReader reader = new FileReader(file);
+        Reader reader = getReader();
         try {
             return cx.compileReader(reader, file.getPath(),1,null);
         } finally {
             reader.close();
         }
         
+    }
+    
+    /**
+     * @see cello.alt.servlet.scripting.JavaScript#getReader()
+     */
+    public Reader getReader() throws IOException {
+        return new FileReader(file);
     }
     /**
      * Returns whether or not this file has been modified.

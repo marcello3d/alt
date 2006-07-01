@@ -28,6 +28,11 @@ public abstract class AbstractJavaScript implements JavaScript {
     private String scriptName;
     
     /**
+     * Defines whether files are automatically checked for updates
+     */
+    public static boolean AUTO_UPDATES = true;
+    
+    /**
      * Initializes the script
      * @param scriptName the name of the script
      * @param scriptLoader  the loader that loaded the script
@@ -46,7 +51,7 @@ public abstract class AbstractJavaScript implements JavaScript {
      * @throws IOException  if there was an error loading
      */
     public boolean update(Context cx, GlobalScope global) throws IOException {
-        System.out.println("update : "+this);
+        //System.out.println("update : "+this);
         // If file has not been modified, check dependencies.
         //  If any of the dependencies require this file to be reloaded, 
         //  checkDependencies will return true.
@@ -67,7 +72,7 @@ public abstract class AbstractJavaScript implements JavaScript {
      * @throws IOException  if there was an error loading
      */
     public Object evaluate(Context cx, Scriptable scope) throws IOException {
-        System.out.println("evaluate : "+this);
+        //System.out.println("evaluate : "+this);
         // Set current script
         JavaScript previousScript = RhinoServlet.setCurrentScript(cx,this);
         
@@ -75,7 +80,7 @@ public abstract class AbstractJavaScript implements JavaScript {
         resetDependencies();
         
         // Compile file if necessary
-        if (compiledScript==null || isModified()) {
+        if (compiledScript==null || (AUTO_UPDATES && isModified())) {
             System.out.println("compile : "+this);
             compiledScript = compile(cx);
         }

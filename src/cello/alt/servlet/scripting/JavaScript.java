@@ -4,6 +4,7 @@
 package cello.alt.servlet.scripting;
 
 import java.io.IOException;
+import java.io.Reader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -31,7 +32,7 @@ public interface JavaScript {
      * Forces this script to be evaluated.
      * @param cx  The JavaScript Context
      * @param scope  The JavaScript Scope
-     * @return TODO
+     * @return the result of evaluation
      * @throws IOException if there is a problem loading the script.
      */
     public Object evaluate(Context cx, Scriptable scope) throws IOException;
@@ -45,6 +46,14 @@ public interface JavaScript {
      *  reload when the dependency does
      */
     public void addDependency(JavaScript parent, boolean cascadeReload);
+    
+    /**
+     * Gets a reader for this JavaScript (used for analyzing the source itself).
+     * 
+     * @return the reader
+     * @throws IOException  if there was an error getting the reader.
+     */
+    public Reader getReader() throws IOException;
     
     /**
      * Get the script loader associated with this script. 
