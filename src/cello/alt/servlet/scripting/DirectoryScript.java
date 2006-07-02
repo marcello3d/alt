@@ -53,7 +53,7 @@ public class DirectoryScript implements JavaScript {
      * @return true if something was loaded
      */
     public boolean update(Context cx, GlobalScope global)  {
-        if (fileCount>0 && !AbstractJavaScript.AUTO_UPDATES || !isModified()) 
+        if (fileCount>0 && (!AbstractJavaScript.AUTO_UPDATES || !isModified())) 
             return false;
         // update last modified
         lastModified = directory.lastModified();

@@ -4,6 +4,7 @@
 package cello.alt.servlet.scripting;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Wrapper;
 
 import cello.alt.servlet.RhinoServlet;
 
@@ -135,10 +137,12 @@ public class GlobalScope extends ImporterTopLevel {
             this.server = server;
             defineFunctionProperties( 
                     new String[] {  "require",
-                                    "evaluate", 
+                                    "evaluate",
+                                    "eval",
                                     "addScriptPath",
                                     "getResource",
                                     "synchronize",
+                                    "defineClass",
                                     "debug",
                                     "log"},
                                     RhinoClass.class,
@@ -175,7 +179,7 @@ public class GlobalScope extends ImporterTopLevel {
                 IOException {
 
             // Read arguments
-            String scriptName = (String)getJavaObject(args[0]);
+            String scriptName = Context.toString(args[0]);
             
             boolean cascade = false;
             if (args.length>=2)
@@ -198,7 +202,7 @@ public class GlobalScope extends ImporterTopLevel {
             // Update the dependency
             s.update(cx, (GlobalScope)cx.getThreadLocal("globalScope"));
 
-            return false;
+            return s;
         }
         /**
          * JavaScript function "evaluate".  In order to access the current 
@@ -222,10 +226,10 @@ public class GlobalScope extends ImporterTopLevel {
 
             // Read arguments
             if (args.length==0) return false;
-            String scriptName = (String)getJavaObject(args[0]);
+            String scriptName = Context.toString(args[0]);
             
             // Get scope
-            Scriptable scope = funObj.getPrototype();
+            Scriptable scope = thisObj;
             if (args.length>=2 && args[1] instanceof Scriptable)
                 scope = (Scriptable)args[1];
 
@@ -241,9 +245,44 @@ public class GlobalScope extends ImporterTopLevel {
             JavaScript s = loader.loadScript(scriptName);
             s.evaluate(cx, scope);
             
-            return false;
+            return s;
         }
-        
+        /**
+         * JavaScript function "evaluate".  In order to access the current 
+         *  JavaScript scope and Context, this static form needs to be used.
+         * <ul>
+         *  <li>evaluate(scriptname)</li>
+         *  <li>evaluate(scriptname,scope)</li>
+         * </ul> 
+         * @param cx  javascript Context
+         * @param thisObj  javascript "this" object
+         * @param args  the arguments passed to the function
+         * @param funObj  the function object associated with this method
+         * @return  the return value of the JavaScript function
+         * @see ScriptableObject#defineFunctionProperties(java.lang.String[], java.lang.Class, int) 
+         */
+        public static Object eval(Context cx, Scriptable thisObj, 
+                Object[] args, Function funObj) {
+
+            // Read arguments
+            if (args.length==0) return false;
+            String source = Context.toString(args[0]);
+            
+            // Get scope
+            Scriptable scope = thisObj;
+            if (args.length>=2 && args[1] instanceof Scriptable)
+                scope = (Scriptable)args[1];
+
+            // Get the current script (the one that called evaluate())
+            JavaScript currentScript = RhinoServlet.getCurrentScript(cx);
+            
+            // This should never be null
+            if (currentScript == null)
+                throw new RuntimeException("Current script is undefined!");
+            
+            
+            return cx.evaluateString(scope,source,currentScript.getName()+"(eval)",1,null);
+        }
 
         /**
          * JavaScript function "getResource".  In order to access the current 
@@ -262,7 +301,7 @@ public class GlobalScope extends ImporterTopLevel {
                 Object[] args, Function funObj) {
 
             // Read arguments
-            String resourceName = (String)args[0];
+            String resourceName = Context.toString(args[0]);
             
             // Get the current script (the one that called require())
             JavaScript currentScript = RhinoServlet.getCurrentScript(cx);
@@ -289,12 +328,43 @@ public class GlobalScope extends ImporterTopLevel {
         public void addScriptPath(Object path) throws IOException {
             if (path instanceof ScriptLoader)
                 server.setScriptPath((ScriptLoader)path);
-            else if (path instanceof String)
-                server.addScriptPath((String)path);
             else
-                throw new IOException("Invalid ScriptLoader "+path);
+                server.addScriptPath(Context.toString(path));
         }
-        
+        private static Class getClass(Object[] args) 
+        throws  ClassNotFoundException {
+            Object arg0 = args[0];
+            if (arg0 instanceof Wrapper) {
+                Object wrapped = ((Wrapper)arg0).unwrap();
+                if (wrapped instanceof Class)
+                    return (Class)wrapped;
+            }
+            String className = Context.toString(arg0);
+            return Class.forName(className);
+        }
+        /**
+         * Defines a class in the same style as 
+         * org.mozilla.javascript.tools.shell
+         * @see org.mozilla.javascript.tools.shell.Global#defineClass(org.mozilla.javascript.Context, org.mozilla.javascript.Scriptable, java.lang.Object[], org.mozilla.javascript.Function)
+         * @param cx
+         * @param thisObj
+         * @param args
+         * @param funObj
+         * @throws ClassNotFoundException if the class wasn't found
+         * @throws InvocationTargetException 
+         * @throws IllegalAccessException 
+         * @throws InstantiationException 
+         */
+        public static void defineClass(Context cx, Scriptable thisObj, 
+                Object[] args, Function funObj) throws ClassNotFoundException, 
+                InvocationTargetException, IllegalAccessException, 
+                InstantiationException {
+            Class clazz = getClass(args);
+            ScriptableObject.defineClass(thisObj, clazz);
+        }
+        /**
+         * Starts the Rhino debugger
+         */
         public void debug() {
             server.startDebugger();
         }
@@ -318,11 +388,12 @@ public class GlobalScope extends ImporterTopLevel {
                 Object[] args, Function funObj) {
             Object lock = args[0];
             Function func = (Function)args[1];
+            
             synchronized (lock) {
                 func.call(cx, func.getParentScope(), thisObj, new Object[]{cx,lock,func,funObj,thisObj});
             }
+            
             return lock;
-            //System.out.println("Rhino.synchronize: "+msg.toString()+" "+msg.getClass().getName());
         }
 
 
