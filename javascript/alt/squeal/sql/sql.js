@@ -5,18 +5,15 @@
  * These are required by cello.SQLSchema.sync and Delight.
  */
 
-if (typeof(cello) == "undefined") cello = {};
-
-cello['import SQLSchema.sql'] = function() {
-
-	cello.load('SQLSchema');
+Rhino.require('alt.squeal.SQLSchema', true);
+Rhino.require('alt.squeal.Table', true);
 	
 /**
  * Returns the fully qualified SQL name for this table
  * @return a SQL format of this class's name
  * @type String
  */
-cello.SQLSchema.Table.prototype.getSQLName = function() {
+alt.squeal.Table.prototype.getSQLName = function() {
 	var sqlname = this.name.replace(reg,'_');
 	var node = this.parent;
 	var reg = /[^a-z_]/i;
@@ -37,12 +34,12 @@ cello.SQLSchema.Table.prototype.getSQLName = function() {
  * @param {String} msg		the message associated with this exception
  * @param {String} query	the query that caused this exception
  */
-cello.SQLSchema.SQLException = function(msg,query) {
+SQLException = function(msg,query) {
 	this.msg = msg;
 	this.query = query;
 }
-cello.SQLSchema.SQLException.prototype = new cello.SQLSchema.Exception();
-cello.SQLSchema.SQLException.prototype.toString = function() {
+SQLException.prototype = new cello.SQLSchema.Exception();
+SQLException.prototype.toString = function() {
 	return "[cello.SQLSchema.SQLException: "+this.msg+" (query: "+this.query+")]";
 }
 
@@ -146,5 +143,3 @@ cello.SQLSchema.sql.getLastId = function(conn, error_ok, log) {
 	var row = result.fetch();
 	return row.id;
 }
-
-}// import

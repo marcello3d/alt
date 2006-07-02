@@ -6,7 +6,15 @@
  * various SQueaL modules.
  */
  
-Rhino.require("alt.squeal.Node");
+Rhino.require('alt.squeal.Exception');
+Rhino.require('alt.squeal.Node');
+Rhino.require('alt.squeal.Database');
+Rhino.require('alt.squeal.Table');
+Rhino.require('alt.squeal.Type');
+Rhino.require('alt.squeal.View');
+Rhino.require('alt.squeal.Link');
+Rhino.require('alt.squeal.Field');
+Rhino.require('alt.squeal.ID');
 
 /**
  * Creates a new SQueaL object based on a cello.SimpleXML source.
@@ -308,95 +316,3 @@ SQLSchema.prototype.validate = function(node) {
 			this.validate(node.tables[x]);
 }
 
-/**
- * Finds a type relative to this Node.
- * This may return a Table if the type is a table type, 
- * it may return a Type if the type is a regular type,
- * or it will throw an exception if the type cannot be found.
- *
- * @param {String} name 	The relative name of the type.
- * @returns		A Type or Table
- * @type Node
- * @throws Exception if the type could not be found
- */
-Node.prototype.findType = function(name) {
-	if (/^sql:/.test(this.type)) return this.type;
-	if (!name) name = this.type;
-	var path = name.split('.');
-	var from = this;
-	
-	var s = "";
-	// Go "up" until we find a matching key
-	while (!((from.types && from.types[path[0]]) ||
-			 (from.tables && from.tables[path[0]]) ||
-			 (from.databases && from.databases[path[0]]))) {
-		if (s) s+=",";
-		s+=from.name;
-		from = from.parent;
-		if (from == null)
-			throw new Exception("Cannot find '"+path[0]+"' "+this+" ("+s+")");
-	}
-	
-	// Go "down" following our path
-	for (var i in path) {
-		var name = path[i];
-		if (from.databases && from.databases[name])
-			from = from.databases[name];
-		else if (from.tables && from.tables[name]) {
-			from = from.tables[name];
-		} else if (from.types && from.types[name]) {
-			return from.types[name];
-		} else
-			throw new Exception("Cannot find '"+name+"' in "+from);
-	}
-	if (from instanceof Table)
-		return from;
-		
-	if (from instanceof Database)
-		throw new Exception("Cannot use a database name as a type name.");
-	
-	throw new Exception("Cannot find '"+name+"' in "+from);
-}
-
-/**
- * Returns the database associated with a particular table
- * @returns the database associated with this table
- * @type Database
- */
-Table.prototype.getDatabase = function() {
-	var node = this;
-	while (node && !(node instanceof Database))
-		node = node.parent;
-	return node;
-}
-/**
- * Finds the Table object associated with this link.  If the table
- * cannot be found, a Exception will be thrown.
- *
- * @returns table pointed to by this Link
- * @type Table
- * @throws Exception if the table could not be found or link is invalid
- */
- 
-Link.prototype.getTable = function() {
-	var table = this.findType(this.table);
-	if (!(table instanceof Table)) 
-		throw new Exception("Cannot locate table linked by "+this+".");
-	return table;		
-}
-
-/**
- * Checks if a Link field has a loop.  A loop is defined by a series of required
- * SQL Schema link tags 
- *
- * @returns true if there is a loop, or false if there is none
- * @type boolean
- * @throws Exception if the table could not be found or link is invalid
- */
-Link.prototype.hasLoop = function(table) {
-	if (!this.required) return false;
-	if (!table) table = this;
-	if (this==table) return true;
-	var link = this.getTable();
-	return link.hasLoop(table) || link.hasLoop();
-}

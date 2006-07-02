@@ -1,4 +1,5 @@
-Rhino.require("alt.squeal.Node");
+
+Rhino.require('alt.squeal.Node', true);
 
 /**
  * Constructor for Field object.

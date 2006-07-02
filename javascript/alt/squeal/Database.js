@@ -1,3 +1,6 @@
+
+Rhino.require('alt.squeal.Node', true);
+
 /**
  * Constructor for Database object.
  * @param {String} name the name of the database

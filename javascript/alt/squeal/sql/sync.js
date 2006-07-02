@@ -9,10 +9,7 @@
  * updating the database), you do not need this module.
  */
 
-if (typeof(cello) == "undefined") cello = {};
-
-cello['import SQLSchema.sync.MySQL'] = function() {
-	
+Rhino.require('alt.squeal.sql.SQL');
 	cello.load('SQLSchema.sql');
 	
 /**

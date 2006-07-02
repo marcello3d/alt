@@ -1,5 +1,5 @@
 
-Rhino.require('alt.Exception');
+Rhino.require('alt.Exception', true);
 
 /**
  * Constructs a new cello.SQLSchema exception
@@ -8,7 +8,7 @@ Rhino.require('alt.Exception');
 Exception = function(msg) {
 	this.msg = msg;
 }
-Exception.prototype = new cello.Exception();
+Exception.prototype = new alt.Exception();
 Exception.prototype.toString = function() {
 	return "[alt.squeal.Exception: "+this.msg+"]";
 }
