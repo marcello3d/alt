@@ -8,7 +8,7 @@ Rhino.require('alt.squeal.Database');
  * @param {String} 			name	The name of the node
  * @param {Node}	parent	The parent node of this node (or null)
  */ 
-Node = function(name, parent) {
+function Node(name, parent) {
 	this.init(name,parent);
 }
 /**

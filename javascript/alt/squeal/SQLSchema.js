@@ -24,14 +24,14 @@ Rhino.require('alt.squeal.ID');
  * @requires cello.SimpleXML
  * @param {cello.SimpleXML} xml base cello.SimpleXML object to use as reference
  */
-SQLSchema = function(xml) {
+function SQLSchema(xml) {
 
 	this.parent = null;
 	
 	this.verified = false;
 	this.valid = false;
 
-	if (xml instanceof cello.SimpleXML)
+	if (xml instanceof XML)
 		this.add(xml);
 }
 

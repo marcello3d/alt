@@ -9,8 +9,14 @@
  * updating the database), you do not need this module.
  */
 
+Rhino.require('alt.squeal.SQLSchema', true);
+Rhino.require('alt.squeal.Database', true);
+Rhino.require('alt.squeal.Table', true);
+Rhino.require('alt.squeal.ID', true);
+Rhino.require('alt.squeal.Link', true);
+Rhino.require('alt.squeal.Field', true);
+Rhino.require('alt.squeal.Type', true);
 Rhino.require('alt.squeal.sql.SQL');
-	cello.load('SQLSchema.sql');
 	
 /**
  * Synchronizes a cello.SQLSchema structure with an actual database.
@@ -19,7 +25,7 @@ Rhino.require('alt.squeal.sql.SQL');
  * @throws cello.SQLSchema.SQLException  if there was an SQL exception
  */
  
-cello.SQLSchema.prototype.synchronize = function(conn,log) {
+alt.squeal.SQLSchema.prototype.synchronize = function(conn,log) {
 	var created_database = new Array();
 	
 	if (!log) log = function(){};
@@ -40,7 +46,7 @@ cello.SQLSchema.prototype.synchronize = function(conn,log) {
  * @param {function(msg)}		log		A function that takes a string parameter for logging actions (optional)
  * @throws cello.SQLSchema.SQLException  if there was an SQL exception
  */
-cello.SQLSchema.Database.prototype.synchronize = function(conn, log) {
+alt.squeal.Database.prototype.synchronize = function(conn, log) {
 	//alter("CREATE DATABASE "+database, true);
 
 	for (var name in this.tables)
@@ -53,7 +59,7 @@ cello.SQLSchema.Database.prototype.synchronize = function(conn, log) {
  * @returns the SQL type of this link
  * @type String
  */
-cello.SQLSchema.Link.prototype.getSQLType = function() {
+alt.squeal.Link.prototype.getSQLType = function() {
 	var table = this.getTable();
 	var type = table.getSQLType();
 	return type;
@@ -63,7 +69,7 @@ cello.SQLSchema.Link.prototype.getSQLType = function() {
  * @returns the SQL type of this link
  * @type String
  */
-cello.SQLSchema.ID.prototype.getSQLType = function() {
+alt.squeal.ID.prototype.getSQLType = function() {
 	var table = this.getTable();
 	var type = table.getSQLType() + " auto_increment";
 	return type;
@@ -73,7 +79,7 @@ cello.SQLSchema.ID.prototype.getSQLType = function() {
  * @returns the SQL type of this table
  * @type String
  */
-cello.SQLSchema.Table.prototype.getSQLType = function() {
+alt.squeal.Table.prototype.getSQLType = function() {
 	return this.type;
 }
 /**
@@ -81,7 +87,7 @@ cello.SQLSchema.Table.prototype.getSQLType = function() {
  * @returns the SQL type of this type
  * @type String
  */
-cello.SQLSchema.Type.prototype.getSQLType = function() {
+alt.squeal.Type.prototype.getSQLType = function() {
 	if (/^sql:/.test(this.base))
 		return this.base.substring(4);
 	return this.findType(this.base).getSQLType();
@@ -91,7 +97,7 @@ cello.SQLSchema.Type.prototype.getSQLType = function() {
  * @returns the SQL type of this field
  * @type String
  */
-cello.SQLSchema.Field.prototype.getSQLType = function() {
+alt.squeal.Field.prototype.getSQLType = function() {
 	if (/^sql:/.test(this.type))
 		return this.type.substring(4);
 	return this.findType(this.type).getSQLType();
@@ -101,7 +107,7 @@ cello.SQLSchema.Field.prototype.getSQLType = function() {
  * @returns the SQL definition of this field
  * @type String
  */
-cello.SQLSchema.Field.prototype.getSQLDefinition = function() {
+alt.squeal.Field.prototype.getSQLDefinition = function() {
 	return this.getSQLType() +
 		(this.required ? ' NOT NULL' : ' NULL') + 
 		(this.defaultValue ? ' DEFAULT "'+cello.SQLSchema.escapeString(this.defaultValue)+'"' : '');
@@ -114,7 +120,7 @@ cello.SQLSchema.Field.prototype.getSQLDefinition = function() {
  * @param {function(msg)}		log		A function that takes a string parameter for logging actions (optional)
  * @throws cello.SQLSchema.SQLException  if there was an SQL exception
  */
-cello.SQLSchema.Table.prototype.synchronize = function(conn, log) {
+alt.squeal.Table.prototype.synchronize = function(conn, log) {
 	log("Synchronizing "+this.name+" ("+this.fullname+").");
 
 	var sqlname = this.getSQLName();
@@ -288,5 +294,3 @@ cello.SQLSchema.Table.prototype.synchronize = function(conn, log) {
 		return cello.SQLSchema.sql.alter(conn,q,error_ok,log);
 	}
 }
-
-};// import

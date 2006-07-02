@@ -5,7 +5,7 @@ Rhino.require('alt.Exception', true);
  * Constructs a new cello.SQLSchema exception
  * @param {String} msg exception message
  */
-Exception = function(msg) {
+function Exception(msg) {
 	this.msg = msg;
 }
 Exception.prototype = new alt.Exception();

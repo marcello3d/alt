@@ -9,7 +9,7 @@ Rhino.require('alt.squeal.Table');
  * @param {String} name the name of the link
  * @param {Node} parent the parent node
  */
-Link = function(name, parent) {
+function Link(name, parent) {
 	this.init(name,parent);
 }
 Link.prototype = new Field();

@@ -6,7 +6,7 @@ Rhino.require('alt.squeal.Node', true);
  * @param {String} name the name of the database
  * @param {Node} parent the parent node
  */
-Database = function(name, parent) {
+function Database(name, parent) {
 	this.init(name,parent);
 }
 Database.prototype = new Node();

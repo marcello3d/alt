@@ -6,7 +6,7 @@ Rhino.require('alt.squeal.Node', true);
  * @param {String} name the name of the field
  * @param {Node} parent the parent node
  */
-Field = function(name, parent) {
+function Field(name, parent) {
 	this.init(name,parent);
 }
 Field.prototype = new Node();

@@ -7,7 +7,7 @@ Rhino.require('alt.squeal.Database');
  * @param {String} name the name of the table
  * @param {Node} parent the parent node
  */
-Table = function(name, parent) {
+function Table(name, parent) {
 	this.init(name,parent);
 }
 Table.prototype = new Node();
