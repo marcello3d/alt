@@ -2,7 +2,7 @@
 
 RhinoServlet for the Alt Framework
 
- v0.02
+ v0.03 alpha
 
 by Marcello Bastea-Forte
 
@@ -32,8 +32,8 @@ Please Note!  RhinoServlet requires Java 1.5.0 (aka Java 5.0).
 
 Let's jump in!
 
-Double click altlauncher.jar (or execute java -jar altlauncher.jar) to open the 
- GUI, click the "Start Server" button.
+Double click server.jar (or execute java -jar server.jar) to open the  GUI, 
+ click the "Start Server" button.
 
 Point your web browser to http://localhost:4500/ and enjoy!
 
@@ -250,6 +250,15 @@ The RhinoServlet implements a static class, Rhino, which contains several
   
     Logs a message to the console.  This method is "unofficial" and may be 
     removed in the future.
+    
+  Rhino.eval(string, scope)
+  
+    Alternative to default eval(), allowing code to be evaluated in a particular
+    scope.
+  
+  Rhion.defineClass(string)
+  
+    Loads a Java class as a JavaScript module.  (Currently does not work.)
 
 RhinoServlet implements dynamic scope.  This means allows modules to be defined
 in their own scope and for separate requests to each have their own scope.

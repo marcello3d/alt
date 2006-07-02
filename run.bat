@@ -1,1 +1,1 @@
-java -jar altlauncher.jar
+java -jar server.jar
