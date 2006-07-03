@@ -1,7 +1,5 @@
 
 Rhino.require('alt.squeal.Exception');
-Rhino.require('alt.squeal.Table');
-Rhino.require('alt.squeal.Database');
 
 /**
  * cello.SQLSchema node base object for various nodes found in 

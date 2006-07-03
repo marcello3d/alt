@@ -1,6 +1,6 @@
 /**
  * @fileoverview
- * File for base exception class used by {@link cello.SQLSchema} and {@link cello.Delight}
+ * File for base exception class for the Alt Framework
  */
 
 /**
@@ -26,6 +26,6 @@ Exception.prototype.getMessage = function() {
  * @type String
  */
 Exception.prototype.toString = function() {
-	return "[cello.Exception: "+this.msg+"]";
+	return "[alt.Exception: "+this.msg+"]";
 }
 

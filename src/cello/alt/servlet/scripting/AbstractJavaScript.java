@@ -50,13 +50,16 @@ public abstract class AbstractJavaScript implements JavaScript {
      * @return true if the script was actually reloaded
      * @throws IOException  if there was an error loading
      */
-    public boolean update(Context cx, GlobalScope global) throws IOException {
-        //System.out.println("update : "+this);
+    public boolean update(Context cx, GlobalScope global, Set<JavaScript> loaded) throws IOException {
+        System.out.println("update : "+this);
+        if (loaded.contains(this))
+            return false;
+        loaded.add(this);
         // If file has not been modified, check dependencies.
         //  If any of the dependencies require this file to be reloaded, 
         //  checkDependencies will return true.
         if (!isModified())
-            if (!checkDependencies(cx,global))
+            if (!checkDependencies(cx,global, loaded))
                 return false;
         
         evaluate(cx, global.getModuleScope(getName()));
@@ -140,19 +143,20 @@ public abstract class AbstractJavaScript implements JavaScript {
      * script to reload).
      * @param cx  javascript Context
      * @param global  javascript Scope
+     * @param loaded TODO
      * @return true if a cascading dependency was loaded
      * @throws IOException  if there was a problem loading something
      */
-    protected boolean checkDependencies(Context cx, GlobalScope global) 
+    protected boolean checkDependencies(Context cx, GlobalScope global, Set<JavaScript> loaded) 
             throws IOException {
         // Check the regular dependencies
         for (JavaScript s : dependencies)
-            s.update(cx, global);
+            s.update(cx, global, loaded);
         
         // Check cascading dependencies
         boolean loadedSomething = false;
         for (JavaScript s : cascadeDependencies)
-            if (s.update(cx, global))
+            if (s.update(cx, global, loaded))
                 loadedSomething = true;
         
         return loadedSomething;

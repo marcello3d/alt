@@ -5,6 +5,7 @@ package cello.alt.servlet.scripting;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Set;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -23,10 +24,11 @@ public interface JavaScript {
      *  scripts, if necessary.
      * @param cx  javascript Context
      * @param global  javascript Scope
+     * @param loaded TODO
      * @return whether the script was actually updated
      * @throws IOException if there is a problem loading the script.
      */
-    public boolean update(Context cx, GlobalScope global)  throws IOException;
+    public boolean update(Context cx, GlobalScope global, Set<JavaScript> loaded)  throws IOException;
     
     /**
      * Forces this script to be evaluated.
