@@ -17,8 +17,12 @@ import org.mortbay.jetty.servlet.ServletHolder;
  */
 public class HTTPServer {
     
-    /** The version information of the HTTPServer */
-    public static final String VERSION = "HTTPServer v0.02 alpha";
+    /** The name version information of the HTTPServer */
+    public static final String NAME = "HTTPServer";
+    /** The version number information of the HTTPServer */
+    public static final String VERSION = "v0.03 alpha";
+    /** The combined version information of the HTTPServer */
+    public static final String NAME_VERSION = NAME+" "+VERSION;
     
     /**
      * Starts a new Jetty6 server and adds the RhinoServlet to the default path.

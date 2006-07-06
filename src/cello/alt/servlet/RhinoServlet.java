@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.debugger.Main;
@@ -41,7 +41,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     private GlobalScope globalScope;
     
     /** Version string */
-    public static final String NAME_VERSION = "RhinoServlet v0.02 alpha";
+    public static final String NAME_VERSION = "RhinoServlet v0.03 alpha";
     
     private String entryPoint = "Main";
     /** 
@@ -190,15 +190,14 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             out.println("<html>");
             out.println(" <head><title>Execution Error: 500</title></head>");
             out.println(" <body>");
-            out.println("  <h2>Execution Error: "+ex.getClass().getSimpleName()+"</h2>");
+            out.println("  <h2>Uncaught "+ex.getClass().getSimpleName()+"</h2>");
+            if (ex instanceof JavaScriptException) {
+                JavaScriptException jse = (JavaScriptException)ex;
+                out.println("  <p>JavaScript Exception: "+Context.toString(jse.getValue())+"</p>");
+            }
             out.println("  <p>Stack trace:</p>");
             out.print("  <blockquote><pre>");
-            if (ex instanceof RhinoException) {
-                RhinoException rex = (RhinoException)ex;
-                rex.printStackTrace(out);
-            } else {
-                ex.printStackTrace(out);
-            }
+            ex.printStackTrace(out);
             out.println("</pre></blockquote>");
             out.println(" <p><address>"+NAME_VERSION+"</address></p>");
             out.println(" </body>");

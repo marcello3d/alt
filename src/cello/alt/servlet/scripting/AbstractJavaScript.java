@@ -47,11 +47,12 @@ public abstract class AbstractJavaScript implements JavaScript {
      * 
      * @param cx  javascript Context 
      * @param global  javascript Scope
+     * @param loaded 
      * @return true if the script was actually reloaded
      * @throws IOException  if there was an error loading
      */
     public boolean update(Context cx, GlobalScope global, Set<JavaScript> loaded) throws IOException {
-        System.out.println("update : "+this);
+        //System.out.println("update : "+this);
         if (loaded.contains(this))
             return false;
         loaded.add(this);

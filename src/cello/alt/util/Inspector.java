@@ -2,15 +2,25 @@ package cello.alt.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PushbackReader;
 import java.io.Reader;
-import java.io.StringReader;
 
 import cello.alt.servlet.scripting.JavaScript;
 
+/**
+ * Scans a JavaScript file and finds methods and stuff.  Grossly incomplete.
+ * Probably should use some rhino internals, but I have not found any good 
+ * methods for doing such. 
+ * @author Marcello
+ *
+ */
 public class Inspector {
 
     private JavaScript script;
+    /**
+     * Constructs a new Inspector object and parses the script
+     * @param script
+     * @throws IOException
+     */
     public Inspector(JavaScript script) throws IOException {
         this.script = script;
         parse();
@@ -48,14 +58,13 @@ public class Inspector {
     }
     private void parseComment(Reader r, String comment) {
         System.out.println("Parse comment [");
-        BufferedReader br = new BufferedReader(new StringReader(comment));
+        //BufferedReader br = new BufferedReader(new StringReader(comment));
         for (String line : comment.split("\\s*\\n\\s*(\\*\\s*)?"))
             if (line.length()>0) {
                 System.out.println("line = "+line);
             }
         System.out.println("]");
     }
-    
     
 
 }

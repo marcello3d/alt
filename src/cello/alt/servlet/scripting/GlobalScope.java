@@ -40,7 +40,7 @@ public class GlobalScope extends ImporterTopLevel {
      */
     public GlobalScope(RhinoServlet server) {
         Context cx = Context.enter();
-        cx.initStandardObjects(this,true);
+        cx.initStandardObjects(this,false);
         Context.exit();
         
         moduleScopes = new HashMap<String,Scriptable>();

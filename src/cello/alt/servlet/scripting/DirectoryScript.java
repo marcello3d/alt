@@ -51,6 +51,7 @@ public class DirectoryScript implements JavaScript {
      *  checkDependencies method to actually load them.
      * @param cx javascript Context
      * @param global  the global Object
+     * @param loaded 
      * @return true if something was loaded
      */
     public boolean update(Context cx, GlobalScope global, Set<JavaScript> loaded)  {
