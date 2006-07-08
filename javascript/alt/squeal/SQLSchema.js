@@ -25,7 +25,7 @@ Rhino.require('alt.squeal.ID');
  * @param {cello.SimpleXML} xml base cello.SimpleXML object to use as reference
  */
 function SQLSchema(xml) {
-
+ 
 	this.parent = null;
 	
 	this.verified = false;
@@ -41,7 +41,7 @@ function SQLSchema(xml) {
  * @type String
  */
 SQLSchema.prototype.toString = function() {
-	return "[cello.SQLSchema]";
+	return "[alt.squeal.SQLSchema]";
 }
 
 
@@ -64,109 +64,106 @@ SQLSchema.prototype.isValid = function() {
 SQLSchema.prototype.add = function(xml) {		
 	this.verified = false;
 	
-	if (!(xml instanceof cello.SimpleXML))
-		throw new Exception("add only takes cello.SimpleXML type");
+	if (!(xml instanceof XML))
+		throw new Exception("XML type");
 
-	if (xml.tag != 'schema')
+	if (!xml.schema)
 		throw new Exception("Invalid XML (must have schema tag)");
 	
 	var schema = this;
 	
-	this.databases = new Array();
+	this.databases = {};
 	
-	for (var i in xml.children) {
-		var child = xml.children[i];
-		switch (child.tag) {
+	for each (var child in xml.children())
+		switch (child.name().toString()) {
 			case 'types':
-				for (var x in child.children)
-					handleType(this, child.children[x]);
+				for each (var type in child.children())
+					handleType(this, type);
 				break;
 			case 'database':
-				var db = child.attributes.name;
+				var db = child.@name;
 
 				if (!this.databases[db])
 					this.databases[db] = new Database(db, this);
 					
 					
-				for (var x in child.children) 
-					switch (child.children[x].tag) {
+				for each (var grandchild in child.children()) 
+					switch (grandchild.name().toString()) {
 						case 'table':
-							handleTable(this.databases[db], child.children[x]);
+							handleTable(this.databases[db], grandchild);
 							break;
 						case 'type':
-							handleType(this.databases[db], child.children[x]);
+							handleType(this.databases[db], grandchild);
 							break;
 						default:
-							throw new Exception("Expected (table|type), got '"+table.name+"'.");
+							throw new Exception("Expected (table|type), got '"+grandchild.name()+"'.");
 					}
 				break;
 			case 'table':
 				handleTable(this, child);
 				break;
 			default:
-				throw new Exception("Unknown tag '"+child.name+"'.");
+				throw new Exception("Unknown tag '"+child.name()+"'.");
 		}
-	}
 
 	/**
 	 * Handles a cello.SimpleXML "type" node
 	 * @param {Node}	parent	The node this type belongs to.
-	 * @param {cello.SimpleXML}		xml		The cello.SimpleXML node for the type.
+	 * @param {XML}		xml		The XML node for the type.
 	 * @throws Exception if there was an error in the type
 	 */
 	function handleType(parent, xml) {
-		if (xml.tag != 'type')
-			throw new Exception("Expected type, got '"+type.name+"'.");
+		if (xml.name() != 'type')
+			throw new Exception("Expected type, got '"+type.name()+"'.");
 			
-		addType(parent, xml.attributes['name'], xml.attributes);
+		addType(parent, xml);
 	}
 	
 	/**
 	 * Adds a type to the schema.
 	 * @param {Node}	parent	The node this type belongs to.
-	 * @param {cello.SimpleXML}		xml		The cello.SimpleXML node for the type.
+	 * @param {XML}		xml		The XML node for the type.
 	 * @throws Exception if there was an error in the type
 	 */
-	function addType(parent, name, attributes) {
-		var type = new Type(name, parent);
+	function addType(parent, xml) {
+		var type = new Type(xml.@name, parent);
 		
-		type.base			= attributes['base'];
-		type.defaultValue	= attributes['default'];
-		type.valid			= attributes['valid'];
+		type.base			= xml.@base;
+		type.defaultValue	= xml.@['default'];
+		type.valid			= xml.@valid;
 
-		if (!parent.types) 
-			parent.types = new Array();
-		parent.types[name] = type;
+		if (!parent.types) parent.types = {};
+		parent.types[xml.@name] = type;
 	}
 	
 	/**
 	 * Handles a cello.SimpleXML table tag, adding it and its children to the schema.
 	 * @param {Node}	parent	The node this table belongs to.
-	 * @param {cello.SimpleXML}			xml		The cello.SimpleXML node for the table.
+	 * @param {XML}		xml		The XML node for the table.
 	 * @throws Exception if there was an error in the table
 	 */
 	function handleTable(parent, xml) {
 		
 		// Get name
-		var name = xml.attributes['name'];
+		var name = xml.@name;
 		
 		var type = 'sql:int';
 		
 		// Initialize table information
 		var table = new Table(name, parent);
-		table.type = xml.attributes['type'] ? xml.attributes['type'] : 'int';
-		table.encoding = xml.attributes['encoding'];
+		table.type = xml.@type.length > 0 ? xml.@type : 'int';
+		table.encoding = xml.@encoding;
 		table.fields = new Array();
 		table.parent = parent;
 		
 		// Store in tree
-		if (!parent.tables) parent.tables = new Array();
+		if (!parent.tables) parent.tables = {};
 		parent.tables[name] = table;
 		
 		
 		// Unique tables map directly to their parent table and 
 		// do not have their own auto_increment id
-		var unique = xml.attributes['unique'] == 'true';
+		var unique = xml.@unique == 'true';
 		
 		
 		// Non-unique tables need an id to distinguish entries
@@ -185,28 +182,25 @@ SQLSchema.prototype.add = function(xml) {
 		
 		// Tables with the parent attribute allow remote linking 
 		// to other tables. (This is kinda weird.)
-		if (xml.attributes['parent']) {
-			var parentName = xml.attributes['parent'];
+		if (xml.@parent.length > 0) {
+			Rhino.log("xml.@parent = ["+xml.@parent+"]")
 			// This may change in the future to calculate the field name
 			// with better respect to namespace.
 			addLink(table,
-					 parentName+'.id',
-					 { table: parent, index: (unique ? 'primary' : 'true')},
-					 true);
+					<link name={xml.@parent+'.id'} table={parent} index={unique ? 'primary' : 'true'} />,
+					true);
 		}
 		
 		// Create link to parent table (if there is one)
 		if (parent instanceof Table) {
 			addLink(table,
-					 'parent.id', 
-					 { table: parent.name, index: (unique ? 'primary' : 'true')}, 
+					 <link name="parent.id" table={parent.name} index={unique ? 'primary' : 'true'} />, 
 					 true);
 		}
 		
 		// Look at children.  All sorts going on here!
-		for (var i in xml.children) { 
-			var field = xml.children[i];
-			switch (field.tag) {
+		for each (var field in xml.children())
+			switch (field.name().toString()) {
 				case 'table':
 					handleTable(table, field);
 					break;
@@ -214,19 +208,18 @@ SQLSchema.prototype.add = function(xml) {
 					handleType(table, field);
 					break;
 				case 'link':
-					addLink(table, field.attributes['name'], field.attributes, false);
+					addLink(table, field, false);
 					break;
 				case 'field':
-					addField(table, field.attributes['name'], field.attributes, false);
+					addField(table, field, false);
 					break;
 				case 'view':
 					// TODO: handle views 
 					break;
 				default:
-					throw new Exception("Expected (table|type|link|field), got '"+field.name+"'.");
+					throw new Exception("Expected (table|type|link|field), got '"+field.name()+"'.");
 					break;
 			}
-		}
 	}
 	/**
 	 * Translates an index name into a valid name.
@@ -249,36 +242,34 @@ SQLSchema.prototype.add = function(xml) {
 	/**
 	 * Adds a field to the table
 	 * @param {Table} table the table object
-	 * @param {String} name the name of the field
-	 * @param {Map} attributes the attributes of this field
+	 * @param {XML} xml   the xml node for the field
 	 * @param {boolean} hidden whether or not this field is "hidden"
 	 */
-	function addField(table, name, attributes, hidden) {
-		var field = new Field(name, table);
+	function addField(table, xml, hidden) {
+		var field = new Field(xml.@name, table);
 		
-		field.type =			attributes['type'];
+		field.type =			xml.@type;
 		field.hidden =			hidden;
-		field.required =		attributes['required']=='true';
-		field.defaultValue =	attributes['default'];
-		field.index =			getIndex(attributes['index']);
-		field.extra =			attributes['extra'];
+		field.required =		xml.@required=='true';
+		field.defaultValue =	xml.@['default'];
+		field.index =			getIndex(xml.@index);
+		field.extra =			xml.@extra;
 		
 		table.fields.push(field);
 	}
 	/**
 	 * Adds a link field to the table
 	 * @param {Table} table the table object
-	 * @param {String} name the name of the field
-	 * @param {Map} attributes the attributes of this field
+	 * @param {XML} xml   the xml node for the field
 	 * @param {boolean} hidden whether or not this field is "hidden"
 	 */
-	function addLink(table, name, attributes, hidden) {
-		var link = new Link(name, table);
+	function addLink(table, xml, hidden) {
+		var link = new Link(xml.@name, table);
 		
-		link.type = 			attributes['table'];
+		link.type = 			xml.@table;
 		link.hidden = 			hidden;
-		link.required =			attributes['required']=='true';
-		link.index =			getIndex(attributes['index']);
+		link.required =			xml.@required=='true';
+		link.index =			getIndex(xml.@index);
 		
 		table.fields.push(link);
 	}

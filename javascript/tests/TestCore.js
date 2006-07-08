@@ -44,16 +44,30 @@ TestCore.prototype.assertRun = function(code) {
 	}
 }
 TestCore.prototype.assertEquals = function(code, correctResult) {
-	if (correctResult == null)
-		correctResult = true;
 	this.tests ++;
 	try {
 		var result = Rhino.eval(code,this.scope);
-		if (result===correctResult) {
+		if (result==correctResult) {
 			this.logSuccess("O "+this.name+": Test "+this.tests+" successful : "+code+" = "+correctResult);
 			return true;
 		} else {
 			this.logFail("X "+this.name+": Test "+this.tests+" failed : "+code+" = "+result+" (should be "+correctResult+")");
+		}
+	} catch (ex) {
+		this.logFail("X "+this.name+": Test "+this.tests+" failed : "+code+" exception thrown:"+ex);
+	}
+	this.failures ++;
+	return false;
+}
+TestCore.prototype.assertNotEquals = function(code, incorrectResult) {
+	this.tests ++;
+	try {
+		var result = Rhino.eval(code,this.scope);
+		if (result!=incorrectResult) {
+			this.logSuccess("O "+this.name+": Test "+this.tests+" successful : "+code+" = "+result+" (should not be "+incorrectResult+")");
+			return true;
+		} else {
+			this.logFail("X "+this.name+": Test "+this.tests+" failed : "+code+" = "+result+" (should not be!)");
 		}
 	} catch (ex) {
 		this.logFail("X "+this.name+": Test "+this.tests+" failed : "+code+" exception thrown:"+ex);
