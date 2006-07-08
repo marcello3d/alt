@@ -48,13 +48,12 @@ public class ScriptableWrapper extends ScriptableObject {
 	public static void init(Scriptable scope) {
 
         System.out.println("ScriptableWrapper.init("+scope+")");
-        Method[] methods = ScriptableWrapper.class.getDeclaredMethods();
         ScriptableWrapper proto = new ScriptableWrapper();
         proto.setPrototype(getObjectPrototype(scope));
         Member ctorMember = null;
-        for (int i=0; i<methods.length; i++)
-            if ("jsConstructor".equals(methods[i].getName())) {
-                ctorMember = methods[i];
+        for (Method m : ScriptableWrapper.class.getDeclaredMethods())
+            if ("jsConstructor".equals(m.getName())) {
+                ctorMember = m;
                 break;
             }
         FunctionObject ctor = new FunctionObject("ScriptableWrapper", ctorMember, scope);

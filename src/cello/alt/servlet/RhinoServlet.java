@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.debugger.Main;
@@ -256,8 +257,11 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             
             cx.putThreadLocal("globalScope", globalScope);
             // Define thread-local variables
-            threadScope.defineProperty("request", request, PROTECTED);
-            threadScope.defineProperty("response", response, PROTECTED);
+            Scriptable jsRequest = new NativeJavaObject(threadScope, request, HttpServletRequest.class);
+            Scriptable jsResponse = new NativeJavaObject(threadScope, response, HttpServletResponse.class);
+            System.out.println("response.class = "+response.getClass());
+            threadScope.defineProperty("request", jsRequest, PROTECTED);
+            threadScope.defineProperty("response", jsResponse, PROTECTED);
             
             // Evaluate the script in this scope
             s.evaluate(cx, threadScope);

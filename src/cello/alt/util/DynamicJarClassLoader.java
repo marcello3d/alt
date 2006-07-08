@@ -79,10 +79,8 @@ public class DynamicJarClassLoader extends URLClassLoader {
      */
     private boolean checkFolder() {
         boolean addedSomething = false;
-        for (File base : this.bases) {
-            File[] libs = base.listFiles();
-            
-            for (File f : libs) 
+        for (File base : this.bases)
+            for (File f : base.listFiles()) 
                 if (!seenFiles.contains(f))
                     try {
                         seenFiles.add(f);
@@ -95,7 +93,6 @@ public class DynamicJarClassLoader extends URLClassLoader {
                         // continue
                         System.err.println("cannot add "+f+":"+ex);
                     }
-        }
         return addedSomething;
     }
 }

@@ -9,6 +9,7 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=alt/src&lt;cello.alt.util.scripting"/>
+        <javaElement handleIdentifier="=alt/src&lt;cello.alt.util{ScriptableWrapper.java"/>
+        <javaElement handleIdentifier="=alt/src&lt;cello.alt.util{Inspector.java"/>
     </selectedElements>
 </jardesc>
