@@ -63,6 +63,14 @@ public interface JavaScript {
      */
     public ScriptLoader getScriptLoader();
     
+    
+    /**
+     * Returns the last evaluation time for this script
+     * @return  the time in ms
+     * @see System#currentTimeMillis() 
+     */
+    public long getEvaluationTime();
+    
     /**
      * Returns the script's full name in module.Script format.
      * 

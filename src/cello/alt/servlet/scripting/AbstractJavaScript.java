@@ -56,15 +56,13 @@ public abstract class AbstractJavaScript implements JavaScript {
         if (loaded.contains(this))
             return false;
         loaded.add(this);
-        // If file has not been modified, check dependencies.
-        //  If any of the dependencies require this file to be reloaded, 
-        //  checkDependencies will return true.
-        if (!isModified())
-            if (!checkDependencies(cx,global, loaded))
-                return false;
-        
-        evaluate(cx, global.getModuleScope(getName()));
-        return true;
+        // If script has been modified, or if any of the cascading dependencies 
+        //  were modified, evaluate this script.
+        if (isModified() || checkDependencies(cx,global, loaded)) {
+            evaluate(cx, global.getModuleScope(getName()));
+            return true;
+        }
+        return false;
     }
     /**
      * Forces the script to reload (without checking dependencies).  This really
@@ -80,7 +78,7 @@ public abstract class AbstractJavaScript implements JavaScript {
         // Set current script
         JavaScript previousScript = RhinoServlet.setCurrentScript(cx,this);
         
-        // Clear any dependencies
+        // Clear any current dependencies
         resetDependencies();
         
         // Compile file if necessary
@@ -89,8 +87,12 @@ public abstract class AbstractJavaScript implements JavaScript {
             compiledScript = compile(cx);
         }
         
+        // Update modification time.
+        evaluationTime = System.currentTimeMillis();
+        
         // Evaluate the script
         Object returnValue = evaluate(cx, scope, compiledScript);
+        
         
         // Restore previous current script
         RhinoServlet.setCurrentScript(cx,previousScript);
@@ -98,6 +100,16 @@ public abstract class AbstractJavaScript implements JavaScript {
         return returnValue;
     }
     
+    
+    
+    private long evaluationTime = 0;
+    /**
+     * @see cello.alt.servlet.scripting.JavaScript#getEvaluationTime()
+     */
+    public long getEvaluationTime() {
+        return evaluationTime;
+    }
+
     /**
      * Returns whether or not the current script needs to be reloaded.
      * @return true if the script is modified
@@ -156,9 +168,11 @@ public abstract class AbstractJavaScript implements JavaScript {
         
         // Check cascading dependencies
         boolean loadedSomething = false;
-        for (JavaScript s : cascadeDependencies)
-            if (s.update(cx, global, loaded))
+        for (JavaScript s : cascadeDependencies) {
+            s.update(cx, global, loaded);
+            if (s.getEvaluationTime() >= getEvaluationTime())
                 loadedSomething = true;
+        }
         
         return loadedSomething;
     }

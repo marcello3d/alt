@@ -73,6 +73,8 @@ public class DirectoryScript implements JavaScript {
                     // Load the script and try to get a dependency
                     JavaScript s = getScriptLoader().loadScript(scriptName);
                     s.update(cx, global, loaded);
+                    if (evaluationTime < s.getEvaluationTime())
+                        evaluationTime = s.getEvaluationTime();
                 } catch (ScriptNotFoundException ex) {
                     ex.printStackTrace(System.err);
                     continue;
@@ -82,6 +84,15 @@ public class DirectoryScript implements JavaScript {
                 }
         }
         return somethingLoaded;
+    }
+
+    
+    private long evaluationTime = 0;
+    /**
+     * @see cello.alt.servlet.scripting.JavaScript#getEvaluationTime()
+     */
+    public long getEvaluationTime() {
+        return evaluationTime;
     }
 
     /**
