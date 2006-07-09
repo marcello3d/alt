@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
-import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.debugger.Main;
@@ -25,6 +23,7 @@ import cello.alt.servlet.scripting.GlobalScope;
 import cello.alt.servlet.scripting.JarScriptLoader;
 import cello.alt.servlet.scripting.JavaScript;
 import cello.alt.servlet.scripting.NamedScriptableObject;
+import cello.alt.servlet.scripting.NativeJavaInterface;
 import cello.alt.servlet.scripting.ScriptLoader;
 
 /**
@@ -77,19 +76,23 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     public void startDebugger() {
         Main.mainEmbedded(ContextFactory.getGlobal(),this,"RhinoServlet");
     }
-
+    
+    private String getInitParameter(String name, String def) {
+        String s = getServletConfig().getInitParameter(name);
+        if (s==null)
+            return def;
+        return s;
+    }
+    
     /**
      * Initialize this RhinoServlet.
-     * @param config the Servlet configuration object
      * @throws ServletException if there was a problem initializing
      */
     @Override
-    public void init(ServletConfig config) throws ServletException {
+    public void init() throws ServletException {
         try {
-            addScriptPath(config.getInitParameter("scriptpath"));
-            String s = config.getInitParameter("entryPoint");
-            if (s!=null)
-                entryPoint = s;
+            addScriptPath(getInitParameter("scriptpath","javascript/"));
+            entryPoint = getInitParameter("service","Main");
         } catch (IOException ex) {
             throw new ServletException("Error initializing",ex);
         }
@@ -257,8 +260,8 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             
             cx.putThreadLocal("globalScope", globalScope);
             // Define thread-local variables
-            Scriptable jsRequest = new NativeJavaObject(threadScope, request, HttpServletRequest.class);
-            Scriptable jsResponse = new NativeJavaObject(threadScope, response, HttpServletResponse.class);
+            Scriptable jsRequest = new NativeJavaInterface(threadScope, request, HttpServletRequest.class);
+            Scriptable jsResponse = new NativeJavaInterface(threadScope, response, HttpServletResponse.class);
             System.out.println("response.class = "+response.getClass());
             threadScope.defineProperty("request", jsRequest, PROTECTED);
             threadScope.defineProperty("response", jsResponse, PROTECTED);

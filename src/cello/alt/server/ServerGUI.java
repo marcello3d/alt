@@ -54,6 +54,7 @@ public class ServerGUI extends JFrame {
     private JTextField entryPointField;
     private JEditorPane console;
     private Server server = null;
+    private StartStopAction startStopAction = null;
     
     /**
      * Constructs a new ServerGUI
@@ -77,6 +78,7 @@ public class ServerGUI extends JFrame {
         portField = new JFormattedTextField(port);
         scriptpathField = new JTextField(scriptpath);
         entryPointField = new JTextField(entryPoint);
+        startStopAction = new StartStopAction();
         
         c.add(makeToolbar(), BorderLayout.NORTH);
         c.add(makeConsole(), BorderLayout.CENTER);
@@ -103,6 +105,13 @@ public class ServerGUI extends JFrame {
         this.pack();
 
     }
+    /**
+     * Starts the server
+     *
+     */
+    public void start() {
+        startStopAction.actionPerformed(new ActionEvent(this,0,null));
+    }
     private JComponent makeToolbar() {
         JToolBar tb = new JToolBar();
         
@@ -119,7 +128,7 @@ public class ServerGUI extends JFrame {
         label.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         tb.add(label);
         tb.add(entryPointField);
-        JButton button = new JButton(new StartStopAction());
+        JButton button = new JButton(startStopAction);
         tb.add(button);
         
         return tb;

@@ -4,7 +4,7 @@
 var session = request.getSession(true);
 
 response.contentType = "text/html; charset=UTF-8";
-response.setStatus (response.SC_OK);
+response.status = (response.SC_OK);
 
 var o = response.writer;
 o.println("<html>");

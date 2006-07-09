@@ -101,6 +101,7 @@ public class HTTPServer {
             if (gui) {
                 ServerGUI servergui = new ServerGUI(port, scriptpath, entryPoint);
                 servergui.setVisible(true);
+                servergui.start();
                 
             } else {
                 Server server = startServer(port, scriptpath, entryPoint);
