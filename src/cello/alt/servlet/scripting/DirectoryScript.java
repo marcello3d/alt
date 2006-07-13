@@ -6,7 +6,6 @@ package cello.alt.servlet.scripting;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Set;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -51,10 +50,9 @@ public class DirectoryScript implements JavaScript {
      *  checkDependencies method to actually load them.
      * @param cx javascript Context
      * @param global  the global Object
-     * @param loaded 
      * @return true if something was loaded
      */
-    public boolean update(Context cx, GlobalScope global, Set<JavaScript> loaded)  {
+    public boolean update(Context cx, GlobalScope global)  {
         if (fileCount>0 && (!AbstractJavaScript.AUTO_UPDATES || !isModified())) 
             return false;
         // update last modified
@@ -72,7 +70,7 @@ public class DirectoryScript implements JavaScript {
                                       name.substring(0, name.lastIndexOf('.'));
                     // Load the script and try to get a dependency
                     JavaScript s = getScriptLoader().loadScript(scriptName);
-                    s.update(cx, global, loaded);
+                    s.update(cx, global);
                     if (evaluationTime < s.getEvaluationTime())
                         evaluationTime = s.getEvaluationTime();
                 } catch (ScriptNotFoundException ex) {

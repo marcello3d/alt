@@ -15,19 +15,17 @@ import cello.alt.servlet.scripting.JavaScript;
  */
 public class Inspector {
 
-    private JavaScript script;
     /**
      * Constructs a new Inspector object and parses the script
-     * @param script
+     * @param reader reader
      * @throws IOException
      */
-    public Inspector(JavaScript script) throws IOException {
-        this.script = script;
-        parse();
+    public Inspector(Reader reader) throws IOException {
+        parse(reader);
     }
     
-    private void parse() throws IOException {
-        Reader r = new BufferedReader(script.getReader());
+    private void parse(Reader reader) throws IOException {
+        Reader r = new BufferedReader(reader);
         int i;
         String comment = null;
         while ((i = r.read()) > 0) {

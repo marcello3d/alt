@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import cello.alt.servlet.scripting.ScriptLoader;
+
 /**
  * Defines a default implementation for MutableResources.  getTag() is based on 
  *  URL is not necessarily efficient (involves calling 
@@ -17,18 +19,27 @@ import java.net.URLConnection;
 public class URLResource implements MutableResource {
 
     
+    private ScriptLoader loader;
     private String name;
     private URL url;
     
     /**
      * Constructs a new MutableResource object based on a resource name and a
      * URL.
-     * @param name
-     * @param url
+     * @param loader  the loader that loaded this resource
+     * @param name  the name of this resource
+     * @param url  the url of this resource
      */
-    protected URLResource(String name, URL url) {
+    public URLResource(ScriptLoader loader, String name, URL url) {
         this.name = name;
         this.url = url;
+    }
+    
+    /**
+     * @see cello.alt.servlet.Resource#getScriptLoader()
+     */
+    public ScriptLoader getScriptLoader() {
+        return loader;
     }
     
     /**

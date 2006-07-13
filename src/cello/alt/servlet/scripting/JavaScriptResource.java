@@ -1,6 +1,9 @@
 package cello.alt.servlet.scripting;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,6 +11,8 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
+import cello.alt.servlet.MutableResource;
+import cello.alt.servlet.Resource;
 import cello.alt.servlet.RhinoServlet;
 
 /**
@@ -17,15 +22,13 @@ import cello.alt.servlet.RhinoServlet;
  * 
  * @author Marcello
  */
-public abstract class AbstractJavaScript implements JavaScript {
+public class JavaScriptResource implements JavaScript,MutableResource {
 
-
+    
+    private Resource resource;
     private Set<JavaScript> dependencies = new HashSet<JavaScript>();
     private Set<JavaScript> cascadeDependencies = new HashSet<JavaScript>();
     private Script compiledScript = null;
-    
-    private ScriptLoader scriptLoader = null;
-    private String scriptName;
     
     /**
      * Defines whether files are automatically checked for updates
@@ -33,14 +36,49 @@ public abstract class AbstractJavaScript implements JavaScript {
     public static boolean AUTO_UPDATES = true;
     
     /**
-     * Initializes the script
-     * @param scriptName the name of the script
-     * @param scriptLoader  the loader that loaded the script
+     * 
+     * @param resource
      */
-    protected AbstractJavaScript(String scriptName, ScriptLoader scriptLoader) {
-        this.scriptLoader = scriptLoader;
-        this.scriptName = scriptName;
+    public JavaScriptResource(Resource resource) {
+        this.resource = resource;
     }
+    
+    
+    /**
+     * @see cello.alt.servlet.scripting.JavaScript#getName()
+     */
+    public String getName() {
+        return resource.getName();
+    }
+
+    /**
+     * @see cello.alt.servlet.Resource#getScriptLoader()
+     */
+    public ScriptLoader getScriptLoader() {
+        return resource.getScriptLoader();
+    }
+
+    /**
+     * @see cello.alt.servlet.Resource#getStream()
+     */
+    public InputStream getStream() throws IOException {
+        return resource.getStream();
+    }
+    /**
+     * @see cello.alt.servlet.Resource#getURL()
+     */
+    public URL getURL() {
+        return resource.getURL();
+    }
+    /**
+     * @see cello.alt.servlet.MutableResource#getVersionTag()
+     */
+    public Object getVersionTag() {
+        if (resource instanceof MutableResource)
+            return ((MutableResource)resource).getVersionTag();
+        return "";
+    }
+    
 
     /**
      * Loads a script if necessary.
@@ -105,12 +143,16 @@ public abstract class AbstractJavaScript implements JavaScript {
     public long getEvaluationTime() {
         return evaluationTime;
     }
+    
+    private Object versionTag = null;
 
     /**
      * Returns whether or not the current script needs to be reloaded.
      * @return true if the script is modified
      */
-    protected abstract boolean isModified();
+    protected boolean isModified() {
+        return versionTag==null || versionTag.equals(getVersionTag());
+    }
     
     /**
      * Compile and return the current script for use by evaluate().  This method
@@ -119,7 +161,10 @@ public abstract class AbstractJavaScript implements JavaScript {
      * @return the compiled script
      * @throws IOException if there was a problem compiling the script
      */
-    protected abstract Script compile(Context cx) throws IOException;
+    protected Script compile(Context cx) throws IOException {
+        return cx.compileReader(new InputStreamReader(resource.getStream()),
+                    getName(), 1, null);
+    }
     
     /**
      * Evaluates a script on a particular Context/Scope 
@@ -178,21 +223,5 @@ public abstract class AbstractJavaScript implements JavaScript {
         dependencies.clear();
         cascadeDependencies.clear();
     }
-
-    /**
-     * @see cello.alt.servlet.scripting.JavaScript#getScriptLoader()
-     */
-    public ScriptLoader getScriptLoader() {
-        return scriptLoader;
-    }
-
-    /**
-     * @see cello.alt.servlet.scripting.JavaScript#getName()
-     */
-    public String getName() {
-        return scriptName;
-    }
-    
-    
 
 }

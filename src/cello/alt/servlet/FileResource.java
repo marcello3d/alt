@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import cello.alt.servlet.scripting.ScriptLoader;
+
 /**
  * 
  * @author Marcello
@@ -17,13 +19,17 @@ public class FileResource extends URLResource {
     private File file;
     
     /**
-     * Constructs a new File resource
-     * @param name
-     * @param file
+     * Constructs a new resource from a File object.  The version tag is based
+     *  on the last modification time of the file.
+     * 
+     * @param loader the loader that loaded this resource
+     * @param name  the name of this resource
+     * @param file  the File of this resource
      * @throws MalformedURLException
      */
-    public FileResource(String name, File file) throws MalformedURLException {
-        super(name, new URL("file:"+file.getAbsolutePath()));
+    public FileResource(ScriptLoader loader, String name, File file) 
+                throws MalformedURLException {
+        super(loader, name, new URL("file:"+file.getAbsolutePath()));
         this.file = file;
     }
 
@@ -34,5 +40,15 @@ public class FileResource extends URLResource {
     public InputStream getStream() throws IOException {
         return new FileInputStream(file);
     }
+
+    /**
+     * @see cello.alt.servlet.MutableResource#getVersionTag()
+     */
+    @Override
+    public Object getVersionTag() {
+        return file.lastModified();
+    }
+    
+    
 
 }

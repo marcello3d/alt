@@ -3,10 +3,17 @@
  */
 package cello.alt.servlet.scripting;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
+
+import javax.servlet.ServletContext;
+
+import cello.alt.servlet.Resource;
 
 
 /**
@@ -82,25 +89,39 @@ public abstract class ScriptLoader {
     }
     
     /**
-     * Returns a newly loaded script.  
-     * @param name
+     * Returns a JavaScripty object from this directory based on the specified
+     *  module/script name.
+     * @param name the module/script name to load
      * @return the script
      * @throws ScriptNotFoundException if the script could not be loaded (does 
      *  not exist)
      */
-    protected abstract JavaScript findScript(String name)
-            throws ScriptNotFoundException;
+    protected JavaScript findScript(String name) throws ScriptNotFoundException {
+        try {
+            String path = getPath(name);
+            return new JavaScriptResource(getResource(path));
+        } catch (IOException ex) {
+            throw new ScriptNotFoundException("Could not load "+name, ex);
+        }
+    }
 
     /**
      * Returns the {@link URL} object associated with the named resource
      * relative to this ScriptLoader. 
      * @param name  The name of the resource to get.
      * @return  the resource
+     * @throws MalformedURLException if there was a problem loading the resource
      */
-    public URL getResource(String name) {
-        return null;
-    }
+    public abstract Resource getResource(String name) 
+            throws MalformedURLException;
 
+    /**
+     * Returns a Set of paths starting with the specified path
+     * @param path the base path
+     * @return a set of paths, or null if none is found.
+     * @see ServletContext#getResourcePaths(java.lang.String)
+     */
+    public abstract Set<String> getResourcePaths(String path);
 
     private static Pattern validName = Pattern.compile(
             "^([a-z_][a-z0-9_]*\\.)*([a-z_][a-z0-9_]*|\\*)",

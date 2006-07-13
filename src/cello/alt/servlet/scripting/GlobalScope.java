@@ -6,7 +6,6 @@ package cello.alt.servlet.scripting;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -231,7 +230,7 @@ public class GlobalScope extends ImporterTopLevel {
             // Add the dependency
             currentScript.addDependency(s, cascade);
             // Update the dependency
-            s.update(cx, (GlobalScope)cx.getThreadLocal("globalScope"), new HashSet<JavaScript>());
+            s.update(cx, (GlobalScope)cx.getThreadLocal("globalScope"));
 
             return s;
         }
