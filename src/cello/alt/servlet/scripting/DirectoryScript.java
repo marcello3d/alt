@@ -5,10 +5,11 @@ package cello.alt.servlet.scripting;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+
+import cello.alt.servlet.js.GlobalScope;
 /**
  * This class is a pseudo-script.  It pretends to be a script that requires all
  *  scripts in its module, and is used when you write require('module.*').
@@ -93,13 +94,6 @@ public class DirectoryScript implements JavaScript {
         return evaluationTime;
     }
 
-    /**
-     * @see cello.alt.servlet.scripting.JavaScript#getReader()
-     */
-    public Reader getReader() {
-        return null;
-    }
-
 
     /**
      * Checks if the directory has been modified (files added/removed).
@@ -155,9 +149,9 @@ public class DirectoryScript implements JavaScript {
     }
 
     /**
-     * @see cello.alt.servlet.scripting.JavaScript#getName()
+     * @see cello.alt.servlet.scripting.JavaScript#getPath()
      */
-    public String getName() {
+    public String getPath() {
         return moduleName;
     }
 

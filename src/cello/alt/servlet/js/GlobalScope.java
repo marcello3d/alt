@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cello.alt.servlet.scripting;
+package cello.alt.servlet.js;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -19,6 +19,10 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Wrapper;
 
 import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.resource.ResourceException;
+import cello.alt.servlet.scripting.JavaScript;
+import cello.alt.servlet.scripting.ScriptLoader;
+import cello.alt.servlet.scripting.ScriptNotFoundException;
 
 /**
  * Top-level scope object for RhinoServlet.  This defines the standard objects,
@@ -326,9 +330,10 @@ public class GlobalScope extends ImporterTopLevel {
          * @param funObj  the function object associated with this method
          * @return  the return value of the JavaScript function
          * @see ScriptableObject#defineFunctionProperties(String[], Class, int)
+         * @throws ResourceException if there was a problem getting the resource
          */
         public static Object getResource(Context cx, Scriptable thisObj, 
-                Object[] args, Function funObj) {
+                Object[] args, Function funObj) throws ResourceException {
 
             // Read arguments
             String resourceName = Context.toString(args[0]);
@@ -341,10 +346,8 @@ public class GlobalScope extends ImporterTopLevel {
             if (currentScript == null)
                 throw new RuntimeException("Current script is undefined!");
             
-            // Get its loader and then the resource
-            ScriptLoader loader = currentScript.getScriptLoader();
-            
-            return loader.getResource(resourceName);
+            // Get the resource relative to the current script
+            return currentScript.getResource(resourceName);
         }        
         /**
          * The JavaScript function "addScriptPath" has two formats:

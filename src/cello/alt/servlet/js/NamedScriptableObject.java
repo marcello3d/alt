@@ -1,4 +1,4 @@
-package cello.alt.servlet.scripting;
+package cello.alt.servlet.js;
 
 import org.mozilla.javascript.ScriptableObject;
 

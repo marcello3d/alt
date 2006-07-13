@@ -6,7 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import cello.alt.servlet.Resource;
+import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
 
 
 /**
@@ -65,10 +66,10 @@ public class MultiScriptLoader extends ScriptLoader {
     }
 
     /**
-     * @see cello.alt.servlet.scripting.ScriptLoader#getResource(java.lang.String)
+     * @see ScriptLoader#getResource(java.lang.String)
      */
     @Override
-    public Resource getResource(String path) throws MalformedURLException {
+    public Resource getResource(String path) throws ResourceException {
         for (ScriptLoader sl : loaders) 
             try {
                 return sl.getResource(path);
@@ -79,7 +80,7 @@ public class MultiScriptLoader extends ScriptLoader {
     }
 
     /**
-     * @see cello.alt.servlet.scripting.ScriptLoader#getResourcePaths(java.lang.String)
+     * @see ScriptLoader#getResourcePaths(java.lang.String)
      */
     @Override
     public Set<String> getResourcePaths(String path) {

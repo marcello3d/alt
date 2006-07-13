@@ -17,13 +17,13 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.debugger.Main;
 import org.mozilla.javascript.tools.debugger.ScopeProvider;
 
+import cello.alt.servlet.js.GlobalScope;
+import cello.alt.servlet.js.NamedScriptableObject;
+import cello.alt.servlet.js.NativeJavaInterface;
 import cello.alt.servlet.scripting.DirectoryScriptLoader;
 import cello.alt.servlet.scripting.DynamicFactory;
-import cello.alt.servlet.scripting.GlobalScope;
 import cello.alt.servlet.scripting.JarScriptLoader;
 import cello.alt.servlet.scripting.JavaScript;
-import cello.alt.servlet.scripting.NamedScriptableObject;
-import cello.alt.servlet.scripting.NativeJavaInterface;
 import cello.alt.servlet.scripting.ScriptLoader;
 
 /**

@@ -3,8 +3,6 @@
  */
 package cello.alt.servlet.scripting;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +11,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
-import cello.alt.servlet.Resource;
+import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
 
 
 /**
@@ -98,11 +97,52 @@ public abstract class ScriptLoader {
      */
     protected JavaScript findScript(String name) throws ScriptNotFoundException {
         try {
+            if (name.endsWith(".*")) {
+                return null;
+            }
             String path = getPath(name);
-            return new JavaScriptResource(getResource(path));
-        } catch (IOException ex) {
+            return new JavaScriptResource(getResource(path), name);
+        } catch (ResourceException ex) {
             throw new ScriptNotFoundException("Could not load "+name, ex);
         }
+    }
+    
+    /**
+     * Gets a resource relative to another resource.  This can be a relative 
+     *  path or an absolute path starting with /.  This method is similar to 
+     *  {@link Class#getResource(java.lang.String)}.
+     * 
+     * @param context  the resource the resource is relative to
+     * @param path  the path to this 
+     * @return  the resource object
+     * @throws ResourceException if the resource could not be loaded
+     */
+    public Resource getResource(Resource context, String path) 
+            throws ResourceException {
+        // Absolute path?
+        if (path.startsWith("/"))
+            return getResource(path);
+        
+        
+        // Strip off everything from last / to 
+        String newPath = getBaseDir(context.getPath());
+        while (path.startsWith("../")) {
+            path = path.substring(3);
+            newPath = getBaseDir(newPath);
+        }
+        // TODO: Is this good?
+        if (newPath.contains(".."))
+            throw new ResourceException("Security-error path: "+newPath);
+        
+        // Return the resource
+        return getResource(newPath);
+    }
+    
+    private String getBaseDir(String path) {
+        int i = path.lastIndexOf('/');
+        if (i<=0)
+            return "/"; 
+        return path.substring(0, i);
     }
 
     /**
@@ -110,10 +150,10 @@ public abstract class ScriptLoader {
      * relative to this ScriptLoader. 
      * @param name  The name of the resource to get.
      * @return  the resource
-     * @throws MalformedURLException if there was a problem loading the resource
+     * @throws ResourceException if there was a problem loading the resource
      */
     public abstract Resource getResource(String name) 
-            throws MalformedURLException;
+            throws ResourceException;
 
     /**
      * Returns a Set of paths starting with the specified path
@@ -122,6 +162,8 @@ public abstract class ScriptLoader {
      * @see ServletContext#getResourcePaths(java.lang.String)
      */
     public abstract Set<String> getResourcePaths(String path);
+    
+    
 
     private static Pattern validName = Pattern.compile(
             "^([a-z_][a-z0-9_]*\\.)*([a-z_][a-z0-9_]*|\\*)",

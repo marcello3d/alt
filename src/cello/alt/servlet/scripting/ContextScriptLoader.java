@@ -10,9 +10,10 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 
-import cello.alt.servlet.FileResource;
-import cello.alt.servlet.Resource;
-import cello.alt.servlet.URLResource;
+import cello.alt.servlet.resource.FileResource;
+import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
+import cello.alt.servlet.resource.URLResource;
 
 /**
  * This class provides a standard filesystem directory based ScriptLoader.  That
@@ -60,13 +61,17 @@ public class ContextScriptLoader extends ScriptLoader {
      * @see cello.alt.servlet.scripting.ScriptLoader#getResource(java.lang.String)
      */
     @Override
-    public Resource getResource(String path) throws MalformedURLException {
+    public Resource getResource(String path) throws ResourceException {
         String fullPath = basePath+path;
         String realPath = context.getRealPath(fullPath);
-        if (realPath!=null)
-            return new FileResource(this, path, new File(realPath));
-        
-        return new URLResource(this, path, context.getResource(fullPath));
+        try {
+            if (realPath!=null)
+                return new FileResource(this, path, new File(realPath));
+            
+            return new URLResource(this, path, context.getResource(fullPath));
+        } catch (MalformedURLException ex) {
+            throw new ResourceException("Error loading resource",ex);
+        }
     }
     
     /**

@@ -1,12 +1,14 @@
-package cello.alt.servlet.scripting;
+package cello.alt.servlet.resource;
+
+import cello.alt.servlet.scripting.ScriptLoader;
 
 /**
- * Exception for when a script is not found by the {@link ScriptLoader}.
+ * Exception for when a resource is not found by the {@link ScriptLoader}.
  * 
  * @author Marcello
  *
  */
-public class ScriptNotFoundException extends Exception {
+public class ResourceException extends Exception {
 
     /**
      * 
@@ -16,7 +18,7 @@ public class ScriptNotFoundException extends Exception {
     /**
      * Constructs a ResourceException with no details.
      */
-    public ScriptNotFoundException() {
+    public ResourceException() {
         super();
     }
 
@@ -24,7 +26,7 @@ public class ScriptNotFoundException extends Exception {
      * Constructs a ResourceException with a message.
      * @param message
      */
-    public ScriptNotFoundException(String message) {
+    public ResourceException(String message) {
         super(message);
     }
 
@@ -33,7 +35,7 @@ public class ScriptNotFoundException extends Exception {
      * @param message
      * @param cause
      */
-    public ScriptNotFoundException(String message, Throwable cause) {
+    public ResourceException(String message, Throwable cause) {
         super(message, cause);
     }
 }

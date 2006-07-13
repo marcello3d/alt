@@ -51,7 +51,7 @@ public class DirectoryScriptLoader extends ScriptLoader {
      *  module/script name.
      * @param name the module/script name to load
      * @return the script
-     * @throws ScriptNotFoundException 
+     * @throws ResourceException 
      */
     @Override
     public JavaScript findScript(String name) throws ScriptNotFoundException {

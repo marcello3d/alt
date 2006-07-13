@@ -1,4 +1,4 @@
-package cello.alt.servlet;
+package cello.alt.servlet.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +25,7 @@ public interface Resource {
      * Returns the name of this resource
      * @return  the resource name
      */
-    public String getName();
+    public String getPath();
 
     /**
      * Returns the URL associated with this Resource.
@@ -39,5 +39,15 @@ public interface Resource {
      * @throws IOException if there was an error opening the stream
      */
     public InputStream getStream() throws IOException;
+
+    /**
+     * Gets a resource relative to this resource.  
+     * @see ScriptLoader#getResource(Resource, String)
+     * 
+     * @param path  the path to this 
+     * @return  the resource object
+     * @throws ResourceException if the resource could not be loaded
+     */
+    public Resource getResource(String path) throws ResourceException;
     
 }

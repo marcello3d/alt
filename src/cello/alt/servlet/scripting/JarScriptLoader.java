@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
+
+import cello.alt.servlet.resource.Resource;
 
 /**
  * A ScriptLoader object that uses a compressed archive (.jar/.zip) to look for
@@ -81,7 +84,7 @@ public class JarScriptLoader extends ScriptLoader {
      * Returns a specified script from the jar/zip file.
      * @param name the name of the script
      * @return the JavaScript associated with this path
-     * @throws ScriptNotFoundException if the script does not exist or cannot be 
+     * @throws ResourceException if the script does not exist or cannot be 
      *  loaded
      */
     @Override
@@ -104,9 +107,13 @@ public class JarScriptLoader extends ScriptLoader {
      * @see cello.alt.servlet.scripting.ScriptLoader#getResource(java.lang.String)
      */
     @Override
-    public URL getResource(String name) {
-        // TODO implement JarScriptLoader.getResource
-        return null;
+    public Resource getResource(String name) throws ResourceException {
+        String path = getPath(name);
+        openZip();
+        ZipEntry ze = zipFile.getEntry(path);
+        if (ze == null)
+            throw new MalformedURLException("Cannot find ZipEntry");
+        return new JarResource(name, path);
     }
 
     /**

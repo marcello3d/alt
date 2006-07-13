@@ -1,4 +1,5 @@
-package cello.alt.servlet;
+package cello.alt.servlet.resource;
+
 
 /**
  * Mutable resources add the ability to see when a resource was last changed.

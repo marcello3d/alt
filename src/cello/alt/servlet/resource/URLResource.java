@@ -1,4 +1,4 @@
-package cello.alt.servlet;
+package cello.alt.servlet.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,27 +36,27 @@ public class URLResource implements MutableResource {
     }
     
     /**
-     * @see cello.alt.servlet.Resource#getScriptLoader()
+     * @see cello.alt.servlet.resource.Resource#getScriptLoader()
      */
     public ScriptLoader getScriptLoader() {
         return loader;
     }
     
     /**
-     * @see cello.alt.servlet.Resource#getName()
+     * @see cello.alt.servlet.resource.Resource#getPath()
      */
-    public String getName() {
+    public String getPath() {
         return name;
     }
     
     /**
-     * @see cello.alt.servlet.Resource#getURL()
+     * @see cello.alt.servlet.resource.Resource#getURL()
      */
     public URL getURL() {
         return url;
     }
     /**
-     * @see cello.alt.servlet.Resource#getStream()
+     * @see cello.alt.servlet.resource.Resource#getStream()
      */
     public InputStream getStream() throws IOException {
         return url.openConnection().getInputStream();
@@ -66,7 +66,7 @@ public class URLResource implements MutableResource {
      * This method simply calls {@link URLConnection#getLastModified()} from
      * {@link URL#openConnection()}.
      * 
-     * @see cello.alt.servlet.MutableResource#getVersionTag()
+     * @see cello.alt.servlet.resource.MutableResource#getVersionTag()
      */
     public Object getVersionTag() {
         try {            
@@ -75,5 +75,14 @@ public class URLResource implements MutableResource {
             return url; 
         }
     }
+
+    /**
+     * @see cello.alt.servlet.resource.Resource#getResource(java.lang.String)
+     */
+    public Resource getResource(String path) throws ResourceException {
+        return getScriptLoader().getResource(this,path);
+    }
+    
+    
     
 }

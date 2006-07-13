@@ -1,4 +1,4 @@
-package cello.alt.servlet;
+package cello.alt.servlet.resource;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -42,7 +42,7 @@ public class FileResource extends URLResource {
     }
 
     /**
-     * @see cello.alt.servlet.MutableResource#getVersionTag()
+     * @see cello.alt.servlet.resource.MutableResource#getVersionTag()
      */
     @Override
     public Object getVersionTag() {

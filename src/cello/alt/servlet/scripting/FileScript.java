@@ -62,12 +62,6 @@ public class FileScript extends AbstractJavaScript {
     }
     
     /**
-     * @see cello.alt.servlet.scripting.JavaScript#getReader()
-     */
-    public Reader getReader() throws IOException {
-        return new FileReader(file);
-    }
-    /**
      * Returns whether or not this file has been modified.
      * @return true if the file is modified
      * @see cello.alt.servlet.scripting.AbstractJavaScript#isModified()

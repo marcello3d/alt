@@ -11,9 +11,11 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
-import cello.alt.servlet.MutableResource;
-import cello.alt.servlet.Resource;
 import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.js.GlobalScope;
+import cello.alt.servlet.resource.MutableResource;
+import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
 
 /**
  * This AbstractJavaScript class a useful basis for creating cached JavaScript
@@ -26,6 +28,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
 
     
     private Resource resource;
+    private String scriptName;
     private Set<JavaScript> dependencies = new HashSet<JavaScript>();
     private Set<JavaScript> cascadeDependencies = new HashSet<JavaScript>();
     private Script compiledScript = null;
@@ -36,42 +39,55 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     public static boolean AUTO_UPDATES = true;
     
     /**
+     * Constructs a new JavaScriptResource from a particular Resource with a 
+     * given script name.
      * 
-     * @param resource
+     * @param resource  the resource
+     * @param scriptName  the script name
      */
-    public JavaScriptResource(Resource resource) {
+    public JavaScriptResource(Resource resource, String scriptName) {
         this.resource = resource;
+        this.scriptName = scriptName;
     }
     
     
     /**
-     * @see cello.alt.servlet.scripting.JavaScript#getName()
+     * @see Resource#getPath()
      */
-    public String getName() {
-        return resource.getName();
+    public String getPath() {
+        return resource.getPath();
     }
 
     /**
-     * @see cello.alt.servlet.Resource#getScriptLoader()
+     * @see cello.alt.servlet.resource.Resource#getScriptLoader()
      */
     public ScriptLoader getScriptLoader() {
         return resource.getScriptLoader();
     }
 
+    
     /**
-     * @see cello.alt.servlet.Resource#getStream()
+     * @see cello.alt.servlet.scripting.JavaScript#getResource(java.lang.String)
+     */
+    public Resource getResource(String path) throws ResourceException {
+        return resource.getResource(path);
+    }
+
+
+    /**
+     * @see cello.alt.servlet.resource.Resource#getStream()
      */
     public InputStream getStream() throws IOException {
         return resource.getStream();
     }
     /**
-     * @see cello.alt.servlet.Resource#getURL()
+     * @see cello.alt.servlet.resource.Resource#getURL()
      */
     public URL getURL() {
         return resource.getURL();
     }
     /**
-     * @see cello.alt.servlet.MutableResource#getVersionTag()
+     * @see cello.alt.servlet.resource.MutableResource#getVersionTag()
      */
     public Object getVersionTag() {
         if (resource instanceof MutableResource)
@@ -93,7 +109,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
         // If script has been modified, or if any of the cascading dependencies 
         //  were modified, evaluate this script.
         if (isModified() || checkDependencies(cx,global)) {
-            evaluate(cx, global.getModuleScope(getName()));
+            evaluate(cx, global.getModuleScope(getPath()));
             return true;
         }
         return false;
@@ -163,7 +179,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      */
     protected Script compile(Context cx) throws IOException {
         return cx.compileReader(new InputStreamReader(resource.getStream()),
-                    getName(), 1, null);
+                    getPath(), 1, null);
     }
     
     /**
@@ -222,6 +238,13 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     protected void resetDependencies() {
         dependencies.clear();
         cascadeDependencies.clear();
+    }
+    
+    /**
+     * @see JavaScript#getName()
+     */
+    public String getName() {
+        return scriptName;
     }
 
 }

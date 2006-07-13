@@ -8,6 +8,10 @@ import java.io.IOException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
+import cello.alt.servlet.js.GlobalScope;
+import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
+
 /**
  * Interface defining a module Script used in Rhino.  It provides methods to
  *  check for updates (update method), evaluate the script in a particular
@@ -53,6 +57,16 @@ public interface JavaScript {
      */
     public ScriptLoader getScriptLoader();
     
+    /**
+     * Gets a resource relative to this script.  This can be a relative path or
+     *  an absolute path starting with /.  This method is similar to 
+     *  {@link Class#getResource(java.lang.String)}.
+     * 
+     * @param path  the path to this 
+     * @return  the resource object
+     * @throws ResourceException if the resource could not be loaded
+     */
+    public Resource getResource(String path) throws ResourceException;
     
     /**
      * Returns the last evaluation time for this script

@@ -9,6 +9,7 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
 import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.js.GlobalScope;
 
 /**
  * This AbstractJavaScript class a useful basis for creating cached JavaScript
