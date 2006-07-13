@@ -10,6 +10,8 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 import cello.alt.servlet.js.GlobalScope;
+import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
 /**
  * This class is a pseudo-script.  It pretends to be a script that requires all
  *  scripts in its module, and is used when you write require('module.*').
@@ -149,10 +151,17 @@ public class DirectoryScript implements JavaScript {
     }
 
     /**
-     * @see cello.alt.servlet.scripting.JavaScript#getPath()
+     * @see JavaScript#getName()
      */
-    public String getPath() {
+    public String getName() {
         return moduleName;
+    }
+
+    /**
+     * @see cello.alt.servlet.scripting.JavaScript#getResource(java.lang.String)
+     */
+    public Resource getResource(String path) throws ResourceException {
+        throw new ResourceException("Cannot load resources from this object");
     }
 
     /**

@@ -2,17 +2,19 @@ package cello.alt.servlet.scripting;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Script;
-
+import cello.alt.servlet.resource.MutableResource;
 import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
+import cello.alt.servlet.resource.URLResource;
 
 /**
  * A ScriptLoader object that uses a compressed archive (.jar/.zip) to look for
@@ -64,11 +66,14 @@ public class JarScriptLoader extends ScriptLoader {
     }
     /**
      * Closes the zip file from reading (releases locks and whatnot).
-     * @throws IOException
      */
-    private void closeZip() throws IOException {
+    private void closeZip() {
         if (zipFile!=null)
-            zipFile.close();
+            try {
+                zipFile.close();
+            } catch (IOException ex) {
+                // do nothing
+            }
         zipFile = null;
     }
     
@@ -81,41 +86,51 @@ public class JarScriptLoader extends ScriptLoader {
     }
 
     /**
-     * Returns a specified script from the jar/zip file.
-     * @param name the name of the script
-     * @return the JavaScript associated with this path
-     * @throws ResourceException if the script does not exist or cannot be 
-     *  loaded
-     */
-    @Override
-    public JavaScript findScript(String name) throws ScriptNotFoundException {
-        try {
-            String path = getPath(name);
-            openZip();
-            ZipEntry ze = zipFile.getEntry(path);
-            if (ze == null)
-                throw new ScriptNotFoundException("Cannot find ZipEntry");
-            return new JarScript(name, path);
-        } catch (IOException ex) {
-            throw new ScriptNotFoundException("Cannot load script "+name, ex);
-        }
-    }
-    
-    
-
-    /**
-     * @see cello.alt.servlet.scripting.ScriptLoader#getResource(java.lang.String)
+     * @see ScriptLoader#getResource(java.lang.String)
      */
     @Override
     public Resource getResource(String name) throws ResourceException {
         String path = getPath(name);
-        openZip();
-        ZipEntry ze = zipFile.getEntry(path);
-        if (ze == null)
-            throw new MalformedURLException("Cannot find ZipEntry");
-        return new JarResource(name, path);
+        try {
+            openZip();
+            ZipEntry ze = zipFile.getEntry(path);
+            if (ze == null)
+                throw new ResourceException("Cannot find ZipEntry");
+            return new JarResource(name, path);
+        } catch (IOException ex) {
+            throw new ResourceException("Cannot open zip", ex);
+        } finally {
+            closeZip();
+        }
     }
 
+    /**
+     * @see ScriptLoader#getResourcePaths(java.lang.String)
+     */
+    @Override
+    public Set<String> getResourcePaths(String basePath) {
+        try {
+            openZip();
+        } catch (IOException ex) {
+            return null;
+        }
+        Set<String> set = new HashSet<String>();
+        
+        // Enumeration...meh
+        Enumeration e = zipFile.entries();
+        while (e.hasMoreElements()) {
+            // Get filename
+            String file = ((ZipFile)e.nextElement()).getName();
+            // If it starts with path, and is not a sub-file (that is,
+            // there are no /s after the base path)
+            if (file.startsWith(basePath) && 
+                    file.indexOf('/', basePath.length()) < 0)
+                set.add(basePath);
+        }
+        if (set.size()==0)
+            return null;
+        return set;
+    }
     /**
      * Returns a string representation of this JarScriptLoader.
      * @return the string representation
@@ -131,62 +146,43 @@ public class JarScriptLoader extends ScriptLoader {
      * @author Marcello
      *
      */
-    private class JarScript extends AbstractJavaScript {
-        private String path;
-        private long lastModified = 0;
-        
+    private class JarResource extends URLResource {
         /**
          * Constructs a new JarScript with a given path
          * @param scriptName the name of this script
          * @param path
+         * @throws MalformedURLException if there was a problem
          */
-        private JarScript(String scriptName, String path) {
-            super(scriptName, JarScriptLoader.this);
-            this.path = path;
+        private JarResource(String scriptName, String path) throws
+                MalformedURLException {
+            super(JarScriptLoader.this, path, 
+                    new URL("jar:file:"+file.getAbsolutePath()+"!"+path));
         }
         /**
-         * Evaluates the script from within the jar file.
-         * @param cx the javascript Context
-         * @return the compiled Script
-         * @throws IOException if there was an error reading the zip
+         * @see MutableResource#getVersionTag()
          */
         @Override
-        protected Script compile(Context cx) throws IOException {
-            // update last modified
-            openZip();
-            lastModified = JarScriptLoader.this.lastModified;
-            
-            // evaluate
-            try {
-                return cx.compileReader(getReader(),file.getPath()+"!"+path,1,null);
-            } finally {
-                closeZip();
-            }
+        public Object getVersionTag() {
+            return file.lastModified();
         }
         /**
-         * @see cello.alt.servlet.scripting.JavaScript#getReader()
+         * @see Resource#getStream()
          */
-        public Reader getReader() throws IOException {
-            return new InputStreamReader(zipFile.getInputStream(zipFile.getEntry(path)));
+        @Override
+        public InputStream getStream() throws IOException {
+            openZip();
+            ZipEntry ze = zipFile.getEntry(getPath());
+            return zipFile.getInputStream(ze);
         }
 
-        /**
-         * Returns whether or not this JarScript has been modified.
-         * @return true if the script is modified
-         */
-        @Override
-        protected boolean isModified() {
-            return lastModified != file.lastModified();
-        }
         /**
          * Returns a string representation of this JarScript
          * @return the string representation
          */
         @Override
         public String toString() {
-            return "JarScript["+file+"!"+path+"]";
+            return "JarScript["+file+"!"+getPath()+"]";
         }
-        
     }
 
 }

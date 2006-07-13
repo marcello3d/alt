@@ -20,18 +20,18 @@ public class URLResource implements MutableResource {
 
     
     private ScriptLoader loader;
-    private String name;
+    private String path;
     private URL url;
     
     /**
-     * Constructs a new MutableResource object based on a resource name and a
+     * Constructs a new MutableResource object based on a resource path and a
      * URL.
      * @param loader  the loader that loaded this resource
-     * @param name  the name of this resource
+     * @param path  the path to this resource
      * @param url  the url of this resource
      */
-    public URLResource(ScriptLoader loader, String name, URL url) {
-        this.name = name;
+    public URLResource(ScriptLoader loader, String path, URL url) {
+        this.path = path;
         this.url = url;
     }
     
@@ -46,7 +46,7 @@ public class URLResource implements MutableResource {
      * @see cello.alt.servlet.resource.Resource#getPath()
      */
     public String getPath() {
-        return name;
+        return path;
     }
     
     /**
@@ -82,6 +82,34 @@ public class URLResource implements MutableResource {
     public Resource getResource(String path) throws ResourceException {
         return getScriptLoader().getResource(this,path);
     }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o==null || !(o instanceof URLResource))
+            return false;
+        URLResource r = (URLResource)o;
+        return url.equals(r.url);
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return url.hashCode();
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "URLResource["+url+"]";
+    }
+    
     
     
     

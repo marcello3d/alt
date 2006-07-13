@@ -157,11 +157,11 @@ public abstract class ScriptLoader {
 
     /**
      * Returns a Set of paths starting with the specified path
-     * @param path the base path
+     * @param basePath the base path
      * @return a set of paths, or null if none is found.
      * @see ServletContext#getResourcePaths(java.lang.String)
      */
-    public abstract Set<String> getResourcePaths(String path);
+    public abstract Set<String> getResourcePaths(String basePath);
     
     
 

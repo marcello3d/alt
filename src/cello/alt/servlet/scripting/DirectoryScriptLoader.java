@@ -6,7 +6,12 @@ package cello.alt.servlet.scripting;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+
+import cello.alt.servlet.resource.FileResource;
+import cello.alt.servlet.resource.Resource;
+import cello.alt.servlet.resource.ResourceException;
 
 /**
  * This class provides a standard filesystem directory based ScriptLoader.  That
@@ -45,37 +50,34 @@ public class DirectoryScriptLoader extends ScriptLoader {
             throw new IOException(directory + " is not a directory!");
         this.directory = directory;
     }
-
+    
     /**
-     * Returns a JavaScripty object from this directory based on the specified
-     *  module/script name.
-     * @param name the module/script name to load
-     * @return the script
-     * @throws ResourceException 
+     * @see ScriptLoader#getResourcePaths(java.lang.String)
      */
     @Override
-    public JavaScript findScript(String name) throws ScriptNotFoundException {
-        try {
-            File f = new File(directory, getPath(name));
-            if (f.isDirectory())
-                return new DirectoryScript(this, getPath(name).replace('/','.'), 
-                        f);
-            return new FileScript(name, f, this);
-        } catch (IOException ex) {
-            throw new ScriptNotFoundException("Could not load "+name, ex);
+    public Set<String> getResourcePaths(String basePath) {
+        if (!basePath.endsWith("/"))
+            basePath += "/";
+        
+        Set<String> paths = new HashSet<String>();
+        
+        for (String name : new File(directory,basePath).list()) {
+            paths.add(basePath+name);
         }
+        if (paths.size()>0)
+            return paths;
+        
+        return null;
     }
-    
-    
     /**
-     * @see cello.alt.servlet.scripting.ScriptLoader#getResource(java.lang.String)
+     * @see ScriptLoader#getResource(java.lang.String)
      */
     @Override
-    public URL getResource(String name) {
+    public Resource getResource(String path) throws ResourceException {
         try {
-            return new URL("file:"+new File(directory,name).getAbsolutePath());
+            return new FileResource(this, path, new File(directory,path));
         } catch (MalformedURLException ex) {
-            return null;
+            throw new ResourceException("Cannot find resource",ex);
         }
     }
     /**

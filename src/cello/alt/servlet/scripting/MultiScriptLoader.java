@@ -1,6 +1,5 @@
 package cello.alt.servlet.scripting;
 
-import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,10 +72,10 @@ public class MultiScriptLoader extends ScriptLoader {
         for (ScriptLoader sl : loaders) 
             try {
                 return sl.getResource(path);
-            } catch (MalformedURLException ex) {
+            } catch (ResourceException ex) {
                 continue;
             }
-        throw new MalformedURLException("Could not find "+path); 
+        throw new ResourceException("Could not find "+path); 
     }
 
     /**
