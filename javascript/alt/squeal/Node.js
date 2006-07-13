@@ -7,7 +7,11 @@ Rhino.require('alt.squeal.Exception');
  * @param {Node}	parent	The parent node of this node (or null)
  */ 
 function Node(name, parent) {
-	this.init(name,parent);
+	this.name = name;
+	this.parent = parent ? parent : null;
+	this.fullname = name;
+	if (parent && parent.fullname)
+		this.fullname = parent.fullname + '.' + name;
 }
 /**
  * Returns a string representation of this node.
@@ -17,19 +21,6 @@ function Node(name, parent) {
 Node.prototype.toString = function() {
 	return "[alt.squeal.Node: "+this.name+"]";
 }
-/**
- * Initializes this node (used by subclasses)
- * @param {String} 			name	The name of the node
- * @param {Node}	parent	The parent node of this node (or null)
- */
-Node.prototype.init = function(name, parent) {
-	this.name = name;
-	this.parent = parent ? parent : null;
-	this.fullname = name;
-	if (parent && parent.fullname)
-		this.fullname = parent.fullname + '.' + name;
-}
-
 
 /**
  * Finds a type relative to this Node.

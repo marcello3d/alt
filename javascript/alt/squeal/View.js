@@ -7,7 +7,7 @@ Rhino.require("alt.squeal.Node");
  * @param {Node} parent the parent node
  */
 function View(name, parent) {
-	this.init(name,parent);
+	Node.call(this,name,parent);
 }
 View.prototype = new Node();
 View.prototype.toString = function() {

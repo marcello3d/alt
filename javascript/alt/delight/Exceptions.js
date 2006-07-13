@@ -9,7 +9,7 @@ Rhino.require('alt.Exception');
  * @constructor
  * @param {String}	msg		exception message
  */
-Exception = function(msg) {
+function Exception(msg) {
 	this.msg = msg;
 }
 Exception.prototype = new alt.Exception();
@@ -25,7 +25,7 @@ Exception.prototype.toString = function() {
  * @param {String}	msg		exception message
  * @param {String}	field	the field name that failed
  */
-ValidationException = function(msg,field) {
+function ValidationException(msg,field) {
 	this.msg = msg;
 	this.field = field;
 }
@@ -48,7 +48,7 @@ ValidationException.prototype.toString = function() {
  * @constructor
  * @param {String}	msg		exception message
  */
-AddException = function(msg) {
+function AddException(msg) {
 	this.msg = msg;
 }
 AddException.prototype = new Exception();
@@ -66,7 +66,7 @@ AddException.prototype.toString = function() {
  * @param {String}	field	the field name
  * @param {Object}	value	the value 
  */
-SetException = function(msg,field,value) {
+function SetException(msg,field,value) {
 	this.msg = msg;
 	this.field = field;
 	this.value = value;
@@ -83,7 +83,7 @@ SetException.prototype.toString = function() {
  * @param {String}	msg		exception message
  * @param {String}	field	the field name
  */
-GetException = function(msg,field) {
+function GetException(msg,field) {
 	this.msg = msg;
 	this.field = field;
 }
@@ -99,7 +99,7 @@ GetException.prototype.toString = function() {
  * @param {String}				msg		exception message
  * @param {Table}	table	the table
  */
-InnerTableException = function(msg,table) {
+function InnerTableException(msg,table) {
 	this.msg = msg;
 	this.table = table;
 }

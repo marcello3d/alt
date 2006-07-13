@@ -7,7 +7,7 @@ Rhino.require('alt.squeal.Link', true);
  * @param {Node} parent the parent node
  */
 function ID(name, parent) {
-	this.init(name,parent);
+	Link.call(this,name,parent);
 }
 ID.prototype = new Link();
 ID.prototype.toString = function() {

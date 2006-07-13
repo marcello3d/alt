@@ -5,7 +5,7 @@
  * Default view class for   
  * @constructor
  */
-View = function() {
+function View() {
 }
 /**
  * Returns a string representation of this class

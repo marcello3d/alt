@@ -71,6 +71,30 @@ tests.Tester.test(this,
 	writeln, writeColorln('green'), writeColorln('red')
 	);
 
+
+
+
+var d = new Date();
+var o2 = {};
+o2[d] = 2;
+
+
+//Rhino.require('alt.util.Inspector');
+//var ins = new alt.util.Inspector(global);
+//o.println(ins.toHTML());
+
+
+
+
+
+
+
+
+
+
+
+
+
 Rhino.require('alt.squeal.SQLSchema');
 Rhino.require('alt.squeal.sql.SQL');
 Rhino.require('alt.squeal.sql.Synchronize');
@@ -169,6 +193,13 @@ var xml =
 var sql = new alt.squeal.SQLSchema();
 
 sql.add(xml);
+
+Rhino.require('alt.delight.Delight');
+
+java.lang.Class.forName("com.mysql.jdbc.Driver");
+var db = java.sql.DriverManager.getConnection("jdbc:mysql://localhost/", "root", "");
+var delight = new alt.delight.Delight(sql, db);
+
 
 o.print('<span class="squeal">' + sql.toHTML() + '</span>');
 

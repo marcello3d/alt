@@ -7,7 +7,7 @@
  * @param {String} 				name		Database name
  * @param {cello.SQLSchema.Database}	schemadb	a cello.SQLSchema database
  */
-Database = function(conn, name, schemadb) {
+function Database(conn, name, schemadb) {
 	this.name = name;
 	for (var table in schemadb.tables)
 		this[table] = new Table(conn, this,table,schemadb.tables[table]);

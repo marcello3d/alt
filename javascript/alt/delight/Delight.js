@@ -4,7 +4,8 @@
  * {@link cello.Delight} can be constructed using a {@link cello.SQLSchema} object.
  */
 
-Rhino.require('alt.squeal.SQLSchema.sql');
+Rhino.require('alt.squeal.SQLSchema');
+Rhino.require('alt.squeal.sql.SQL');
 
 Rhino.require('alt.delight.Exceptions');
 

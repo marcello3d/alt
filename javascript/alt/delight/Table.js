@@ -15,7 +15,7 @@ Rhino.require('alt.delight.Results');
  * @param {String}					name 		Table name
  * @param {cello.SQLSchema.Table}	table 		a cello.SQLSchema table
  */
-Table = function(conn, parent, name, table) {
+function Table(conn, parent, name, table) {
 	this.conn = conn;
 	this.name = name;
 	this.fullname = table.fullname;
@@ -60,7 +60,7 @@ Table = function(conn, parent, name, table) {
 	 * @param row copy another row's contents (optional) 
 	 */
 	this.Row = function(row) {
-		this.init(delightTable);
+		Row.call(this,delightTable);
 		if (row) this.set(row);
 		this._sw = new alt.util.ScriptableWrapper(this,"get","set");
 		return this._sw;

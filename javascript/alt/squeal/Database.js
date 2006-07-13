@@ -7,7 +7,8 @@ Rhino.require('alt.squeal.Node', true);
  * @param {Node} parent the parent node
  */
 function Database(name, parent) {
-	this.init(name,parent);
+	// super constructor
+	Node.call(this,name,parent);
 }
 Database.prototype = new Node();
 Database.prototype.toString = function() {

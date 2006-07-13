@@ -56,9 +56,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
      * Constructs a new RhinoServer
      */
     public RhinoServlet() {
-        if (!ContextFactory.hasExplicitGlobal())
-            ContextFactory.initGlobal(new DynamicFactory());
-        globalScope = new GlobalScope(this);
+        // Do nothing
     }
     
 
@@ -92,10 +90,16 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     public void init() throws ServletException {
         try {
             addScriptPath(getInitParameter("scriptpath","javascript/"));
-            entryPoint = getInitParameter("service","Main");
         } catch (IOException ex) {
             throw new ServletException("Error initializing",ex);
         }
+
+        entryPoint = getInitParameter("service","Main");
+
+        if (!ContextFactory.hasExplicitGlobal())
+            ContextFactory.initGlobal(new DynamicFactory());
+        globalScope = new GlobalScope(this);
+        
     }
     
     /**
@@ -260,11 +264,13 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             
             cx.putThreadLocal("globalScope", globalScope);
             // Define thread-local variables
-            Scriptable jsRequest = new NativeJavaInterface(threadScope, request, HttpServletRequest.class);
-            Scriptable jsResponse = new NativeJavaInterface(threadScope, response, HttpServletResponse.class);
-            System.out.println("response.class = "+response.getClass());
-            threadScope.defineProperty("request", jsRequest, PROTECTED);
-            threadScope.defineProperty("response", jsResponse, PROTECTED);
+            threadScope.defineProperty("request", 
+                    new NativeJavaInterface(threadScope, request, 
+                            HttpServletRequest.class), PROTECTED);
+            
+            threadScope.defineProperty("response", 
+                    new NativeJavaInterface(threadScope, response, 
+                            HttpServletResponse.class), PROTECTED);
             
             // Evaluate the script in this scope
             s.evaluate(cx, threadScope);

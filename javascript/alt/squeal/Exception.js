@@ -7,7 +7,6 @@ Rhino.require('alt.Exception', true);
  */
 function Exception(msg) {
 	this.msg = msg;
-	this.message = msg;
 }
 Exception.prototype = new alt.Exception();
 Exception.prototype.toString = function() {

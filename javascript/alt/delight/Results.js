@@ -5,7 +5,7 @@
  * Default results class for 
  * @constructor
  */
-Results = function() {
+function Results() {
 }
 /**
  * Returns a string representation of this class

@@ -8,7 +8,8 @@ Rhino.require('alt.squeal.Database');
  * @param {Node} parent the parent node
  */
 function Table(name, parent) {
-	this.init(name,parent);
+	// Super constructor
+	Node.call(this,name,parent);
 }
 Table.prototype = new Node();
 Table.prototype.toString = function() {

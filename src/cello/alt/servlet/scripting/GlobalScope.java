@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
@@ -50,6 +52,11 @@ public class GlobalScope extends ImporterTopLevel {
         //  and a "static" class for managing Rhino
         RhinoClass rhinoClass = new RhinoClass(server);
         defineProperty("Rhino", rhinoClass, RhinoServlet.PROTECTED);
+        
+        // Static class for managing servlet
+        ServletClass servletClass = new ServletClass(server);
+        defineProperty("Servlet", servletClass, RhinoServlet.PROTECTED);
+        
         // Add require as a global method
         defineProperty("require", rhinoClass.get("require",rhinoClass),
                 RhinoServlet.PROTECTED);
@@ -124,7 +131,30 @@ public class GlobalScope extends ImporterTopLevel {
         
         return scope;
     }
-    
+    private static class ServletClass extends ScriptableObject {
+        /** For Eclipse warning */
+        private static final long serialVersionUID = 7263015886240684296L;
+
+        /**
+         * Constructs a new ServletClass object
+         * @param server  the RhinoServlet
+         */
+        private ServletClass(RhinoServlet server) {
+            defineProperty("context", new NativeJavaInterface(this, 
+                    server.getServletContext(), ServletContext.class), 
+                    RhinoServlet.PROTECTED);
+   
+        }
+
+        /**
+         * @see org.mozilla.javascript.ScriptableObject#getClassName()
+         */
+        @Override
+        public String getClassName() {
+            return "ServletClass";
+        }
+        
+    }
     private static class RhinoClass extends ScriptableObject {
         /** For Eclipse warning */
         private static final long serialVersionUID = 4816919208983818311L;

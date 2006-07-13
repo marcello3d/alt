@@ -10,7 +10,7 @@ Rhino.require('alt.squeal.Table');
  * @param {Node} parent the parent node
  */
 function Link(name, parent) {
-	this.init(name,parent);
+	Field.call(this,name,parent);
 }
 Link.prototype = new Field();
 Link.prototype.toString = function() {
