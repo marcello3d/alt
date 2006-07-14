@@ -40,7 +40,8 @@ public class JarScriptLoader extends ScriptLoader {
      * @param file
      * @throws IOException
      */
-    public JarScriptLoader(File file) throws IOException {
+    public JarScriptLoader(File file) 
+            throws IOException {
         this(null,file);
     }
     /**

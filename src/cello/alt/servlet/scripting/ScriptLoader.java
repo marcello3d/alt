@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
+import cello.alt.servlet.js.ModuleProvider;
 import cello.alt.servlet.resource.Resource;
 import cello.alt.servlet.resource.ResourceException;
 
@@ -27,7 +28,7 @@ public abstract class ScriptLoader {
     private Map<String,JavaScript> cache = new HashMap<String,JavaScript>();
     
     private ScriptLoader parentLoader;
-    
+
     /**
      * Initializes ScriptLoader with no parent loader.
      */
@@ -97,11 +98,13 @@ public abstract class ScriptLoader {
      */
     protected JavaScript findScript(String name) throws ScriptNotFoundException {
         try {
-            if (name.endsWith(".*")) {
-                return null;
-            }
+            if (name.endsWith(".*"))
+                return new MultiResourceScript(this, getPath(name), name);
+
             String path = getPath(name);
-            return new JavaScriptResource(getResource(path), name);
+            return new JavaScriptResource(
+                    getModuleProvider().getScriptModule(name), 
+                    getResource(path), name);
         } catch (ResourceException ex) {
             throw new ScriptNotFoundException("Could not load "+name, ex);
         }
@@ -164,6 +167,28 @@ public abstract class ScriptLoader {
     public abstract Set<String> getResourcePaths(String basePath);
     
     
+    private ModuleProvider moduleProvider = null;
+    /**
+     * Sets the current module provider for this loader.
+     * @param moduleProvider the new module provider
+     */
+    public void setModuleProvider(ModuleProvider moduleProvider) {
+        this.moduleProvider = moduleProvider;
+    }
+    
+    /**
+     * Returns the module provider used by this script loader.
+     * 
+     * @return the module provider
+     */
+    public ModuleProvider getModuleProvider() {
+        if (moduleProvider==null) {
+            ScriptLoader parent = getParentLoader();
+            if (parent!=null)
+                return parent.getModuleProvider();
+        }
+        return moduleProvider;
+    }
 
     private static Pattern validName = Pattern.compile(
             "^([a-z_][a-z0-9_]*\\.)*([a-z_][a-z0-9_]*|\\*)",

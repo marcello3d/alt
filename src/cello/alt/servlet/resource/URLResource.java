@@ -31,6 +31,7 @@ public class URLResource implements MutableResource {
      * @param url  the url of this resource
      */
     public URLResource(ScriptLoader loader, String path, URL url) {
+        this.loader = loader;
         this.path = path;
         this.url = url;
     }

@@ -15,7 +15,7 @@ import cello.alt.servlet.resource.ResourceException;
 
 /**
  * This class provides a standard filesystem directory based ScriptLoader.  That
- *  is, it looks for .js files in its path and returns new {@link FileScript} 
+ *  is, it looks for files in its path and returns new {@link FileResource} 
  *  objects.
  *    
  * @author Marcello
@@ -28,11 +28,12 @@ public class DirectoryScriptLoader extends ScriptLoader {
     /**
      * Constructs a new DirectoryScriptLoader object based on a particular file-
      *  system folder.
-     *   
+     *  
      * @param directory  the filesystem directory to look in
      * @throws IOException  if the directory is not a directory
      */
-    public DirectoryScriptLoader(File directory) throws IOException {
+    public DirectoryScriptLoader(File directory) 
+            throws IOException {
         this(null,directory);
     }
     /**
@@ -43,7 +44,8 @@ public class DirectoryScriptLoader extends ScriptLoader {
      * @param directory  the filesystem directory to look in
      * @throws IOException  if the directory is not a directory
      */
-    public DirectoryScriptLoader(ScriptLoader parent, File directory) throws IOException {
+    public DirectoryScriptLoader(ScriptLoader parent, 
+            File directory) throws IOException {
         super(parent);
         
         if (!directory.isDirectory())

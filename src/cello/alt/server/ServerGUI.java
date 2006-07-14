@@ -50,8 +50,8 @@ public class ServerGUI extends JFrame {
     private static final long serialVersionUID = -8748896100821559082L;
 
     private JFormattedTextField portField;
-    private JTextField scriptpathField;
-    private JTextField entryPointField;
+    private JTextField rootField;
+    private JTextField mainField;
     private JEditorPane console;
     private Server server = null;
     private StartStopAction startStopAction = null;
@@ -60,10 +60,10 @@ public class ServerGUI extends JFrame {
      * Constructs a new ServerGUI
      * 
      * @param port default port
-     * @param scriptpath  default scriptpath
-     * @param entryPoint the entry point javascript file
+     * @param root  default scriptpath
+     * @param main the entry point javascript file
      */
-    public ServerGUI(int port, String scriptpath, String entryPoint) {
+    public ServerGUI(int port, String root, String main) {
         super(HTTPServer.NAME_VERSION+" - "+RhinoServlet.NAME_VERSION);
 
         try {
@@ -76,8 +76,8 @@ public class ServerGUI extends JFrame {
         c.setLayout(new BorderLayout());
         
         portField = new JFormattedTextField(port);
-        scriptpathField = new JTextField(scriptpath);
-        entryPointField = new JTextField(entryPoint);
+        rootField = new JTextField(root);
+        mainField = new JTextField(main);
         startStopAction = new StartStopAction();
         
         c.add(makeToolbar(), BorderLayout.NORTH);
@@ -116,18 +116,33 @@ public class ServerGUI extends JFrame {
         JToolBar tb = new JToolBar();
         
         JLabel label;
+        String desc;
+        
+        desc = "The port to listen on.";
         label = new JLabel("Port:");
         label.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+        label.setToolTipText(desc);
+        portField.setToolTipText(desc);
         tb.add(label);
         tb.add(portField);
-        label = new JLabel("ScriptPath:");
+        
+        
+        desc = "The root directory to look for scripts.";
+        label = new JLabel("rhino.root:");
         label.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+        label.setToolTipText(desc);
+        rootField.setToolTipText(desc);
         tb.add(label);
-        tb.add(scriptpathField);
-        label = new JLabel("Entry point:");
+        tb.add(rootField);
+        
+        desc = "The script to load with every page request.";
+        label = new JLabel("rhino.main:");
         label.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+        label.setToolTipText(desc);
+        mainField.setToolTipText(desc);
         tb.add(label);
-        tb.add(entryPointField);
+        tb.add(mainField);
+        
         JButton button = new JButton(startStopAction);
         tb.add(button);
         
@@ -168,8 +183,8 @@ public class ServerGUI extends JFrame {
                     System.out.flush();
                     server = HTTPServer.startServer(
                             (Integer)portField.getValue(),
-                            scriptpathField.getText(), 
-                            entryPointField.getText()
+                            rootField.getText(), 
+                            mainField.getText()
                            );
                     server.start();
                     this.putValue(Action.NAME, "Stop Server");

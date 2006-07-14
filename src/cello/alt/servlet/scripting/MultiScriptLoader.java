@@ -57,7 +57,7 @@ public class MultiScriptLoader extends ScriptLoader {
     protected JavaScript findScript(String name) throws ScriptNotFoundException {
         for (ScriptLoader sl : loaders) 
             try {
-                return sl.loadScript(name);
+                return sl.findScript(name);
             } catch (ScriptNotFoundException ex) {
                 continue;
             }

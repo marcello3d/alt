@@ -25,11 +25,14 @@ public class FileResource extends URLResource {
      * @param loader the loader that loaded this resource
      * @param name  the name of this resource
      * @param file  the File of this resource
-     * @throws MalformedURLException
+     * @throws MalformedURLException if there was a problem creating the url
+     * @throws ResourceException if the file could not be read
      */
     public FileResource(ScriptLoader loader, String name, File file) 
-                throws MalformedURLException {
+                throws MalformedURLException, ResourceException {
         super(loader, name, new URL("file:"+file.getAbsolutePath()));
+        if (!file.canRead())
+            throw new ResourceException("Cannot read file "+file);
         this.file = file;
     }
 

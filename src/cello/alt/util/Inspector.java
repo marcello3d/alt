@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
-import cello.alt.servlet.scripting.JavaScript;
-
 /**
  * Scans a JavaScript file and finds methods and stuff.  Grossly incomplete.
  * Probably should use some rhino internals, but I have not found any good 

@@ -33,11 +33,12 @@ import cello.alt.servlet.scripting.ScriptNotFoundException;
  * @author Marcello
  *
  */
-public class GlobalScope extends ImporterTopLevel {
+public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
 
     /** For Eclipse warning */
     private static final long serialVersionUID = 3328680909322034652L;
-    private Map<String,Scriptable> moduleScopes;
+    private Map<String,Module> moduleScopes = new HashMap<String,Module>();
+    private RootModule rootModule;
     
     /**
      * Constructs a new GlobalScope object referencing a particular RhinoServlet
@@ -47,8 +48,6 @@ public class GlobalScope extends ImporterTopLevel {
         Context cx = Context.enter();
         cx.initStandardObjects(this,false);
         Context.exit();
-        
-        moduleScopes = new HashMap<String,Scriptable>();
 
         // Two properties of global: a self pointer
         defineProperty("global", this, RhinoServlet.PROTECTED);
@@ -63,6 +62,8 @@ public class GlobalScope extends ImporterTopLevel {
         // Add require as a global method
         defineProperty("require", rhinoClass.get("require",rhinoClass),
                 RhinoServlet.PROTECTED);
+
+        rootModule = new RootModule(this);
     }
     /**
      * Converts wrapped Java objects to their native object. 
@@ -76,19 +77,12 @@ public class GlobalScope extends ImporterTopLevel {
     }
 
     /**
-     * Each module has its own scope from which its scripts are executed. This
-     *  method returns that scope (creating it if necessary).  It also creates
-     *  the necessary object hierarchy.  For example, if this method were called
-     *  with the argument "module1.module2.Script", a global.module1 would be
-     *  created, and within that a module2, global.module1.module2.  
-     *  
-     * @param name  the module/script name (or .*)
-     * @return the scope associated with this module/script name
+     * @see cello.alt.servlet.js.ModuleProvider#getScriptModule(java.lang.String)
      */
-    public Scriptable getModuleScope(String name) {
+    public Module getScriptModule(String name) {
         int index = name.lastIndexOf('.');
         if (index<=0)
-            return this;
+            return rootModule;
         
         // Strip off the script name
         String modulePath = name.substring(0,index); 
@@ -99,40 +93,23 @@ public class GlobalScope extends ImporterTopLevel {
         
         // Start with the global object as the base object and walk down the
         // module tree
-        Scriptable scope = this;
+        Module module = rootModule;
         for (String moduleName : modulePath.split("\\.")) {
             // Check if there already exists an object with this module name
-            Object o = scope.get(moduleName, scope);
+            Object o = ScriptableObject.getProperty(module,moduleName);
+            System.out.println("looking in "+module+" for "+moduleName+" found "+o);
             // If not, create the new scope.
-            if (o == Scriptable.NOT_FOUND) {
-                ScriptableObject child = new NamedScriptableObject("Module "+moduleName);
-                // Prototype the child scope with the global scope so it has
-                // direct access to all its values, to read them, anyway 
-                child.setPrototype(this);
-                
-                // Create a self-pointer
-                child.defineProperty("module", child, RhinoServlet.PROTECTED);
-
-                // We want "threadScope" to be a new top-level scope, so set its parent 
-                // scope to null. This means that any variables created by assignments
-                // will be properties of "threadScope".
-                child.setParentScope(null);                
-
-                // Add the child scope as a member of the parent
-                scope.put(moduleName, scope, child);
-                
-                scope = child;
-            } else {
-                scope = (Scriptable)o;
-            }
+            module = (o == Scriptable.NOT_FOUND) ? new Module(this, module,
+                    moduleName) : (Module) o;
                 
         }
         
         // Add to cache
-        moduleScopes.put(modulePath, scope);
-        System.out.println("getModuleScope("+name+") : "+scope);
+        moduleScopes.put(modulePath, module);
         
-        return scope;
+        System.out.println("getModule("+name+") : "+module);
+        
+        return module;
     }
     private static class ServletClass extends ScriptableObject {
         /** For Eclipse warning */
@@ -230,11 +207,13 @@ public class GlobalScope extends ImporterTopLevel {
             
             // Get its loader and load the script
             ScriptLoader loader = currentScript.getScriptLoader();
+            
             JavaScript s = loader.loadScript(scriptName);
+            
             // Add the dependency
             currentScript.addDependency(s, cascade);
             // Update the dependency
-            s.update(cx, (GlobalScope)cx.getThreadLocal("globalScope"));
+            s.update(cx, (ModuleProvider)cx.getThreadLocal("globalScope"));
 
             return s;
         }
@@ -360,7 +339,7 @@ public class GlobalScope extends ImporterTopLevel {
          */
         public void addScriptPath(Object path) throws IOException {
             if (path instanceof ScriptLoader)
-                server.setScriptPath((ScriptLoader)path);
+                server.addScriptLoader((ScriptLoader)path);
             else
                 server.addScriptPath(Context.toString(path));
         }

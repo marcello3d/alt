@@ -8,7 +8,8 @@ import java.io.IOException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
-import cello.alt.servlet.js.GlobalScope;
+import cello.alt.servlet.js.Module;
+import cello.alt.servlet.js.ModuleProvider;
 import cello.alt.servlet.resource.Resource;
 import cello.alt.servlet.resource.ResourceException;
 
@@ -29,7 +30,7 @@ public interface JavaScript {
      * @return whether the script was actually updated
      * @throws IOException if there is a problem loading the script.
      */
-    public boolean update(Context cx, GlobalScope global)  throws IOException;
+    public boolean update(Context cx, ModuleProvider global)  throws IOException;
     
     /**
      * Forces this script to be evaluated.
@@ -83,9 +84,9 @@ public interface JavaScript {
     public String getName();
     
     /**
-     * Get the script's module name.
+     * Get the script's module.
      * @return the module
      */
-    //public Module getModule();
+    public Module getModule();
     
 }

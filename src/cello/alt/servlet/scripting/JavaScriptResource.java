@@ -12,7 +12,8 @@ import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
 import cello.alt.servlet.RhinoServlet;
-import cello.alt.servlet.js.GlobalScope;
+import cello.alt.servlet.js.Module;
+import cello.alt.servlet.js.ModuleProvider;
 import cello.alt.servlet.resource.MutableResource;
 import cello.alt.servlet.resource.Resource;
 import cello.alt.servlet.resource.ResourceException;
@@ -26,7 +27,8 @@ import cello.alt.servlet.resource.ResourceException;
  */
 public class JavaScriptResource implements JavaScript,MutableResource {
 
-    
+
+    private Module module;
     private Resource resource;
     private String scriptName;
     private Set<JavaScript> dependencies = new HashSet<JavaScript>();
@@ -42,15 +44,17 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * Constructs a new JavaScriptResource from a particular Resource with a 
      * given script name.
      * 
-     * @param resource  the resource
+     * @param module      the module
+     * @param resource    the resource
      * @param scriptName  the script name
      */
-    public JavaScriptResource(Resource resource, String scriptName) {
+    public JavaScriptResource(Module module, Resource resource, 
+            String scriptName) {
+        this.module = module;
         this.resource = resource;
         this.scriptName = scriptName;
     }
-    
-    
+
     /**
      * @see Resource#getPath()
      */
@@ -59,7 +63,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     }
 
     /**
-     * @see cello.alt.servlet.resource.Resource#getScriptLoader()
+     * @see Resource#getScriptLoader()
      */
     public ScriptLoader getScriptLoader() {
         return resource.getScriptLoader();
@@ -67,7 +71,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
 
     
     /**
-     * @see cello.alt.servlet.scripting.JavaScript#getResource(java.lang.String)
+     * @see Resource#getResource(java.lang.String)
      */
     public Resource getResource(String path) throws ResourceException {
         return resource.getResource(path);
@@ -75,19 +79,19 @@ public class JavaScriptResource implements JavaScript,MutableResource {
 
 
     /**
-     * @see cello.alt.servlet.resource.Resource#getStream()
+     * @see Resource#getStream()
      */
     public InputStream getStream() throws IOException {
         return resource.getStream();
     }
     /**
-     * @see cello.alt.servlet.resource.Resource#getURL()
+     * @see Resource#getURL()
      */
     public URL getURL() {
         return resource.getURL();
     }
     /**
-     * @see cello.alt.servlet.resource.MutableResource#getVersionTag()
+     * @see MutableResource#getVersionTag()
      */
     public Object getVersionTag() {
         if (resource instanceof MutableResource)
@@ -104,12 +108,13 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @return true if the script was actually reloaded
      * @throws IOException  if there was an error loading
      */
-    public boolean update(Context cx, GlobalScope global) throws IOException {
+    public boolean update(Context cx, ModuleProvider global) throws IOException {
         //System.out.println("update : "+this);
+        
         // If script has been modified, or if any of the cascading dependencies 
         //  were modified, evaluate this script.
         if (isModified() || checkDependencies(cx,global)) {
-            evaluate(cx, global.getModuleScope(getPath()));
+            evaluate(cx, getModule());
             return true;
         }
         return false;
@@ -216,7 +221,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @return true if a cascading dependency was loaded
      * @throws IOException  if there was a problem loading something
      */
-    protected boolean checkDependencies(Context cx, GlobalScope global) 
+    protected boolean checkDependencies(Context cx, ModuleProvider global) 
             throws IOException {
         // Check the regular dependencies
         for (JavaScript s : dependencies)
@@ -246,5 +251,23 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     public String getName() {
         return scriptName;
     }
+
+
+    /**
+     * @see JavaScript#getModule()
+     */
+    public Module getModule() {
+        return module;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "JavaScriptResource["+resource+"]";
+    }
+    
+    
 
 }

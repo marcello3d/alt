@@ -16,9 +16,8 @@ import cello.alt.servlet.resource.ResourceException;
 import cello.alt.servlet.resource.URLResource;
 
 /**
- * This class provides a standard filesystem directory based ScriptLoader.  That
- *  is, it looks for .js files in its path and returns new {@link FileScript} 
- *  objects.
+ * This class provides a {@link ServletContext} based ScriptLoader.  That
+ *  is, it looks for resources by 
  *    
  * @author Marcello
  *
@@ -32,6 +31,7 @@ public class ContextScriptLoader extends ScriptLoader {
     /**
      * Constructs a new DirectoryScriptLoader object based on a particular file-
      *  system folder.  The base path must end with /.
+
      * @param context   the servlet context to look for resources in
      * @param basePath   the base path 
      */

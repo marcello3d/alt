@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,10 +20,12 @@ import org.mozilla.javascript.tools.debugger.ScopeProvider;
 import cello.alt.servlet.js.GlobalScope;
 import cello.alt.servlet.js.NamedScriptableObject;
 import cello.alt.servlet.js.NativeJavaInterface;
+import cello.alt.servlet.scripting.ContextScriptLoader;
 import cello.alt.servlet.scripting.DirectoryScriptLoader;
 import cello.alt.servlet.scripting.DynamicFactory;
 import cello.alt.servlet.scripting.JarScriptLoader;
 import cello.alt.servlet.scripting.JavaScript;
+import cello.alt.servlet.scripting.MultiScriptLoader;
 import cello.alt.servlet.scripting.ScriptLoader;
 
 /**
@@ -36,14 +38,14 @@ import cello.alt.servlet.scripting.ScriptLoader;
 public class RhinoServlet extends HttpServlet implements ScopeProvider {
     
     private static final long serialVersionUID = 2280866936332806360L;
-    private ScriptLoader loader = null;
+    private MultiScriptLoader loader = new MultiScriptLoader();
    
     private GlobalScope globalScope;
     
     /** Version string */
     public static final String NAME_VERSION = "RhinoServlet v0.03 alpha";
     
-    private String entryPoint = "Main";
+    private String mainScript = "Main";
     /** 
      * Protected access from ScriptableObject (Don't enum, read-only, and
      *  permanent).
@@ -56,7 +58,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
      * Constructs a new RhinoServer
      */
     public RhinoServlet() {
-        // Do nothing
+        // do nothing
     }
     
 
@@ -84,21 +86,22 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     
     /**
      * Initialize this RhinoServlet.
-     * @throws ServletException if there was a problem initializing
      */
     @Override
-    public void init() throws ServletException {
-        try {
-            addScriptPath(getInitParameter("scriptpath","javascript/"));
-        } catch (IOException ex) {
-            throw new ServletException("Error initializing",ex);
-        }
+    public void init() {
+        globalScope = new GlobalScope(this);
+        loader.setModuleProvider(globalScope);
+        
+        ServletContext context = getServletContext();
+        System.out.println("context = "+context);
+        addScriptLoader(new ContextScriptLoader(loader, context, "/WEB-INF/scripts/"));
+        addScriptLoader(new ContextScriptLoader(loader, context, getInitParameter("rhino.root","/")));
 
-        entryPoint = getInitParameter("service","Main");
+        mainScript = getInitParameter("rhino.main","Main");
 
         if (!ContextFactory.hasExplicitGlobal())
             ContextFactory.initGlobal(new DynamicFactory());
-        globalScope = new GlobalScope(this);
+        
         
     }
     
@@ -112,11 +115,11 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     public void addScriptPath(String path) throws IOException {
         File file = new File(path);
         if (file.isDirectory()) {
-            loader = new DirectoryScriptLoader(loader, file);
+            addScriptLoader(new DirectoryScriptLoader(loader, file));
         } else if (file.isFile()) {
             String lowercase = path.toLowerCase();
             if (lowercase.endsWith(".jar") || lowercase.endsWith(".zip")) 
-                loader = new JarScriptLoader(loader, file);
+                addScriptLoader(new JarScriptLoader(loader, file));
         } else {
             throw new IOException("Cannot add scriptpath : "+path);
         }
@@ -126,11 +129,11 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
      *  loaded by traversing the script path in order.  
      * @param sl  the ScriptLoader to add
      */
-    public void setScriptPath(ScriptLoader sl) {
+    public void addScriptLoader(ScriptLoader sl) {
         if (sl.getParentLoader() != loader)
-            throw new RuntimeException("Cannot replace loader that does not "+
-                                         "parent the current loader");
-        loader = sl;
+            throw new RuntimeException("Cannot add loader that does not "+
+                                         "parent the multi loader");
+        loader.add(sl);
         System.out.println("added scriptpath: "+sl);
     }
     /**
@@ -224,20 +227,12 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
      * @return the new scope
      */
     private ScriptableObject makeChildScope(String name, Scriptable scope) {
-        // This code is based on sample code from Rhino's website:
-        //  http://www.mozilla.org/rhino/scopes.html
-        
-        // I changed it to use a ScriptableObject instead of Context.newObject()
+        // Make new object for scope base. 
         ScriptableObject child = new NamedScriptableObject(name);
         
         // Set the prototype to the scope (so we have access to all its methods 
         // and members). 
         child.setPrototype(scope);
-
-        // We want "threadScope" to be a new top-level scope, so set its parent 
-        // scope to null. This means that any variables created by assignments
-        // will be properties of "threadScope".
-        child.setParentScope(null);
         
         return child;
     }
@@ -257,10 +252,11 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
         try {
 
             // retrieve JavaScript...
-            JavaScript s = loader.loadScript(entryPoint);
+            JavaScript s = loader.loadScript(mainScript);
             
+            // Isolate the request from the module namespace
             ScriptableObject threadScope = makeChildScope("RequestScope", 
-                    globalScope.getModuleScope(entryPoint));
+                    globalScope.getScriptModule(mainScript));
             
             cx.putThreadLocal("globalScope", globalScope);
             // Define thread-local variables

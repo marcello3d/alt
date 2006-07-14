@@ -3,8 +3,8 @@
  */
 package cello.alt.servlet.scripting;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.Set;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -21,32 +21,26 @@ import cello.alt.servlet.resource.ResourceException;
  *
  */
 
-public class DirectoryScript implements JavaScript {
+public class MultiResourceScript implements JavaScript {
     private ScriptLoader loader;
+    private String basePath;
     private String moduleName;
-    private File directory;
-    private long lastModified = 0;
-    private int fileCount = 0;
     private Module module;
     
     /**
-     * Constructs a new DirectoryScript, using a particular module, and a
-     *  directory to look for scripts in.
+     * Constructs a new MultiResourceScript, using a particular module, and 
+     * loader to pull files from.
      *   
      * @param loader the ScriptLoader for this script
-     * @param moduleName  a dot-separated module path (e.g. "module.submodule")
-     * @param directory  a link to the filesystem folder to look inside 
-     * @throws IOException  if the directory is not actually a directory
+     * @param basePath  the base path of this resource path
+     * @param moduleName  a dot-separated module basePath (e.g. "module.submodule")
      */
-    public DirectoryScript(ScriptLoader loader, String moduleName, 
-            File directory) throws IOException {
-        if (!directory.isDirectory())
-            throw new IOException(directory+" is not a directory");
-
+    public MultiResourceScript(ScriptLoader loader, String basePath, 
+            String moduleName) {
         this.loader = loader;
         // This should end with a .
         this.moduleName = moduleName;
-        this.directory = directory;
+        this.basePath = basePath;
     }
     
     /**
@@ -72,21 +66,19 @@ public class DirectoryScript implements JavaScript {
      * @return true if something was loaded
      */
     public boolean update(Context cx, ModuleProvider global)  {
-        if (fileCount>0 && !isModified()) 
-            return false;
         // update last modified
-        lastModified = directory.lastModified();
-        fileCount = directory.list().length;
+        Set<String> paths = loader.getResourcePaths(basePath);
         
         boolean somethingLoaded = false;
         
-        for (String name : directory.list()) {
-            System.out.println (this+" looking at "+name);
-            if (name.endsWith(".js"))
+        for (String path : paths) {
+            System.out.println (this+" looking at "+path);
+            if (path.endsWith(".js"))
                 try {
                     // Get the script name
                     String scriptName = moduleName + 
-                                      name.substring(0, name.lastIndexOf('.'));
+                                          path.substring(path.lastIndexOf('/'), 
+                                              path.lastIndexOf('.'));
                     // Load the script and try to get a dependency
                     JavaScript s = getScriptLoader().loadScript(scriptName);
                     s.update(cx, global);
@@ -112,34 +104,20 @@ public class DirectoryScript implements JavaScript {
         return evaluationTime;
     }
 
-
-    /**
-     * Checks if the directory has been modified (files added/removed).
-     *  Currently this is only checked by the last modification date on the 
-     *  directory, and if that is the same (I do not believe windows updates 
-     *  this value for directories when a file is added/removed), the number of 
-     *  files in the directory.
-     *  
-     * @return true if the directory has been modified.
-     */
-    public boolean isModified() {
-        return lastModified != directory.lastModified() ||
-            fileCount != directory.list().length;
-    }
     /**
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        return directory.hashCode();
+        return loader.hashCode()+basePath.hashCode();
     }
     /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object o) {
-        return o instanceof DirectoryScript &&
-                directory.equals(((DirectoryScript)o).directory);
+        return o instanceof MultiResourceScript &&
+                basePath.equals(((MultiResourceScript)o).basePath);
     }
     /**
      * Returns the string representation of this object
@@ -147,7 +125,7 @@ public class DirectoryScript implements JavaScript {
      */
     @Override
     public String toString() {
-        return "DirectoryScript["+directory+"]";
+        return "MultiResourceScript["+loader+","+basePath+"]";
     }
 
     /**
