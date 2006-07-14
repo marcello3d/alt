@@ -134,7 +134,6 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             throw new RuntimeException("Cannot add loader that does not "+
                                          "parent the multi loader");
         loader.add(sl);
-        System.out.println("added scriptpath: "+sl);
     }
     /**
      * Clears the list of script paths (this does not unload any classes).
