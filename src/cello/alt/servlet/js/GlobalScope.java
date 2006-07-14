@@ -213,7 +213,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             // Add the dependency
             currentScript.addDependency(s, cascade);
             // Update the dependency
-            s.update(cx, (ModuleProvider)cx.getThreadLocal("globalScope"));
+            s.update(cx);
 
             return s;
         }

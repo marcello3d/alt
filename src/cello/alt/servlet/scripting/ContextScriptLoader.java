@@ -58,10 +58,10 @@ public class ContextScriptLoader extends ScriptLoader {
     }
 
     /**
-     * @see cello.alt.servlet.scripting.ScriptLoader#getResource(java.lang.String)
+     * @see ScriptLoader#findResource(java.lang.String)
      */
     @Override
-    public Resource getResource(String path) throws ResourceException {
+    protected Resource findResource(String path) throws ResourceException {
         String fullPath = basePath+path;
         String realPath = context.getRealPath(fullPath);
         try {
@@ -75,7 +75,7 @@ public class ContextScriptLoader extends ScriptLoader {
     }
     
     /**
-     * @see cello.alt.servlet.scripting.ScriptLoader#getResourcePaths(java.lang.String)
+     * @see ScriptLoader#getResourcePaths(java.lang.String)
      */
     @Override
     public Set<String> getResourcePaths(String path) {

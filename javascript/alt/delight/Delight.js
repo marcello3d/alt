@@ -22,7 +22,7 @@ Rhino.require('alt.delight.Table');
  * @param {cello.SQLSchema} 	schema		The cello.SQLSchema object this api is based on.
  * @param {java.sql.Connection}	conn		A database connection
  */
-Delight = function(schema,conn) {
+function Delight(schema,conn) {
 	for (var database in schema.databases)
 		this[database] = new Database(conn, database, schema.databases[database]);
 	for (var table in schema.tables)

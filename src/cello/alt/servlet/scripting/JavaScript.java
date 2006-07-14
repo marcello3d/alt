@@ -9,7 +9,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 import cello.alt.servlet.js.Module;
-import cello.alt.servlet.js.ModuleProvider;
 import cello.alt.servlet.resource.Resource;
 import cello.alt.servlet.resource.ResourceException;
 
@@ -26,11 +25,10 @@ public interface JavaScript {
      * Evaluates this script if it was modified. Also evaluates any child 
      *  scripts, if necessary.
      * @param cx  javascript Context
-     * @param global  javascript Scope
      * @return whether the script was actually updated
      * @throws IOException if there is a problem loading the script.
      */
-    public boolean update(Context cx, ModuleProvider global)  throws IOException;
+    public boolean update(Context cx)  throws IOException;
     
     /**
      * Forces this script to be evaluated.

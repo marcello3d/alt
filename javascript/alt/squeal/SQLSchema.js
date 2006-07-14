@@ -34,6 +34,7 @@ function SQLSchema(xml) {
 	if (xml instanceof XML)
 		this.add(xml);
 }
+SQLSchema.prototype = {};
 
 /**
  * Returns a string representation of this object.

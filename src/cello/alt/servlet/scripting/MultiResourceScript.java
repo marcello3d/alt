@@ -10,7 +10,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 import cello.alt.servlet.js.Module;
-import cello.alt.servlet.js.ModuleProvider;
 import cello.alt.servlet.resource.Resource;
 import cello.alt.servlet.resource.ResourceException;
 /**
@@ -62,10 +61,9 @@ public class MultiResourceScript implements JavaScript {
      *  list from any subscripts in the directory.  Then it calls the super 
      *  checkDependencies method to actually load them.
      * @param cx javascript Context
-     * @param global  the global Object
      * @return true if something was loaded
      */
-    public boolean update(Context cx, ModuleProvider global)  {
+    public boolean update(Context cx)  {
         // update last modified
         Set<String> paths = loader.getResourcePaths(basePath);
         
@@ -81,7 +79,7 @@ public class MultiResourceScript implements JavaScript {
                                               path.lastIndexOf('.'));
                     // Load the script and try to get a dependency
                     JavaScript s = getScriptLoader().loadScript(scriptName);
-                    s.update(cx, global);
+                    s.update(cx);
                     if (evaluationTime < s.getEvaluationTime())
                         evaluationTime = s.getEvaluationTime();
                 } catch (ScriptNotFoundException ex) {

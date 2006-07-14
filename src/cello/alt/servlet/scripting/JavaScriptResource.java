@@ -13,7 +13,6 @@ import org.mozilla.javascript.Scriptable;
 
 import cello.alt.servlet.RhinoServlet;
 import cello.alt.servlet.js.Module;
-import cello.alt.servlet.js.ModuleProvider;
 import cello.alt.servlet.resource.MutableResource;
 import cello.alt.servlet.resource.Resource;
 import cello.alt.servlet.resource.ResourceException;
@@ -34,12 +33,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     private Set<JavaScript> dependencies = new HashSet<JavaScript>();
     private Set<JavaScript> cascadeDependencies = new HashSet<JavaScript>();
     private Script compiledScript = null;
-    
-    /**
-     * Defines whether files are automatically checked for updates
-     */
-    public static boolean AUTO_UPDATES = true;
-    
+        
     /**
      * Constructs a new JavaScriptResource from a particular Resource with a 
      * given script name.
@@ -104,16 +98,15 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * Loads a script if necessary.
      * 
      * @param cx  javascript Context 
-     * @param global  javascript Scope
      * @return true if the script was actually reloaded
      * @throws IOException  if there was an error loading
      */
-    public boolean update(Context cx, ModuleProvider global) throws IOException {
+    public boolean update(Context cx) throws IOException {
         //System.out.println("update : "+this);
         
         // If script has been modified, or if any of the cascading dependencies 
         //  were modified, evaluate this script.
-        if (isModified() || checkDependencies(cx,global)) {
+        if (isModified() || checkDependencies(cx)) {
             evaluate(cx, getModule());
             return true;
         }
@@ -130,6 +123,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      */
     public Object evaluate(Context cx, Scriptable scope) throws IOException {
         //System.out.println("evaluate : "+this);
+        
         // Set current script
         JavaScript previousScript = RhinoServlet.setCurrentScript(cx,this);
         
@@ -137,7 +131,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
         resetDependencies();
         
         // Compile file if necessary
-        if (compiledScript==null || (AUTO_UPDATES && isModified())) {
+        if (compiledScript==null || isModified()) {
             System.out.println("compile : "+this);
             compiledScript = compile(cx);
         }
@@ -159,7 +153,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     
     private long evaluationTime = 0;
     /**
-     * @see cello.alt.servlet.scripting.JavaScript#getEvaluationTime()
+     * @see JavaScript#getEvaluationTime()
      */
     public long getEvaluationTime() {
         return evaluationTime;
@@ -183,6 +177,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @throws IOException if there was a problem compiling the script
      */
     protected Script compile(Context cx) throws IOException {
+        versionTag = getVersionTag();
         return cx.compileReader(new InputStreamReader(resource.getStream()),
                     getPath(), 1, null);
     }
@@ -217,20 +212,19 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * the cascading dependecies were reloaded (thus requiring the current
      * script to reload).
      * @param cx  javascript Context
-     * @param global  javascript Scope
      * @return true if a cascading dependency was loaded
      * @throws IOException  if there was a problem loading something
      */
-    protected boolean checkDependencies(Context cx, ModuleProvider global) 
+    protected boolean checkDependencies(Context cx) 
             throws IOException {
         // Check the regular dependencies
         for (JavaScript s : dependencies)
-            s.update(cx, global);
+            s.update(cx);
         
         // Check cascading dependencies
         boolean loadedSomething = false;
         for (JavaScript s : cascadeDependencies) {
-            s.update(cx, global);
+            s.update(cx);
             if (s.getEvaluationTime() >= getEvaluationTime())
                 loadedSomething = true;
         }

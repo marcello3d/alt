@@ -22,7 +22,6 @@ import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
-import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -49,7 +48,7 @@ public class ServerGUI extends JFrame {
 
     private static final long serialVersionUID = -8748896100821559082L;
 
-    private JFormattedTextField portField;
+    private JTextField hostField;
     private JTextField rootField;
     private JTextField mainField;
     private JEditorPane console;
@@ -59,11 +58,11 @@ public class ServerGUI extends JFrame {
     /**
      * Constructs a new ServerGUI
      * 
-     * @param port default port
+     * @param host default host:port
      * @param root  default scriptpath
      * @param main the entry point javascript file
      */
-    public ServerGUI(int port, String root, String main) {
+    public ServerGUI(String host, String root, String main) {
         super(HTTPServer.NAME_VERSION+" - "+RhinoServlet.NAME_VERSION);
 
         try {
@@ -75,7 +74,7 @@ public class ServerGUI extends JFrame {
         
         c.setLayout(new BorderLayout());
         
-        portField = new JFormattedTextField(port);
+        hostField = new JTextField(host);
         rootField = new JTextField(root);
         mainField = new JTextField(main);
         startStopAction = new StartStopAction();
@@ -122,9 +121,9 @@ public class ServerGUI extends JFrame {
         label = new JLabel("Port:");
         label.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         label.setToolTipText(desc);
-        portField.setToolTipText(desc);
+        hostField.setToolTipText(desc);
         tb.add(label);
-        tb.add(portField);
+        tb.add(hostField);
         
         
         desc = "The root directory to look for scripts.";
@@ -179,10 +178,10 @@ public class ServerGUI extends JFrame {
             boolean starting = true;
             try {
                 if (server==null) {
-                    System.out.println("Attempting to start server on port "+portField.getValue()+"...");
+                    System.out.println("Attempting to start server on "+hostField.getText()+"...");
                     System.out.flush();
                     server = HTTPServer.startServer(
-                            (Integer)portField.getValue(),
+                            hostField.getText(),
                             rootField.getText(), 
                             mainField.getText()
                            );

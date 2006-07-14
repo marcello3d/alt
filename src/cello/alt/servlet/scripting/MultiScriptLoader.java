@@ -65,13 +65,13 @@ public class MultiScriptLoader extends ScriptLoader {
     }
 
     /**
-     * @see ScriptLoader#getResource(java.lang.String)
+     * @see ScriptLoader#findResource(java.lang.String)
      */
     @Override
-    public Resource getResource(String path) throws ResourceException {
+    protected Resource findResource(String path) throws ResourceException {
         for (ScriptLoader sl : loaders) 
             try {
-                return sl.getResource(path);
+                return sl.findResource(path);
             } catch (ResourceException ex) {
                 continue;
             }

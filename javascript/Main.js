@@ -1,7 +1,7 @@
 
 
 
-var session = request.getSession(true);
+var session = request.session;
 
 response.contentType = "text/html; charset=UTF-8";
 response.status = (response.SC_OK);
@@ -48,6 +48,7 @@ o.println("</head>");
 o.println("<body>");
 o.println("<pre>"+request+"</pre>");
 
+
 Rhino.require('alt.html.StringUtils');
 
 function writeln(s) {
@@ -59,6 +60,25 @@ function writeColorln(color) {
 	}
 }
 
+writeln(request.getRequestURI());
+
+writeln("session = "+session);
+writeln("date = "+new Date());
+
+
+Rhino.log("alt="+alt);
+Rhino.log("alt.util="+alt.util);
+Rhino.log("alt.html="+alt.html);
+Rhino.log("alt.module="+alt.module);
+//Rhino.log("alt.util.module="+alt.util.module);
+//Rhino.log("util="+util);
+Rhino.log("module="+module);
+Rhino.log("global.alt="+global.alt);
+Rhino.log("global.alt.util="+global.alt.util);
+Rhino.log("global.alt.module="+global.alt.module);
+//Rhino.log("global.alt.util.module="+global.alt.util.module);
+Rhino.log("global.util="+global.util);
+Rhino.log("global.module="+global.module);
 
 // Do tests
 Rhino.require('tests.Tester');
@@ -203,10 +223,6 @@ var delight = new alt.delight.Delight(sql, db);
 
 o.print('<span class="squeal">' + sql.toHTML() + '</span>');
 
-writeln(request.getRequestURI());
-
-writeln("session = "+session);
-writeln("date = "+new Date());
 o.println("</body>");
 o.println("</html>");
 

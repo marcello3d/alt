@@ -7,9 +7,9 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.servlet.HashSessionIdManager;
 import org.mortbay.jetty.servlet.ServletHandler;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.servlet.SessionHandler;
 
 /**
  * A simple Jetty6 wrapper for running RhinoServlet.  Features commandline
@@ -30,38 +30,116 @@ public class HTTPServer {
     /**
      * Starts a new Jetty6 server and adds the RhinoServlet to the default path.
      * 
-     * @param port  the port to listen on
+     * @param host  the host:port to listen on
      * @param root  the initial scriptpath to load scripts from
      * @param main  the initial script to load
      * @return  the newly created server object.
      * @throws Exception  if there was a problem creating the server.
      */
-    public static Server startServer(int port, String root, String main) throws Exception {
+    public static Server startServer(String host, String root, String main) throws Exception {
 
+        
         Server server = new Server();
         
         SocketConnector connector = new SocketConnector();
-        connector.setPort(port);
+        int colon = host.lastIndexOf(':');
+        if (colon<0)
+            connector.setPort(Integer.parseInt(host));
+        else
+        {
+            connector.setHost(host.substring(0,colon));
+            connector.setPort(Integer.parseInt(host.substring(colon+1)));
+        }
+        server.setConnectors(new Connector[]{connector});
         
         server.setConnectors (new Connector[]{connector});   
-        server.setSessionIdManager(new HashSessionIdManager());
 
+        // Make servlet
         ServletHandler servlet = new ServletHandler();
         ServletHolder holder = 
-           servlet.addServletWithMapping("cello.alt.servlet.RhinoServlet", "/");
+            servlet.addServletWithMapping("cello.alt.servlet.RhinoServlet", "/");
         holder.setInitParameter("rhino.root", root);
         holder.setInitParameter("rhino.main", main);
         
+        // Make session handler
+        SessionHandler session = new SessionHandler();
+        session.setHandler(servlet);
+
+        // Make context handler
         ContextHandler context = new ContextHandler();
         context.setContextPath("/");
         context.setResourceBase(".");
-        context.setHandler(servlet);
         
+        context.setHandler(session);
+        
+
+        // Add handler
         ContextHandlerCollection contexts = new ContextHandlerCollection();
         contexts.addHandler(context);
         server.setHandler(contexts);
         
         return server;
+        
+        
+        
+        
+        
+        /*
+        
+
+        
+        // Create the server
+        Server server = new Server();
+        ContextHandlerCollection contexts = new ContextHandlerCollection();
+        server.setHandler(contexts);
+        
+        SocketConnector connector = new SocketConnector();
+        int colon = host.lastIndexOf(':');
+        if (colon<0)
+            connector.setPort(Integer.parseInt(host));
+        else
+        {
+            connector.setHost(host.substring(0,colon));
+            connector.setPort(Integer.parseInt(host.substring(colon+1)));
+        }
+        server.setConnectors(new Connector[]{connector});
+        
+        if (args.length<3)
+        {
+            ContextHandler context = new ContextHandler();
+            context.setContextPath("/");
+            context.setResourceBase(args.length==1?".":args[1]);
+            ServletHandler servlet = new ServletHandler();
+            servlet.addServletWithMapping("org.mortbay.jetty.servlet.DefaultServlet", "/");
+            context.setHandler(servlet);
+            contexts.addHandler(context);
+        }
+        else if ("-webapps".equals(args[1]))
+        {
+            WebAppContext.addWebApplications(server, args[2], WebAppContext.WEB_DEFAULTS_XML, true, true);
+        }
+        else if ("-webapp".equals(args[1]))
+        {
+            WebAppContext webapp = new WebAppContext();
+            webapp.setResourceBase(args[2]);
+            webapp.setContextPath("/");
+            contexts.addHandler(webapp);
+            
+        }
+            
+        server.start();
+        
+        */
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }
     /**
      * @param args
@@ -71,7 +149,7 @@ public class HTTPServer {
             String flag = null;
             String root = "/javascript/";
             String main = "Main";
-            int port = 4500;
+            String host = "4500";
             boolean gui = !GraphicsEnvironment.isHeadless();
             for (String arg : args)
                 if (flag!=null) {
@@ -79,12 +157,8 @@ public class HTTPServer {
                         root = arg;
                     if (flag.equals("-m") || flag.equals("-main"))
                         main = arg;
-                    else if (flag.equals("-p") || flag.equals("-port"))
-                        try { 
-                            port = Integer.valueOf(arg);
-                        } catch (NumberFormatException ex) {
-                            // nothing
-                        }
+                    else if (flag.equals("-h") || flag.equals("-host"))
+                        host = arg;
                     flag = null;
                 } else {
                     if (arg.equals("-nogui"))
@@ -105,7 +179,7 @@ public class HTTPServer {
                         System.out.println("    -version          version information (-v)");
                         System.out.println("    -root path        set the default script path to path (-r, default /)");
                         System.out.println("    -main script      the initial script to load (-m, default Main)");
-                        System.out.println("    -port n           set the http port to n (-p, default 4500)");
+                        System.out.println("    -host host:port   set the http host:port (-p, default 4500)");
                         System.out.println("    -gui              enable gui (default)");
                         System.out.println("    -nogui            disable gui");
                         System.out.println();
@@ -114,12 +188,12 @@ public class HTTPServer {
                     }
                 }
             if (gui) {
-                ServerGUI servergui = new ServerGUI(port, root, main);
+                ServerGUI servergui = new ServerGUI(host, root, main);
                 servergui.setVisible(true);
                 servergui.start();
                 
             } else {
-                Server server = startServer(port, root, main);
+                Server server = startServer(host, root, main);
                 server.start();
             }
         } catch (Exception ex) {

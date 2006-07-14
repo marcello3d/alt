@@ -87,10 +87,10 @@ public class JarScriptLoader extends ScriptLoader {
     }
 
     /**
-     * @see ScriptLoader#getResource(java.lang.String)
+     * @see ScriptLoader#findResource(java.lang.String)
      */
     @Override
-    public Resource getResource(String name) throws ResourceException {
+    protected Resource findResource(String name) throws ResourceException {
         String path = getPath(name);
         try {
             openZip();

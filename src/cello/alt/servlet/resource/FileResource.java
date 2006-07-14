@@ -45,7 +45,7 @@ public class FileResource extends URLResource {
     }
 
     /**
-     * @see cello.alt.servlet.resource.MutableResource#getVersionTag()
+     * @see MutableResource#getVersionTag()
      */
     @Override
     public Object getVersionTag() {

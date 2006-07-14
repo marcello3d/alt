@@ -72,10 +72,10 @@ public class DirectoryScriptLoader extends ScriptLoader {
         return null;
     }
     /**
-     * @see ScriptLoader#getResource(java.lang.String)
+     * @see ScriptLoader#findResource(java.lang.String)
      */
     @Override
-    public Resource getResource(String path) throws ResourceException {
+    protected Resource findResource(String path) throws ResourceException {
         try {
             return new FileResource(this, path, new File(directory,path));
         } catch (MalformedURLException ex) {

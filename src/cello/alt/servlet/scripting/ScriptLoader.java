@@ -26,6 +26,7 @@ import cello.alt.servlet.resource.ResourceException;
 public abstract class ScriptLoader {
     
     private Map<String,JavaScript> cache = new HashMap<String,JavaScript>();
+    private Map<String,Resource> resourceCache = new HashMap<String,Resource>();
     
     private ScriptLoader parentLoader;
 
@@ -109,6 +110,48 @@ public abstract class ScriptLoader {
             throw new ScriptNotFoundException("Could not load "+name, ex);
         }
     }
+
+    
+    /**
+     * Returns the {@link Resource} object associated with the path to this 
+     *  ScriptLoader. 
+     * @param path  The path to the resource to get.
+     * @return  the Resource object
+     * @throws ResourceException  if the script was not found
+     */
+    public Resource getResource(String path) throws ResourceException {
+        
+        // Check if the script has been loaded
+        Resource resource = findLoadedResource(path);
+        if (resource != null)
+            return resource;
+        
+        // Check parent loader
+        if (parentLoader != null)
+            try {
+                return parentLoader.getResource(path);
+            } catch (ResourceException ex) {
+                // nothing
+            }
+            
+        // Find the class
+        resource = findResource(path);
+        
+        // Store in cache
+        resourceCache.put(path,resource);
+        
+        return resource;
+    }
+    
+    /**
+     * Returns a previously (cached) loaded script.  If the script cannot be
+     * found, null is returned. 
+     * @param name  the name of the script
+     * @return the cached script or null
+     */
+    protected Resource findLoadedResource(String name) {
+        return resourceCache.get(name);
+    }
     
     /**
      * Gets a resource relative to another resource.  This can be a relative 
@@ -155,7 +198,7 @@ public abstract class ScriptLoader {
      * @return  the resource
      * @throws ResourceException if there was a problem loading the resource
      */
-    public abstract Resource getResource(String name) 
+    protected abstract Resource findResource(String name) 
             throws ResourceException;
 
     /**
