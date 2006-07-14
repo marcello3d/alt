@@ -93,7 +93,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
         loader.setModuleProvider(globalScope);
         
         ServletContext context = getServletContext();
-        System.out.println("context = "+context);
+
         addScriptLoader(new ContextScriptLoader(loader, context, "/WEB-INF/scripts/"));
         addScriptLoader(new ContextScriptLoader(loader, context, getInitParameter("rhino.root","/")));
 

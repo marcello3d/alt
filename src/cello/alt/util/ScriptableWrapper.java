@@ -47,7 +47,6 @@ public class ScriptableWrapper extends ScriptableObject {
 	 */
 	public static void init(Scriptable scope) {
 
-        System.out.println("ScriptableWrapper.init("+scope+")");
         ScriptableWrapper proto = new ScriptableWrapper();
         proto.setPrototype(getObjectPrototype(scope));
         Member ctorMember = null;
