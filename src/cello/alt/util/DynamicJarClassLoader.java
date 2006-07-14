@@ -52,8 +52,8 @@ public class DynamicJarClassLoader extends URLClassLoader {
      */
     @Override
     public void addURL(URL url) {
-        super.addURL(url);
         System.out.println("Adding URL... "+url);
+        super.addURL(url);
     }
     /**
      * If we have trouble finding a class, check the if the folder has been 
@@ -80,19 +80,20 @@ public class DynamicJarClassLoader extends URLClassLoader {
     private boolean checkFolder() {
         boolean addedSomething = false;
         for (File base : this.bases)
-            for (File f : base.listFiles()) 
-                if (!seenFiles.contains(f))
-                    try {
-                        seenFiles.add(f);
-                        String name = f.getName().toLowerCase();
-                        if (name.endsWith(".jar") || name.endsWith(".zip")) {
-                            addURL(new URL("file:"+f.getCanonicalPath()));
-                            addedSomething = true;
+            if (base.isDirectory())
+                for (File f : base.listFiles()) 
+                    if (!seenFiles.contains(f))
+                        try {
+                            seenFiles.add(f);
+                            String name = f.getName().toLowerCase();
+                            if (name.endsWith(".jar") || name.endsWith(".zip")) {
+                                addURL(new URL("file:"+f.getCanonicalPath()));
+                                addedSomething = true;
+                            }
+                        } catch (Exception ex) {
+                            // continue
+                            System.err.println("cannot add "+f+":"+ex);
                         }
-                    } catch (Exception ex) {
-                        // continue
-                        System.err.println("cannot add "+f+":"+ex);
-                    }
         return addedSomething;
     }
 }

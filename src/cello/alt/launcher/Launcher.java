@@ -22,13 +22,14 @@ public class Launcher {
             // Get base directory
             File base = new File(System.getProperty("alt.home","."));
             File libdirs[] = {
-                    new File(base, "lib/jetty"),
                     new File(base, "lib/core"),
+                    new File(base, "lib/jetty"),
                     new File(base, "lib/ext")
             };
             
             // Construct a loader
-            ClassLoader loader = new DynamicJarClassLoader(libdirs);
+            DynamicJarClassLoader loader = new DynamicJarClassLoader(libdirs,
+                    Launcher.class.getClassLoader());
             Thread.currentThread().setContextClassLoader(loader);
             
             // Initialize HTTP server
