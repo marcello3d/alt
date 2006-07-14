@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import cello.alt.servlet.scripting.ScriptLoader;
+import cello.alt.servlet.script.ScriptLoader;
 
 /**
  * This interface is used to wrap the concept of Resources from servlets.

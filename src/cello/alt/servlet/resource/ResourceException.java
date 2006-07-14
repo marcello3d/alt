@@ -1,6 +1,6 @@
 package cello.alt.servlet.resource;
 
-import cello.alt.servlet.scripting.ScriptLoader;
+import cello.alt.servlet.script.ScriptLoader;
 
 /**
  * Exception for when a resource is not found by the {@link ScriptLoader}.

@@ -21,12 +21,12 @@ import cello.alt.servlet.js.DynamicFactory;
 import cello.alt.servlet.js.GlobalScope;
 import cello.alt.servlet.js.NamedScriptableObject;
 import cello.alt.servlet.js.NativeJavaInterface;
-import cello.alt.servlet.scripting.ContextScriptLoader;
-import cello.alt.servlet.scripting.DirectoryScriptLoader;
-import cello.alt.servlet.scripting.JarScriptLoader;
-import cello.alt.servlet.scripting.JavaScript;
-import cello.alt.servlet.scripting.MultiScriptLoader;
-import cello.alt.servlet.scripting.ScriptLoader;
+import cello.alt.servlet.script.ContextScriptLoader;
+import cello.alt.servlet.script.DirectoryScriptLoader;
+import cello.alt.servlet.script.JarScriptLoader;
+import cello.alt.servlet.script.JavaScript;
+import cello.alt.servlet.script.MultiScriptLoader;
+import cello.alt.servlet.script.ScriptLoader;
 
 /**
  * The main Servlet class for serving up JavaScript-based web pages.

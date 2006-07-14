@@ -20,9 +20,9 @@ import org.mozilla.javascript.Wrapper;
 
 import cello.alt.servlet.RhinoServlet;
 import cello.alt.servlet.resource.ResourceException;
-import cello.alt.servlet.scripting.JavaScript;
-import cello.alt.servlet.scripting.ScriptLoader;
-import cello.alt.servlet.scripting.ScriptNotFoundException;
+import cello.alt.servlet.script.JavaScript;
+import cello.alt.servlet.script.ScriptLoader;
+import cello.alt.servlet.script.ScriptNotFoundException;
 
 /**
  * Top-level scope object for RhinoServlet.  This defines the standard objects,

@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import cello.alt.servlet.scripting.ScriptLoader;
+import cello.alt.servlet.script.ScriptLoader;
 
 /**
  * Defines a default implementation for MutableResources.  getTag() is based on 
