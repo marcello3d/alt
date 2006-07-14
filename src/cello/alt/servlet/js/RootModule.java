@@ -1,5 +1,7 @@
 package cello.alt.servlet.js;
 
+import org.mozilla.javascript.ScriptableObject;
+
 import cello.alt.servlet.RhinoServlet;
 
 /**
@@ -30,12 +32,11 @@ public class RootModule extends Module {
     @Override
     protected void addChild(Module module) {
         // Add to global
-        System.out.println(this+".addChild("+module+")");
         globalScope.defineProperty(module.getName(), module, 
                 RhinoServlet.PROTECTED);
     }
     /**
-     * @see org.mozilla.javascript.ScriptableObject#getClassName()
+     * @see ScriptableObject#getClassName()
      */
     @Override
     public String getClassName() {

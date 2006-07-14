@@ -83,6 +83,7 @@ public class MultiScriptLoader extends ScriptLoader {
      */
     @Override
     public Set<String> getResourcePaths(String path) {
+        System.out.println(this+".getResourcePaths("+path+")");
         Set<String> fullSet = new HashSet<String>();
         for (ScriptLoader sl : loaders) {
             Set<String> set = sl.getResourcePaths(path);

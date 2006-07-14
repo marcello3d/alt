@@ -64,22 +64,6 @@ writeln(request.getRequestURI());
 
 writeln("session = "+session);
 writeln("date = "+new Date());
-
-
-Rhino.log("alt="+alt);
-Rhino.log("alt.util="+alt.util);
-Rhino.log("alt.html="+alt.html);
-Rhino.log("alt.module="+alt.module);
-//Rhino.log("alt.util.module="+alt.util.module);
-//Rhino.log("util="+util);
-Rhino.log("module="+module);
-Rhino.log("global.alt="+global.alt);
-Rhino.log("global.alt.util="+global.alt.util);
-Rhino.log("global.alt.module="+global.alt.module);
-//Rhino.log("global.alt.util.module="+global.alt.util.module);
-Rhino.log("global.util="+global.util);
-Rhino.log("global.module="+global.module);
-
 // Do tests
 Rhino.require('tests.Tester');
 
@@ -91,12 +75,6 @@ tests.Tester.test(this,
 	writeln, writeColorln('green'), writeColorln('red')
 	);
 
-
-
-
-var d = new Date();
-var o2 = {};
-o2[d] = 2;
 
 
 //Rhino.require('alt.util.Inspector');

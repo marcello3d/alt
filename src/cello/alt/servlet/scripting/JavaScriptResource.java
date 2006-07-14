@@ -101,7 +101,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @return true if the script was actually reloaded
      * @throws IOException  if there was an error loading
      */
-    public boolean update(Context cx) throws IOException {
+    public synchronized boolean update(Context cx) throws IOException {
         //System.out.println("update : "+this);
         
         // If script has been modified, or if any of the cascading dependencies 
@@ -132,7 +132,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
         
         // Compile file if necessary
         if (compiledScript==null || isModified()) {
-            System.out.println("compile : "+this);
+            //System.out.println("compile : "+this);
             compiledScript = compile(cx);
         }
         
@@ -166,7 +166,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @return true if the script is modified
      */
     protected boolean isModified() {
-        return versionTag==null || versionTag.equals(getVersionTag());
+        return versionTag==null || !versionTag.equals(getVersionTag());
     }
     
     /**
@@ -178,8 +178,8 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      */
     protected Script compile(Context cx) throws IOException {
         versionTag = getVersionTag();
-        return cx.compileReader(new InputStreamReader(resource.getStream()),
-                    getPath(), 1, null);
+        return cx.compileReader(new InputStreamReader(getStream()), getName(), 
+                1, null);
     }
     
     /**

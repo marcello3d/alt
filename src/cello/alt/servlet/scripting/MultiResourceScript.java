@@ -38,7 +38,9 @@ public class MultiResourceScript implements JavaScript {
             String moduleName) {
         this.loader = loader;
         // This should end with a .
-        this.moduleName = moduleName;
+        this.moduleName = moduleName.substring(0,moduleName.lastIndexOf('.'));
+        if (!basePath.startsWith("/"))
+            basePath = "/"+basePath;
         this.basePath = basePath;
     }
     
@@ -69,13 +71,12 @@ public class MultiResourceScript implements JavaScript {
         
         boolean somethingLoaded = false;
         
-        for (String path : paths) {
-            System.out.println (this+" looking at "+path);
+        for (String path : paths)
             if (path.endsWith(".js"))
                 try {
                     // Get the script name
-                    String scriptName = moduleName + 
-                                          path.substring(path.lastIndexOf('/'), 
+                    String scriptName = moduleName + '.' + 
+                               path.substring(path.lastIndexOf('/')+1, 
                                               path.lastIndexOf('.'));
                     // Load the script and try to get a dependency
                     JavaScript s = getScriptLoader().loadScript(scriptName);
@@ -89,7 +90,6 @@ public class MultiResourceScript implements JavaScript {
                     ex.printStackTrace(System.err);
                     continue;
                 }
-        }
         return somethingLoaded;
     }
 

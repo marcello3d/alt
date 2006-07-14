@@ -1,7 +1,7 @@
 /**
  * 
  */
-package cello.alt.servlet.scripting;
+package cello.alt.servlet.js;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;

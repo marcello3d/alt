@@ -62,7 +62,10 @@ public class ContextScriptLoader extends ScriptLoader {
      */
     @Override
     protected Resource findResource(String path) throws ResourceException {
-        String fullPath = basePath+path;
+        if (!path.startsWith("/"))
+            path = "/"+path;
+        
+        String fullPath = basePath+path.substring(1);
         String realPath = context.getRealPath(fullPath);
         try {
             if (realPath!=null)
@@ -79,6 +82,9 @@ public class ContextScriptLoader extends ScriptLoader {
      */
     @Override
     public Set<String> getResourcePaths(String path) {
+        if (path.startsWith("/"))
+            path = path.substring(1);
+        
         Set paths = context.getResourcePaths(basePath+path);
         if (paths==null)
             return null;
@@ -88,8 +94,9 @@ public class ContextScriptLoader extends ScriptLoader {
             if (o instanceof String) {
                 String s = (String)o;
                 if (s.startsWith(basePath))
-                    newSet.add(s.substring(basePath.length()));
+                    newSet.add(s.substring(basePath.length()-1));
             }
+
         return newSet;
     }
     

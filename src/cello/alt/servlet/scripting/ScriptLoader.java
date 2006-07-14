@@ -58,6 +58,12 @@ public abstract class ScriptLoader {
         JavaScript script = findLoadedScript(name);
         if (script != null)
             return script;
+
+        if (name.endsWith(".*")) {
+            script = new MultiResourceScript(this, getPath(name), name);
+            cache.put(name,script);
+            return script;
+        }
         
         // Check that the name is valid
         if (!isValidName(name))
@@ -73,7 +79,7 @@ public abstract class ScriptLoader {
             
         // Find the class
         script = findScript(name);
-        
+
         // Store in cache
         cache.put(name,script);
         return script;
@@ -99,9 +105,6 @@ public abstract class ScriptLoader {
      */
     protected JavaScript findScript(String name) throws ScriptNotFoundException {
         try {
-            if (name.endsWith(".*"))
-                return new MultiResourceScript(this, getPath(name), name);
-
             String path = getPath(name);
             return new JavaScriptResource(
                     getModuleProvider().getScriptModule(name), 

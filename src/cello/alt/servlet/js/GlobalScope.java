@@ -77,7 +77,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
     }
 
     /**
-     * @see cello.alt.servlet.js.ModuleProvider#getScriptModule(java.lang.String)
+     * @see ModuleProvider#getScriptModule(java.lang.String)
      */
     public Module getScriptModule(String name) {
         int index = name.lastIndexOf('.');
@@ -97,7 +97,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         for (String moduleName : modulePath.split("\\.")) {
             // Check if there already exists an object with this module name
             Object o = ScriptableObject.getProperty(module,moduleName);
-            System.out.println("looking in "+module+" for "+moduleName+" found "+o);
+
             // If not, create the new scope.
             module = (o == Scriptable.NOT_FOUND) ? new Module(this, module,
                     moduleName) : (Module) o;
@@ -106,8 +106,6 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         
         // Add to cache
         moduleScopes.put(modulePath, module);
-        
-        System.out.println("getModule("+name+") : "+module);
         
         return module;
     }

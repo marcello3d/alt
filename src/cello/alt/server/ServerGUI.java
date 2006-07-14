@@ -196,6 +196,8 @@ public class ServerGUI extends JFrame {
                     this.putValue(Action.NAME, "Start Server");
                 }
             } catch (Exception ex) {
+                if (starting)
+                    server = null;
                 System.err.println("Exception "+(starting?"starting":"stopping")+" server:");
                 ex.printStackTrace(System.err);
             }

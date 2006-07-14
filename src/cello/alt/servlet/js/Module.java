@@ -65,7 +65,6 @@ public class Module extends ScriptableObject {
      * @param module
      */
     protected void addChild(Module module) {
-        System.out.println(this+".addChild("+module+") : "+module.getName());
         // Add the child scope as a member of the parent
         defineProperty(module.getName(), module, RhinoServlet.PROTECTED);
     }
@@ -75,7 +74,7 @@ public class Module extends ScriptableObject {
      */
     @Override
     public String getClassName() {
-        return "Module "+getFullName()+hashCode();
+        return "Module "+getFullName();
     }
     
     /**
