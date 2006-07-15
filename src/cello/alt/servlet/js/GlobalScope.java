@@ -370,7 +370,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
          * @param msg
          */
         public void log(Object msg) {
-            System.out.println("Rhino.log: "+msg.toString());
+            System.out.println("Rhino.log: "+Context.toString(msg));
         }
         
         /**

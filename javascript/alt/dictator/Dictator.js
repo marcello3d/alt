@@ -2,9 +2,9 @@
 Rhino.require('alt.dictator.Path');
 
 // This should not change per Servlet instance
-var mainScript = Servlet.config.getInitParameter('dictator.main');
+var mainScript = Servlet.config.getInitParameter('dictator.index');
 if (mainScript == null)
-	mainScript = 'Main';
+	mainScript = 'Index';
 
 var nopFunction = function() {};
 
@@ -50,7 +50,7 @@ Dictator.prototype.handle = function(request, response, scope) {
  * @param {String}   script  the name of the script as used by Rhino.require()
  */
 Dictator.prototype.error = function(script) {
-	this.exceptionScript = script;
+	this.errorScript = script;
 }
 
 /**
@@ -102,7 +102,6 @@ Dictator.prototype.path = function(path, script) {
 		this.recordPath(path,script);
 }
 Dictator.prototype.paths = function(scripts) {
-	Rhino.log('path = '+this.requestPath);
 	// Get the next path string
 	var script = scripts[this.requestPath.next];
 	// Found a path
@@ -118,7 +117,7 @@ Dictator.prototype.recordPath = function (path,script) {
 	this.recordedPaths[path] = script;
 }
 Dictator.prototype.handleScript = function(script) {
-//	try {
+	try {
 		var lastPath = this.requestPath.pop();
 		
 		// Clear list
@@ -135,9 +134,9 @@ Dictator.prototype.handleScript = function(script) {
 		
 		// Set it as handled
 		this.setHandled();
-//	} catch (ex) {
-//		this.handleException(ex);
-//	}
+	} catch (ex) {
+		this.handleException(ex);
+	}
 }
 Dictator.prototype.filter = function(script) {
 	try {
@@ -156,8 +155,9 @@ Dictator.prototype.handleException = function(ex) {
 	exScope.prototype = this.scope;
 	
 	// Evaluate the error script
-	try {
+	//try {
 		Rhino.evaluate(this.errorScript, exScope);
+		/*
 	} catch (ex2) {
 		// Error in error script, try fail-safe
 		exScope.nestedException = ex2;
@@ -166,10 +166,9 @@ Dictator.prototype.handleException = function(ex) {
 		} catch (ex3) {
 			throw [ex,ex2,ex3];
 		}
-	}
+	}*/
 }
 Dictator.prototype.setHandled = function() {
-	Rhino.log("handled !");
 	// Destroy all the functions that do anything
 	      this.path = 
 	     this.paths = 

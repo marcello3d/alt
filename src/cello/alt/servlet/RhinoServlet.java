@@ -3,6 +3,11 @@ package cello.alt.servlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
@@ -54,6 +59,8 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
                                          ScriptableObject.PERMANENT |
                                          ScriptableObject.READONLY;
 
+    private ExecutorService pool;
+    
     /**
      * Constructs a new RhinoServer
      */
@@ -89,6 +96,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
      */
     @Override
     public void init() {
+        pool = Executors.newCachedThreadPool();
         globalScope = new GlobalScope(this);
         loader.setModuleProvider(globalScope);
         
@@ -204,6 +212,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
                 ex.printStackTrace(out);
                 return;
             }
+            resp.reset();
             resp.setStatus(500);
             resp.setContentType("text/html");
             PrintWriter out = resp.getWriter();
@@ -222,7 +231,8 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             out.println(" <p><address>"+NAME_VERSION+"</address></p>");
             out.println(" </body>");
             out.println("</html>");
-        } catch (IOException ex2) {
+        } catch (Throwable ex2) {
+            ex.printStackTrace(System.err);
             ex2.printStackTrace(System.err);
         }
     }
@@ -246,7 +256,64 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
         return child;
     }
     
-    
+
+    private class Service implements Callable<Void> {
+        private HttpServletRequest request;
+        private HttpServletResponse response;
+        /**
+         * Constructs a new service object
+         * @param request
+         * @param response
+         */
+        Service(HttpServletRequest request, HttpServletResponse response) {
+            this.request = request;
+            this.response = response;
+        }
+        /**
+         * Handles the service
+         * @return null
+         */
+        public Void call() {
+            long startTime = System.nanoTime();
+            Context cx = Context.enter();
+            cx.setOptimizationLevel(-1);
+            cx.putThreadLocal("rhinoServer",RhinoServlet.this);
+            try {
+
+                // retrieve JavaScript...
+                JavaScript s = loader.loadScript(mainScript);
+                
+                // Isolate the request from the module namespace
+                ScriptableObject requestScope = makeChildScope("RequestScope " +
+                        (requestCount++), 
+                        globalScope.getScriptModule(mainScript));
+                
+                cx.putThreadLocal("globalScope", globalScope);
+                cx.putThreadLocal("requestScope", requestScope);
+                // Define thread-local variables
+                requestScope.defineProperty("request", 
+                        new NativeJavaInterface(requestScope, request, 
+                                HttpServletRequest.class), PROTECTED);
+                
+                requestScope.defineProperty("response", 
+                        new NativeJavaInterface(requestScope, response, 
+                                HttpServletResponse.class), PROTECTED);
+                
+                // Evaluate the script in this scope
+                s.evaluate(cx, requestScope);
+            } catch (Throwable ex) {
+                handleError(response,ex);
+            } finally {
+                Context.exit();
+            }
+            long time = System.nanoTime() - startTime;
+            System.out.println("handled in "+(time*1e-9)+"sec");
+            
+            return null;
+        }
+ 
+    }
+
     private int requestCount = 1;
     /**
      * The main Servlet method. 
@@ -256,40 +323,13 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     @Override
     public void service(HttpServletRequest request, 
             HttpServletResponse response) {
-        long startTime = System.nanoTime();
-        Context cx = Context.enter();
-        cx.setOptimizationLevel(-1);
-        cx.putThreadLocal("rhinoServer",RhinoServlet.this);
+        
+        Future<Void> future = pool.submit(new Service(request, response));
         try {
-
-            // retrieve JavaScript...
-            JavaScript s = loader.loadScript(mainScript);
-            
-            // Isolate the request from the module namespace
-            ScriptableObject requestScope = makeChildScope("RequestScope " +
-                    (requestCount++), 
-                    globalScope.getScriptModule(mainScript));
-            
-            cx.putThreadLocal("globalScope", globalScope);
-            cx.putThreadLocal("requestScope", requestScope);
-            // Define thread-local variables
-            requestScope.defineProperty("request", 
-                    new NativeJavaInterface(requestScope, request, 
-                            HttpServletRequest.class), PROTECTED);
-            
-            requestScope.defineProperty("response", 
-                    new NativeJavaInterface(requestScope, response, 
-                            HttpServletResponse.class), PROTECTED);
-            
-            // Evaluate the script in this scope
-            s.evaluate(cx, requestScope);
-        } catch (Throwable ex) {
-            handleError(response,ex);
-        } finally {
-            Context.exit();
+            future.get(5000, TimeUnit.MILLISECONDS);
+        } catch (Throwable t) {
+            handleError(response,t);
         }
-        long time = System.nanoTime() - startTime;
-        System.out.println("handled in "+(time*1e-9)+"sec");
     }
 
 

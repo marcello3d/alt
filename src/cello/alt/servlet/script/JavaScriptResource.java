@@ -178,7 +178,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      */
     protected Script compile(Context cx) throws IOException {
         versionTag = getVersionTag();
-        return cx.compileReader(new InputStreamReader(getStream()), getName(), 
+        return cx.compileReader(new InputStreamReader(getStream()), getPath(), 
                 1, null);
     }
     
