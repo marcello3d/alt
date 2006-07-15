@@ -181,6 +181,16 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             cx.putThreadLocal("currentScript",script);
         return oldScript;
     }
+    /**
+     * Gets the current thread's script from a Context.
+     * @param cx  the javascript Context
+     * @return the current JavaScript, or null
+     */
+    public static Scriptable getRequestScope(Context cx) {
+        Object o = cx.getThreadLocal("requestScope");
+        if (o==null || !(o instanceof Scriptable)) return null;
+        return (Scriptable)o;
+    }
 
     /**
      * Helper function to print out error messages.
@@ -236,6 +246,8 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
         return child;
     }
     
+    
+    private int requestCount = 1;
     /**
      * The main Servlet method. 
      * @param request  the HTTP request object
@@ -254,21 +266,23 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             JavaScript s = loader.loadScript(mainScript);
             
             // Isolate the request from the module namespace
-            ScriptableObject threadScope = makeChildScope("RequestScope", 
+            ScriptableObject requestScope = makeChildScope("RequestScope " +
+                    (requestCount++), 
                     globalScope.getScriptModule(mainScript));
             
             cx.putThreadLocal("globalScope", globalScope);
+            cx.putThreadLocal("requestScope", requestScope);
             // Define thread-local variables
-            threadScope.defineProperty("request", 
-                    new NativeJavaInterface(threadScope, request, 
+            requestScope.defineProperty("request", 
+                    new NativeJavaInterface(requestScope, request, 
                             HttpServletRequest.class), PROTECTED);
             
-            threadScope.defineProperty("response", 
-                    new NativeJavaInterface(threadScope, response, 
+            requestScope.defineProperty("response", 
+                    new NativeJavaInterface(requestScope, response, 
                             HttpServletResponse.class), PROTECTED);
             
             // Evaluate the script in this scope
-            s.evaluate(cx, threadScope);
+            s.evaluate(cx, requestScope);
         } catch (Throwable ex) {
             handleError(response,ex);
         } finally {

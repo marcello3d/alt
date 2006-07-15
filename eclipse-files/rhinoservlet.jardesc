@@ -9,7 +9,9 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=alt/src&lt;cello.alt.servlet.scripting"/>
+        <javaElement handleIdentifier="=alt/src&lt;cello.alt.servlet.js"/>
         <javaElement handleIdentifier="=alt/src&lt;cello.alt.servlet"/>
+        <javaElement handleIdentifier="=alt/src&lt;cello.alt.servlet.script"/>
+        <javaElement handleIdentifier="=alt/src&lt;cello.alt.servlet.resource"/>
     </selectedElements>
 </jardesc>

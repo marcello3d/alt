@@ -43,7 +43,7 @@ TestCore.prototype.assertRun = function(code) {
 		return false;
 	}
 }
-TestCore.prototype.assertEquals = function(code, correctResult) {
+TestCore.prototype.assertEqual = function(code, correctResult) {
 	this.tests ++;
 	try {
 		var result = Rhino.eval(code,this.scope);
@@ -59,7 +59,7 @@ TestCore.prototype.assertEquals = function(code, correctResult) {
 	this.failures ++;
 	return false;
 }
-TestCore.prototype.assertNotEquals = function(code, incorrectResult) {
+TestCore.prototype.assertNotEqual = function(code, incorrectResult) {
 	this.tests ++;
 	try {
 		var result = Rhino.eval(code,this.scope);

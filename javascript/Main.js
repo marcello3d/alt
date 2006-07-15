@@ -1,49 +1,59 @@
 
 
 
+Rhino.require('alt.resource.Loader');
+Rhino.require('alt.resource.XML');
+Rhino.require('alt.resource.String');
+Rhino.require('alt.resource.Image');
+
+var res = alt.resource.Loader.get("/Main.xml");
+
+response.contentType = 'image/png';
+response.status = response.SC_OK;
+
+var BufferedImage = java.awt.image.BufferedImage;
+var Color = java.awt.Color;
+var Line = java.awt.geom.Line2D.Double;
+
+var img = new java.awt.image.BufferedImage(200,200,java.awt.image.BufferedImage.TYPE_INT_ARGB);
+var g = img.graphics;
+g.color = new Color(0xe0e0ff);
+g.fill(new java.awt.geom.Rectangle2D.Double(0,0,img.width,img.height));
+g.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+g.stroke = new java.awt.BasicStroke(20);
+g.color = Color.BLACK;
+g.draw(new Line(30,30,170,170));
+g.color = new Color(0x8080a0);
+g.draw(new Line(35,30,175,170));
+g.color = Color.BLACK;
+g.font = new java.awt.Font("Corbel",java.awt.Font.PLAIN,30);
+g.drawString("la la la!", 8, 190);
+g.color = new Color(0x8080a0);
+g.drawString("la la la!", 9, 191);
+
+
+g.color = Color.BLACK;
+g.font = new java.awt.Font("Corbel",java.awt.Font.PLAIN,10);
+g.drawString("homg ip! "+request.remoteAddr, 50, 20);
+g.drawString("homg host? "+request.remoteHost, 50, 30);
+
+Packages.javax.imageio.ImageIO.write(img, "png", response.outputStream);
+
+
+if (false) {
+	
 var session = request.session;
 
 response.contentType = "text/html; charset=UTF-8";
-response.status = (response.SC_OK);
+response.status = response.SC_OK;
 
 var o = response.writer;
 o.println("<html>");
 o.println("<head>");
 
 XML.ignoreComments = false;
-o.print(<style type="text/css"><!--
-body, p, td, th, li {
-	font-family: Verdana, sans-serif;
-}
 
-big {
-	font-size: 18pt;
-	font-weight: bold;
-}
-
-a {
-	color: #cc3333;
-}
-.squeal table, .delight table {
-	border: solid 1px black;
-}
-.squeal td, .squeal th, .delight td, .delight th {
-	border-bottom: solid 1px silver;
-	vertical-align: top;
-}
-.squeal .header, .delight .header {
-	background-color: #EEF;
-}
-.squeal .name, .squeal .namespace {
-	background-color: #CCF;
-	text-align: left;
-}
-.squeal .hidden {
-	background-color: #FFFFF0;
-	font-style: italic;
-}
- --></style>.toXMLString());
-
+o.print(res.toXMLString());
 o.println("</head>");
 o.println("<body>");
 o.println("<pre>"+request+"</pre>");
@@ -71,6 +81,8 @@ tests.Tester.test(this,
 	['tests.ScriptableWrapper',
 	 'tests.Synchronization',
 	 'tests.Modules',
+	 'tests.RequestScope',
+	 'tests.HashTest',
 	 'tests.E4X'],
 	writeln, writeColorln('green'), writeColorln('red')
 	);
@@ -205,4 +217,4 @@ o.println("</body>");
 o.println("</html>");
 
 
-
+}

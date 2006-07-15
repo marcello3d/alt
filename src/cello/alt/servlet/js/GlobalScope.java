@@ -4,7 +4,6 @@
 package cello.alt.servlet.js;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.Wrapper;
 
 import cello.alt.servlet.RhinoServlet;
 import cello.alt.servlet.resource.ResourceException;
@@ -150,8 +148,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                                     "eval",
                                     "addScriptPath",
                                     "getResource",
+                                    "getRequestScope",
                                     "synchronize",
-                                    "defineClass",
                                     "debug",
                                     "log"},
                                     RhinoClass.class,
@@ -327,6 +325,22 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             return currentScript.getResource(resourceName);
         }        
         /**
+         * JavaScript function "getRequestScope".  This returns the current
+         *  scope of execution, unique to every request. 
+         *   
+         * @param cx  javascript Context
+         * @param thisObj  javascript "this" object
+         * @param args  the arguments passed to the function
+         * @param funObj  the function object associated with this method
+         * @return  the return value of the JavaScript function
+         * @see ScriptableObject#defineFunctionProperties(String[], Class, int)
+         */
+        public static Object getRequestScope(Context cx, Scriptable thisObj, 
+                Object[] args, Function funObj) {
+
+            return RhinoServlet.getRequestScope(cx);
+        }        
+        /**
          * The JavaScript function "addScriptPath" has two formats:
          * <ul>
          *  <li>addScriptPath(string)</li>
@@ -340,37 +354,6 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 server.addScriptLoader((ScriptLoader)path);
             else
                 server.addScriptPath(Context.toString(path));
-        }
-        private static Class getClass(Object[] args) 
-        throws  ClassNotFoundException {
-            Object arg0 = args[0];
-            if (arg0 instanceof Wrapper) {
-                Object wrapped = ((Wrapper)arg0).unwrap();
-                if (wrapped instanceof Class)
-                    return (Class)wrapped;
-            }
-            String className = Context.toString(arg0);
-            return Class.forName(className);
-        }
-        /**
-         * Defines a class in the same style as 
-         * org.mozilla.javascript.tools.shell
-         * @see org.mozilla.javascript.tools.shell.Global#defineClass(org.mozilla.javascript.Context, org.mozilla.javascript.Scriptable, java.lang.Object[], org.mozilla.javascript.Function)
-         * @param cx
-         * @param thisObj
-         * @param args
-         * @param funObj
-         * @throws ClassNotFoundException if the class wasn't found
-         * @throws InvocationTargetException 
-         * @throws IllegalAccessException 
-         * @throws InstantiationException 
-         */
-        public static void defineClass(Context cx, Scriptable thisObj, 
-                Object[] args, Function funObj) throws ClassNotFoundException, 
-                InvocationTargetException, IllegalAccessException, 
-                InstantiationException {
-            Class clazz = getClass(args);
-            ScriptableObject.defineClass(thisObj, clazz);
         }
         /**
          * Starts the Rhino debugger
