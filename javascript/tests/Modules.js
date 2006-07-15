@@ -1,12 +1,12 @@
 
-Rhino.require("test.Func");
-Rhino.require("test.test2.*");
+Rhino.require('tests.moduletest.Func');
+Rhino.require('tests.moduletest.test2.*');
 
 var local = this;
 function foo(local) {
 	return true;
 }
 tc.assertRun('foo(local)');
-tc.assertRun('test.foo(local)');
-tc.assertRun('test.test2.foo(local)');
+tc.assertRun('tests.moduletest.foo(local)');
+tc.assertRun('tests.moduletest.test2.foo(local)');
 

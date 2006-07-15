@@ -5,12 +5,12 @@ Rhino.require('alt.resource.LoaderException');
 var Loader = {};
 
 Loader.resources = {};
+
 Loader.getResource = function(resourceName) {
 	// Check if we've got the resource before
 	if (!Loader.resources[resourceName])
 		Loader.resources[resourceName] = {
 			resource: Rhino.getResource(resourceName),
-			versionTag: null,
 			cache: new java.util.HashMap()
 		};
 		
@@ -44,8 +44,24 @@ Loader.getExtension = function(resourceName) {
 }
 
 
+
 /**
- * Constructs a resource
+ * Loads a resource fresh from the cache
+ */
+
+Loader.load = function(resourceName, constructor) {
+	// Get default constructor for files of this type, if they exist.
+	if (constructor==null)
+		constructor = Loader.getLoader(Loader.getExtension(resourceName));
+	
+	// Get the resource
+	var resource = Loader.getResource(resourceName);
+	
+	// Otherwise build a new object with constructor from resource
+	return new constructor(resource.resource, resourceName);
+}
+/**
+ * Gets a resource from the cache
  */
 Loader.get = function(resourceName, constructor) {
 	// Get default constructor for files of this type, if they exist.
@@ -63,27 +79,30 @@ Loader.get = function(resourceName, constructor) {
 	// If there is a cache, 
 	if (cachedObject != null) {
 		// and version not changed, return it
-		if (!newTag.equals(resource.versionTag))
-			return cachedObject;
+		if (!newTag.equals(cachedObject.versionTag))
+			return cachedObject.object;
 		// otherwise, check if the cachedObject has an 'updateResource' function
 		// and use it
-		if (cachedObject.updateResource instanceof Function) {
+		if (cachedObject.object.updateResource instanceof Function) {
 			// save new version tag
-			resource.versionTag = newTag;
+			cachedObject.versionTag = newTag;
 			// update resource
-			cachedObject.updateResource(resource.resource);
+			cachedObject.object.updateResource(resource.resource);
 			// return it
-			return cachedObject;
+			return cachedObject.object;
 		}
 	}
 		
 	// Otherwise build a new object with constructor from resource
-	var newObject = new constructor(resource.resource);
+	var newObject = new constructor(resource.resource, resourceName);
 
 	// Store new version tag		
 	resource.versionTag = newTag;
 	// Store in cache
-	resource.cache.put(constructor,newObject);
+	resource.cache.put(constructor,{
+		versionTag: newTag,
+		object: newObject
+	});
 	
 	return newObject;
 }

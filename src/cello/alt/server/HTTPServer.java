@@ -79,67 +79,6 @@ public class HTTPServer {
         server.setHandler(contexts);
         
         return server;
-        
-        
-        
-        
-        
-        /*
-        
-
-        
-        // Create the server
-        Server server = new Server();
-        ContextHandlerCollection contexts = new ContextHandlerCollection();
-        server.setHandler(contexts);
-        
-        SocketConnector connector = new SocketConnector();
-        int colon = host.lastIndexOf(':');
-        if (colon<0)
-            connector.setPort(Integer.parseInt(host));
-        else
-        {
-            connector.setHost(host.substring(0,colon));
-            connector.setPort(Integer.parseInt(host.substring(colon+1)));
-        }
-        server.setConnectors(new Connector[]{connector});
-        
-        if (args.length<3)
-        {
-            ContextHandler context = new ContextHandler();
-            context.setContextPath("/");
-            context.setResourceBase(args.length==1?".":args[1]);
-            ServletHandler servlet = new ServletHandler();
-            servlet.addServletWithMapping("org.mortbay.jetty.servlet.DefaultServlet", "/");
-            context.setHandler(servlet);
-            contexts.addHandler(context);
-        }
-        else if ("-webapps".equals(args[1]))
-        {
-            WebAppContext.addWebApplications(server, args[2], WebAppContext.WEB_DEFAULTS_XML, true, true);
-        }
-        else if ("-webapp".equals(args[1]))
-        {
-            WebAppContext webapp = new WebAppContext();
-            webapp.setResourceBase(args[2]);
-            webapp.setContextPath("/");
-            contexts.addHandler(webapp);
-            
-        }
-            
-        server.start();
-        
-        */
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
     }
     /**
      * @param args
@@ -148,7 +87,7 @@ public class HTTPServer {
         try {
             String flag = null;
             String root = "/javascript/";
-            String main = "Main";
+            String main = "alt.dictator.Main";
             String host = "4500";
             boolean gui = !GraphicsEnvironment.isHeadless();
             for (String arg : args)

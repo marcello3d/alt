@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 import org.mozilla.javascript.Context;
@@ -118,6 +119,9 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         private ServletClass(RhinoServlet server) {
             defineProperty("context", new NativeJavaInterface(this, 
                     server.getServletContext(), ServletContext.class), 
+                    RhinoServlet.PROTECTED);
+            defineProperty("config", new NativeJavaInterface(this, 
+                    server.getServletConfig(), ServletConfig.class), 
                     RhinoServlet.PROTECTED);
    
         }
