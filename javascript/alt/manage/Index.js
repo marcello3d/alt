@@ -13,15 +13,5 @@ xml..body[0] +=
 var table = xml..body.table;
 
 var node = global;
-var props = alt.util.Inspector.getProperties(node);
-
-Rhino.log(props.length);
-for (var x in props) {
-	xml..body.table +=
-	  <tr>
-	   <td><a href={x}>{x}</a></td>
-	   <td>{node[x]}</td>
-	  </tr>;
-}
 
 response.writer.print(xml.toXMLString());

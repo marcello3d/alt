@@ -126,14 +126,15 @@ Dictator.prototype.handleScript = function(script) {
 		// Evaluate script
 		Rhino.evaluate(script, this.scope);
 		
-		// Try index page (this will do nothing is a subpage handled this)
-		if (!this.handled && 
-				this.recordedPaths != null && 
-				this.requestPath.next == '')
-			Rhino.evaluate(this.indexScript, this.scope);
-		
-		// Set it as handled
-		this.setHandled();
+		// Was anything generated?
+		if (!this.handled && this.recordedPaths != null) {
+			if (this.requestPath.next == '') {
+				Rhino.evaluate(this.indexScript, this.scope);
+				this.setHandled();
+			}
+		} else
+			// Set it as handled
+			this.setHandled();
 	} catch (ex) {
 		this.handleException(ex);
 	}
@@ -155,9 +156,8 @@ Dictator.prototype.handleException = function(ex) {
 	exScope.prototype = this.scope;
 	
 	// Evaluate the error script
-	//try {
+	try {
 		Rhino.evaluate(this.errorScript, exScope);
-		/*
 	} catch (ex2) {
 		// Error in error script, try fail-safe
 		exScope.nestedException = ex2;
@@ -166,7 +166,7 @@ Dictator.prototype.handleException = function(ex) {
 		} catch (ex3) {
 			throw [ex,ex2,ex3];
 		}
-	}*/
+	}
 }
 Dictator.prototype.setHandled = function() {
 	// Destroy all the functions that do anything
