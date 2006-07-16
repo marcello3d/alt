@@ -2,6 +2,10 @@
 var x = 5;
 
 // Simple XML
+var x2 = <d/>;
+
+
+
 XML.prettyPrinting = false;
 XML.prettyIndent = false;
 tc.assertEqual('<foo>bar</foo>','bar');

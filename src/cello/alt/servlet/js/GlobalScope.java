@@ -45,7 +45,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
      */
     public GlobalScope(RhinoServlet server) {
         Context cx = Context.enter();
-        cx.initStandardObjects(this,false);
+        cx.initStandardObjects(this);
         Context.exit();
 
         // Two properties of global: a self pointer
@@ -258,7 +258,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             JavaScript s = loader.loadScript(scriptName);
             s.evaluate(cx, scope);
             
-            return s;
+            return Context.javaToJS(s,scope);
         }
         /**
          * JavaScript function "evaluate".  In order to access the current 
@@ -326,7 +326,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 throw new RuntimeException("Current script is undefined!");
             
             // Get the resource relative to the current script
-            return currentScript.getResource(resourceName);
+            return Context.javaToJS(currentScript.getResource(resourceName),
+                    thisObj);
         }        
         /**
          * JavaScript function "getRequestScope".  This returns the current

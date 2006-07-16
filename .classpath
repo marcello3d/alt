@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry path="src" kind="src"/>
-	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
 	<classpathentry path="lib/ext/mysql-connector-java-3.0.17-ga-bin.jar" kind="lib"/>
 	<classpathentry path="lib/jetty/commons-logging.jar" kind="lib"/>
-	<classpathentry path="lib/core/rhinoservlet.jar" kind="lib"/>
-	<classpathentry path="lib/ext/xbean.jar" kind="lib"/>
 	<classpathentry sourcepath="C:/java/jetty-6.0.0beta17/modules/jetty/src/main/java" path="lib/jetty/jetty.jar" kind="lib"/>
 	<classpathentry sourcepath="C:/java/jetty-6.0.0beta17/modules/util/src/main/java" path="lib/jetty/jetty-util.jar" kind="lib"/>
 	<classpathentry sourcepath="C:/java/jetty-6.0.0beta17/modules/servlet-api-2.5/src/main/java" path="lib/jetty/servlet-api-2.5.jar" kind="lib"/>
-	<classpathentry path="lib/core/altutil.jar" kind="lib"/>
-	<classpathentry path="lib/ext/E4XUtils.jar" kind="lib"/>
 	<classpathentry path="C:/java/jetty-6.0.0beta17/lib/jsp-2.1/ant-1.6.4.jar" kind="lib"/>
 	<classpathentry path="C:/java/jetty-6.0.0beta17/lib/jsp-2.1/commons-el-1.0.jar" kind="lib"/>
 	<classpathentry path="C:/java/jetty-6.0.0beta17/lib/jsp-2.1/core-3.1.0.jar" kind="lib"/>
@@ -19,5 +14,8 @@
 	<classpathentry path="C:/java/jetty-6.0.0beta17/lib/jsp-2.1/xercesImpl-2.6.2.jar" kind="lib"/>
 	<classpathentry path="C:/java/jetty-6.0.0beta17/lib/jsp-2.1/xmlParserAPIs-2.6.2.jar" kind="lib"/>
 	<classpathentry path="/rhinocvs" combineaccessrules="false" kind="src"/>
+	<classpathentry path="lib/ext/xbean.jar" kind="lib"/>
+	<classpathentry path="lib/ext/jsr173_1.0_api.jar" kind="lib"/>
+	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
 	<classpathentry path="bin" kind="output"/>
 </classpath>

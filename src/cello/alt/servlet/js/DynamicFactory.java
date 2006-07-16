@@ -29,7 +29,8 @@ public class DynamicFactory extends ContextFactory {
     @Override
     protected boolean hasFeature(Context cx, int feature) {
         if (feature == Context.FEATURE_DYNAMIC_SCOPE ||
-            feature == Context.FEATURE_STRICT_VARS)
+            feature == Context.FEATURE_STRICT_VARS ||
+            feature == Context.FEATURE_E4X)
             return true;
         return super.hasFeature(cx, feature);
     }
