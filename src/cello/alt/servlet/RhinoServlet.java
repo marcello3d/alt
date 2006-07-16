@@ -58,7 +58,11 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     public static final int PROTECTED = ScriptableObject.DONTENUM |
                                          ScriptableObject.PERMANENT |
                                          ScriptableObject.READONLY;
-
+    /**
+     * Visible protected access from ScriptableObject (read-only and permanent) 
+     */
+    public static final int VISIBLE = ScriptableObject.PERMANENT |
+                                        ScriptableObject.READONLY;
     private ExecutorService pool;
     
     /**
@@ -293,11 +297,11 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
                 // Define thread-local variables
                 requestScope.defineProperty("request", 
                         new NativeJavaInterface(requestScope, request, 
-                                HttpServletRequest.class), PROTECTED);
+                                HttpServletRequest.class), VISIBLE);
                 
                 requestScope.defineProperty("response", 
                         new NativeJavaInterface(requestScope, response, 
-                                HttpServletResponse.class), PROTECTED);
+                                HttpServletResponse.class), VISIBLE);
                 
                 // Evaluate the script in this scope
                 s.evaluate(cx, requestScope);

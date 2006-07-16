@@ -53,14 +53,6 @@ writeln("date = "+new Date());
 
 
 
-
-
-
-
-
-
-
-
 Rhino.require('alt.squeal.SQLSchema');
 Rhino.require('alt.squeal.sql.SQL');
 Rhino.require('alt.squeal.sql.Synchronize');
@@ -168,6 +160,14 @@ var delight = new alt.delight.Delight(sql, db);
 
 
 o.print('<span class="squeal">' + sql.toHTML() + '</span>');
+
+
+
+
+
+
+
+
 
 o.println("</body>");
 o.println("</html>");

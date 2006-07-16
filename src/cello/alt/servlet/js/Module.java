@@ -66,7 +66,7 @@ public class Module extends ScriptableObject {
      */
     protected void addChild(Module module) {
         // Add the child scope as a member of the parent
-        defineProperty(module.getName(), module, RhinoServlet.PROTECTED);
+        defineProperty(module.getName(), module, RhinoServlet.VISIBLE);
     }
 
     /**

@@ -168,6 +168,7 @@ public abstract class ScriptLoader {
      */
     public Resource getResource(Resource context, String path) 
             throws ResourceException {
+        System.out.println("getResource("+context+","+path+")");
         // Absolute path?
         if (path.startsWith("/"))
             return getResource(path);
@@ -178,11 +179,14 @@ public abstract class ScriptLoader {
         while (path.startsWith("../")) {
             path = path.substring(3);
             newPath = getBaseDir(newPath);
+            System.out.println("getResource : "+path+","+newPath);
         }
+        newPath += '/'+path;
         // TODO: Is this good?
         if (newPath.contains(".."))
             throw new ResourceException("Security-error path: "+newPath);
-        
+
+        System.out.println("getResource : "+newPath);
         // Return the resource
         return getResource(newPath);
     }

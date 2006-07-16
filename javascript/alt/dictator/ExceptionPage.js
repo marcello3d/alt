@@ -12,12 +12,13 @@ if (response.committed) {
 	out.println(" <head><title>Execution Error: 500</title></head>");
 	out.println(" <body>");
 	out.println("  <h2>Uncaught "+exception.name+"</h2>");
+	var str = exception;
+	if (exception.javaException)
+		str = exception.javaException.getClass().simpleName+ ": "+
+			exception.javaException.message;
     out.println("  <p><code>"+exception.fileName + ":" + 
-    					exception.lineNumber+ "</code>: " + exception+"</p>");
+    					exception.lineNumber+ "</code>: " + str + "</p>");
     
-    for (var x in exception) {
-    	out.println(x+" = "+exception[x]+"<br>");
-    }
 	if (exception.rhinoException) {
 		var sw = new java.io.StringWriter();
 		exception.rhinoException.printStackTrace(new java.io.PrintWriter(sw));
@@ -27,9 +28,9 @@ if (response.committed) {
 		out.println(exception);
 		var match;
 		var index = 0;
-		while (match = /at script\(([^:]+.js:[^)]+)\)/g.exec(stack,index)) {
+		while (match = /at (script[^)]*)\(([^:]+.js:[^)]+)\)/g.exec(stack,index)) {
 			index = match.index;
-			out.println('    '+match[1]);
+			out.println('    '+match[1]+" "+match[2]);
 		}
 		out.println("</pre></blockquote>");
 		out.println("  <p>Java stack trace:</p>");

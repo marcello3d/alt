@@ -1,9 +1,10 @@
 
-Rhino.log("Request: "+request.remoteAddr);
+Rhino.log("Request: "+request.remoteAddr + " "+request.method+" "+
+		request.requestURI);
 
 // Define some paths
 dictator.paths({
-	manage:     'alt.manage.Main',
+	manage:     'alt.manage.Index',
 	examples:   'examples.Index',
 	tests:      'tests.Index'
 });

@@ -33,7 +33,7 @@ public class RootModule extends Module {
     protected void addChild(Module module) {
         // Add to global
         globalScope.defineProperty(module.getName(), module, 
-                RhinoServlet.PROTECTED);
+                RhinoServlet.VISIBLE);
     }
     /**
      * @see ScriptableObject#getClassName()
