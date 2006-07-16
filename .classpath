@@ -17,5 +17,7 @@
 	<classpathentry path="lib/ext/xbean.jar" kind="lib"/>
 	<classpathentry path="lib/ext/jsr173_1.0_api.jar" kind="lib"/>
 	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
+	<classpathentry sourcepath="C:/java/commons-fileupload-1.1.1/src/java" path="lib/ext/commons-fileupload-1.1.1.jar" kind="lib"/>
+	<classpathentry path="lib/ext/commons-io-1.2.jar" kind="lib"/>
 	<classpathentry path="bin" kind="output"/>
 </classpath>

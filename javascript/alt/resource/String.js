@@ -2,14 +2,14 @@
 Rhino.require('alt.resource.Loader', true);
 
 
-function String(resource) {
-	var reader = new java.io.BufferedReader(
-						new java.io.InputStreamReader(resource.stream));
+function StringResource(resource) {
+	var isr = new java.io.InputStreamReader(resource.stream);
+	var reader = new java.io.BufferedReader(isr);
 	var line;
-	var str = "";
+	var str = new java.lang.StringBuffer();
 	while ((line = reader.readLine()) != null)
-		str += line;
-	return str;
+		str.append(line);
+	return str.toString();
 }
 
-Loader.defineType(String, 'txt');
+Loader.defineType(StringResource, 'txt');
