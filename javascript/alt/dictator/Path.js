@@ -2,6 +2,7 @@
 
 
 function Path(request) {
+	
 	/*
 	Rhino.log("request.pathInfo = "+request.pathInfo);
 	Rhino.log("request.pathTranslated = "+request.pathTranslated);
@@ -11,9 +12,12 @@ function Path(request) {
 	Rhino.log("request.requestURI = "+request.requestURI);
 	Rhino.log("request.requestURL = "+request.requestURL);
 	*/
-	this.servletPath = request.servletPath;
-	this.fullPath = request.requestURI;
-	this.remainingPath = request.servletPath;
+	
+	this.servletPath = 
+	this.remainingPath = request.pathInfo ? request.pathInfo : 
+						 request.servletPath ? request.servletPath :
+						 request.requestURI;
+						 
 	this.currentPath = '';
 	this.lastPath = '';
 	this.next = '';

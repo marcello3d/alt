@@ -1,0 +1,15 @@
+<html>
+<head>
+ <title>Inspector</title>
+ <style type="text/css">
+ pre {
+   font-size: 0.8em;
+ }
+ </style>
+</head>
+<body>
+<h1>Module inspector (dynamic class analysis)</h1>
+<div id="content"> </div>
+<p>Back to <a href="..">examples list</a>a></p>
+</body>
+</html>

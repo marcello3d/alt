@@ -8,17 +8,43 @@ function isObject(o) {
 			return true;
 	return false;
 }
-function isClass(func) {
-	for (var x in func.prototype)
+function isClass(name,o) {
+	if (!o) 
+		return false;
+	if (o instanceof Function)
+		for (var x in o.prototype)
+			return true;
+	if (o instanceof Object && name.match(/^[A-Z]/))
 		return true;
-//	if (func.toString().match(/this/))
-//		return true;
 	return false;
 }
 
 function Inspector(object) {
 	this.seen = new Array();
-	return new InspectorObject('[root]', this, object);
+	this.objects = {};
+	this.main = new InspectorObject(null, this, object);
+}
+Inspector.prototype.toHTML = function() {
+	return <>
+	 <p>Global:</p>
+	 {this.main.toHTML()}
+	 <p>Modules:</p>
+	 {Inspector.makeTable(this.objects)}
+	</>;
+}
+
+Inspector.makeTable = function(items) {
+	var foundSome = false;
+	var s = <table border="1"></table>;
+	var sorted = [];
+	for (var x in items)
+		sorted.push(x);
+	if (sorted.length==0) 
+		return false;
+	sorted.sort();
+	for each (var x in sorted)
+		s.appendChild(<tr><td valign="top">{x}</td><td>{items[x].toHTML()}</td></tr>);
+	return s;
 }
 function InspectorObject(name,inspector,object) {
 	for (var i=0; i<inspector.seen.length; i++)
@@ -29,58 +55,43 @@ function InspectorObject(name,inspector,object) {
 	this.classes = {};
 	this.functions = {};
 	this.properties = {};
-	this.literal = object.toString();
-//	Rhino.log("count : "+);
+	this.literal = object;
 	var names = [];
 	// get JSInspector's properties
 	var props = JSInspector.getProperties(object);
 	if (props.length>0) {
-		for each (var name in props)
-			names[name] = true;
-	} else {
-		// get other properties
-		//for (var name in object)
-		//names[name] = true; 
+		for each (var x in props)
+			names[x] = true;
 	}
+	var oname = name==null ? x : name+'.'+x;
 	for (var x in names) {
 		var child = object[x];
-//		Rhino.log("looking at object["+x+"]");
-		if (child instanceof Function) {
-			if (isClass(child))
-				this.classes[x] = new InspectorClass(x,inspector,child);
-			else
-				this.functions[x] = new InspectorFunction(x,child);
+		if (isClass(x, child)) {
+			this.classes[x] = new InspectorClass(oname,inspector,child);
+		} else if (child instanceof Function) {
+			this.functions[x] = new InspectorFunction(x,child);
 		} else if (isObject(child)) {
-			this.properties[x] = new InspectorObject(x,inspector,child);
+			inspector.objects[oname] = new InspectorObject(oname,inspector,child);
 		} else {
-			this.properties[x] = new InspectorProperty(x,child);
+			this.properties[x] = new InspectorProperty(oname,child);
 		}
 	}
 }
 
 InspectorObject.prototype.toHTML = function(head) {
 	
-	var f = function(items) {
-		var foundSome = false;
-		var s = <table border="1"></table>;
-		for (var x in items) {
-			foundSome = true;
-			s.appendChild(<tr><td valign="top">{x}</td><td>{items[x].toHTML()}</td></tr>);
-		}
-		if (foundSome)
-			return s;
-		return foundSome ? s : false;
-	}
 	var xml = <>{this.literal}</>;
 	
-	
-	var classes = f(this.classes);
+	var classes = Inspector.makeTable(this.classes);
 	if (classes) xml.appendChild(<p>Classes:{classes}</p>);
 	
-	var properties = f(this.properties);
+	var objects = Inspector.makeTable(this.objects);
+	if (objects) xml.appendChild(<p>Objects:{objects}</p>);
+	
+	var properties = Inspector.makeTable(this.properties);
 	if (properties) xml.appendChild(<p>Properties:{properties}</p>);
 	
-	var functions = f(this.functions);
+	var functions = Inspector.makeTable(this.functions);
 	if (functions) xml.appendChild(<p>Functions:{functions}</p>);
 	
 	return xml;
@@ -118,15 +129,21 @@ function InspectorClass(name,inspector,func) {
 InspectorClass.prototype.toHTML = function() {
 	var f = this.func.toString();
 	var args = /function[^(]+(\([^)]*\))/.exec(f);
+	var id = nextSpanId++;
+	var code = 'var s=document.getElementById("pre' + id + '").style;' +
+				's.display=s.display=="none"?"":"none";return false;';
 	return <>
-		<code>public {this.name}{args[1]} {'{...}'}</code>
+		Constructor: <code><b><a href="#" onclick={code}>{this.name}</a></b>{args[1]} 
+		{'{...}'}</code>
+	    <pre id={'pre'+id} style="display:none">{f}</pre>
 		{this.proto.toHTML()}
 	</>;
 }
-function InspectorProperty(object) {
+function InspectorProperty(name,object) {
+	this.name = name;
 	this.value = object;
 }
 InspectorProperty.prototype.toHTML = function() {
-	return this.value.toString();
+	return this.value;
 }
 
