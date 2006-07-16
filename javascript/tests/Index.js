@@ -30,6 +30,7 @@ tests.Tester.test(this,
 	 'tests.Modules',
 	 'tests.RequestScope',
 	 'tests.HashTest',
+	 'tests.Iterator',
 	 'tests.E4X'],
 	writeln, writeColorln('green'), writeColorln('red')
 	);

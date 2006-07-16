@@ -9,9 +9,10 @@ Loader.resources = {};
 Loader.getResource = function(resourceName) {
 	// Check if we've got the resource before
 	if (!Loader.resources[resourceName]) {
-		var res = new Object(Rhino.getResource(resourceName));
-		res.cache = new java.util.HashMap();
-		Loader.resources[resourceName] = res;
+		Loader.resources[resourceName] = {
+			resource: Rhino.getResource(resourceName),
+			cache: new java.util.HashMap()
+		};
 	}
 		
 	return Loader.resources[resourceName];
@@ -77,7 +78,7 @@ Loader.loadResource = function(resource, constructor, useCache) {
 		var cachedObject = resource.cache.get(constructor);
 		
 		// Check version tag
-		var newTag = resource.getVersionTag();
+		var newTag = resource.resource.getVersionTag();
 		
 		// If there is a cache, 
 		if (cachedObject != null) {

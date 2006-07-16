@@ -1,7 +1,7 @@
 Rhino.require('alt.resource.XML');
 
 default xml namespace = 'http://www.w3.org/1999/xhtml';
-var xml = alt.resource.Loader.get('Session.xml').copy();
+var xml = alt.resource.Loader.load('Session.xml');
 
 
 var sessiondata = request.session.getAttribute('data');
