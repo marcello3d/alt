@@ -72,8 +72,6 @@ Loader.get = function(resourceName, constructor) {
  * Loads a resource
  */
 Loader.loadResource = function(resource, constructor, useCache) {
-	Rhino.log("load resource "+resource.resource+" "+constructor+" use cache = "+useCache);
-	
 	var newTag = null;
 	if (useCache) {
 		// Check for cached object
@@ -81,17 +79,12 @@ Loader.loadResource = function(resource, constructor, useCache) {
 		
 		// Check version tag
 		newTag = resource.resource.getVersionTag();
-		Rhino.log("new tag = "+newTag);
 		
 		// If there is a cache, 
 		if (cachedObject != null) {
-			Rhino.log("old tag = "+cachedObject.versionTag);
 			// and version not changed, return it
-			if (!newTag.equals(cachedObject.versionTag)) {
-
-				Rhino.log("unchanged!  returning cached object");
+			if (newTag.equals(cachedObject.versionTag))
 				return cachedObject.object;
-			}
 			// otherwise, check if the cachedObject has an 'updateResource' function
 			// and use it
 			if (cachedObject.object.updateResource instanceof Function) {
