@@ -1,0 +1,38 @@
+
+RhinoServlet and Alt Framework on Apache Tomcat 5.5
+
+--------------------------------------------------------------------------------
+
+Setting up RhinoServlet on Tomcat is fairly straightforward.  For the time being
+there is not a special installation for Tomcat because it'd require duplicates 
+of the files, but here's the basic structure:
+
+Make a folder in your webapps directory (such as js, rhinoservlet, or ROOT):
+      webapps/js/
+      
+All your scripts can be put directly in this folder, it will act as your root
+scriptpath folder.  (So webapps/js/site/Foo.js would be loaded as site.Foo)
+
+Make a subfolder WEB-INF for Tomcat configuration, a sample web.xml file is 
+included and is a working starting point.  
+
+      webapps/js/WEB-INF/
+      webapps/js/WEB-INF/web.xml
+      webapps/js/WEB-INF/lib/
+
+If you are using Alt framework, put "alt.dictator.Main" as the "rhino.main" 
+init parameter.
+
+The WEB-INF/lib/ hosts all the Java packages you use.
+
+For the core RhinoServlet, the .jars in alt/lib/core/ are needed.
+
+For the Alt Framework, most of the .jars in alt/lib/ext/ are needed.
+
+That should be everything!
+
+--------------------------------------------------------------------------------
+
+Marcello
+
+July 16, 2006
