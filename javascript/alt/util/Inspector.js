@@ -118,6 +118,7 @@ var nextSpanId = 1;
 
 InspectorFunction.prototype.toHTML = function() {
 	var f = this.func.toString();
+	var args = /function[^(]+(\([^)]*\))/.exec(f);
 	var id = nextSpanId++;
 	var code = 'var s=document.getElementById("pre' + id + '").style;' +
 				's.display=s.display=="none"?"":"none";return false;';
