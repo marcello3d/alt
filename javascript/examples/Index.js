@@ -5,6 +5,9 @@ dictator.paths({
 	tests: 		'tests.Index',
 	inspector: 	'examples.Inspector',
 	upload: 	'examples.Upload',
-	session: 	'examples.Session'
+	session: 	'examples.Session',
+	Dictator: 	'examples.Dictator',
+	Delight: 	'examples.Delight',
+	SQueaL: 	'examples.SQueaL'
 	
 });
