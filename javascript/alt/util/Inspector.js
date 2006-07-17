@@ -118,7 +118,7 @@ var nextSpanId = 1;
 
 InspectorFunction.prototype.toHTML = function() {
 	var f = this.func.toString();
-	var args = /function[^(]+(\([^)]*\))/.exec(f);
+	var args = /function[^(]+\(([^)]*)\)/.exec(f);
 	var id = nextSpanId++;
 	var code = 'var s=document.getElementById("pre' + id + '").style;' +
 				's.display=s.display=="none"?"":"none";return false;';
@@ -149,14 +149,14 @@ function InspectorClass(name,oname,inspector,func) {
 
 InspectorClass.prototype.toHTML = function() {
 	var f = this.func.toString();
-	var args = /function[^(]+(\([^)]*\))/.exec(f);
+	var args = /function[^(]+\(([^)]*)\)/.exec(f);
 	var id = nextSpanId++;
 	var code = 'var s=document.getElementById("pre' + id + '").style;' +
 				's.display=s.display=="none"?"":"none";return false;';
 	var s = <>Class</>;
 	if (args)
 		s.appendChild(<p>
-			Constructor: <code><b><a href="#" onclick={code}>{this.name}</a></b>{args[1]} 
+			Constructor: <code><b><a href="#" onclick={code}>{this.name}</a></b>({args[1]})
 			{'{...}'}</code>
 		    <pre id={'pre'+id} style="display:none">{f}</pre>
 	    </p>);
