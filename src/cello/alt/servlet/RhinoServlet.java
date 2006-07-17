@@ -330,7 +330,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
         
         Future<Void> future = pool.submit(new Service(request, response));
         try {
-            future.get(5000, TimeUnit.MILLISECONDS);
+            future.get(10000, TimeUnit.MILLISECONDS);
         } catch (Throwable t) {
             handleError(response,t);
         }

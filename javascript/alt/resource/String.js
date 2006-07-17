@@ -7,8 +7,10 @@ function StringResource(resource) {
 	var reader = new java.io.BufferedReader(isr);
 	var line;
 	var str = new java.lang.StringBuffer();
-	while ((line = reader.readLine()) != null)
+	while ((line = reader.readLine()) != null) {
 		str.append(line);
+		str.append("\n");
+	}
 	return str.toString();
 }
 
