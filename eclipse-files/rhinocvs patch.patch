@@ -1,181 +1,544 @@
+Index: .cvsignore
+===================================================================
+RCS file: /cvsroot/mozilla/js/rhino/.cvsignore,v
+retrieving revision 1.2
+diff -u -r1.2 .cvsignore
+--- .cvsignore	11 Jul 2006 12:28:42 -0000	1.2
++++ .cvsignore	19 Jul 2006 00:04:10 -0000
+@@ -2,3 +2,5 @@
+ lib
+ build.local.properties
+ downloaded
++bin
++.externalToolBuilders
 Index: src/org/mozilla/javascript/BaseFunction.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/BaseFunction.java,v
 retrieving revision 1.57
 diff -u -r1.57 BaseFunction.java
 --- src/org/mozilla/javascript/BaseFunction.java	30 Aug 2005 10:05:42 -0000	1.57
-+++ src/org/mozilla/javascript/BaseFunction.java	17 Jul 2006 03:09:27 -0000
-@@ -373,6 +373,28 @@
-         return sb.toString();
-     }
- 
-+    String compress(int indent, int flags)
-+    {
-+        StringBuffer sb = new StringBuffer();
-+		String FuncName = null;
-+        boolean justbody = (0 != (flags & Decompiler.ONLY_BODY_FLAG));
-+        if (!justbody) {
-+            sb.append("function");
-+			FuncName = getFunctionName();
-+			if(FuncName.length()>0){
-+				sb.append(" "+FuncName);
-+			}
-+            sb.append("(){");
-+        }
-+        sb.append("[native code, arity=");
-+        sb.append(getArity());
-+        sb.append("]");
-+        if (!justbody) {
-+            sb.append("}");
-+        }
-+        return sb.toString();
-+    }
-+
-     public int getArity() { return 0; }
- 
-     public int getLength() { return 0; }
-Index: src/org/mozilla/javascript/Context.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Context.java,v
-retrieving revision 1.244
-diff -u -r1.244 Context.java
---- src/org/mozilla/javascript/Context.java	4 Nov 2005 13:37:45 -0000	1.244
-+++ src/org/mozilla/javascript/Context.java	17 Jul 2006 03:09:28 -0000
-@@ -1178,6 +1178,36 @@
-         }
-     }
- 
-+    public final String decompileReader(Scriptable scope, Reader in,
-+                                       String sourceName, int lineno,
-+                                       Object securityDomain)
-+        throws IOException
-+    {
-+        Script script = compileReader(scope, in, sourceName, lineno,
-+                                      securityDomain);
-+        if (script != null) {
-+			// System.err.println(script);
-+            return decompileScript(script, 0);
-+        } else {
-+            return null;
-+        }
-+    }
-+
-+    public final String compressReader(Scriptable scope, Reader in,
-+                                       String sourceName, int lineno,
-+                                       Object securityDomain)
-+        throws IOException
-+    {
-+        Script script = compileReader(in, sourceName, lineno,
-+                                      securityDomain);
-+        if (script != null) {
-+			// System.err.println(script);
-+            return compressScript(script, 0);
-+        } else {
-+            return null;
-+        }
-+    }
-+
-     /**
-      * Check whether a string is ready to be compiled.
-      * <p>
-@@ -1360,6 +1390,12 @@
-         return scriptImpl.decompile(indent, 0);
-     }
- 
-+    public final String compressScript(Script script, int indent)
-+    {
-+        NativeFunction scriptImpl = (NativeFunction) script;
-+        return scriptImpl.compress(indent, 0);
-+    }
-+
-     /**
-      * Decompile a JavaScript Function.
-      * <p>
++++ src/org/mozilla/javascript/BaseFunction.java	19 Jul 2006 00:04:14 -0000
+@@ -245,6 +245,8 @@
+                 } else {
+                     indent = 0;
+                 }
++                if (args.length>=2)
++                    flags |= ScriptRuntime.toInt32(args[1]);
+             }
+             return realf.decompile(indent, flags);
+           }
 Index: src/org/mozilla/javascript/Decompiler.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Decompiler.java,v
 retrieving revision 1.19
 diff -u -r1.19 Decompiler.java
 --- src/org/mozilla/javascript/Decompiler.java	28 Aug 2005 23:25:22 -0000	1.19
-+++ src/org/mozilla/javascript/Decompiler.java	17 Jul 2006 03:09:28 -0000
-@@ -1,3 +1,7 @@
-+// FIXME: need to implement a stack of something that allows us to keep track
-+// of what was pushed onto the replacement stack at what level and remove it
-+// when we're above that level.
++++ src/org/mozilla/javascript/Decompiler.java	19 Jul 2006 00:04:14 -0000
+@@ -82,6 +82,17 @@
+      * Flag to indicate that the decompilation generates toSource result.
+      */
+     public static final int TO_SOURCE_FLAG = 1 << 1;
++    
++    /**
++     * Flag to indicate that the decompilation generates a compressed result.
++     */
++    public static final int COMPRESS_FLAG = 1 << 2;
 +
- /* -*- Mode: java; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-  *
-  * The contents of this file are subject to the Netscape Public
-@@ -37,6 +41,10 @@
++    /**
++     * Flag to indicate that the decompilation generates a compressed result.
++     */
++    public static final int COMPRESS_NEWLINES_FLAG = 1 << 3;
++    
  
- package org.mozilla.javascript;
+     /**
+      * Decompilation property to specify initial ident value.
+@@ -298,6 +309,10 @@
+         StringBuffer result = new StringBuffer();
+         boolean justFunctionBody = (0 != (flags & Decompiler.ONLY_BODY_FLAG));
+         boolean toSource = (0 != (flags & Decompiler.TO_SOURCE_FLAG));
++        // Compress: features
++        boolean compress = (0 != (flags & Decompiler.COMPRESS_FLAG));
++        boolean compressnl = (0 != (flags & Decompiler.COMPRESS_NEWLINES_FLAG));
++        TokenMapper tm = new TokenMapper();
  
-+import java.util.ArrayList;
-+import java.util.Iterator;
-+import java.util.HashMap;
+         // Spew tokens in source, for debugging.
+         // as TYPE number char
+@@ -329,6 +344,10 @@
+         int braceNesting = 0;
+         boolean afterFirstEOL = false;
+         int i = 0;
++		int prevToken = 0;
++		boolean primeFunctionNesting = false;
++		boolean inArgsList = false;
++		boolean primeInArgsList = false;
+         int topFunctionType;
+         if (source.charAt(i) == Token.SCRIPT) {
+             ++i;
+@@ -339,7 +358,9 @@
+ 
+         if (!toSource) {
+             // add an initial newline to exactly match js.
+-            result.append('\n');
++            // Compress: features
++            if (!compress)
++            	result.append('\n');
+             for (int j = 0; j < indent; j++)
+                 result.append(' ');
+         } else {
+@@ -349,10 +370,20 @@
+         }
+ 
+         while (i < length) {
++			// Compress: features
++			if (i>0)
++				prevToken = source.charAt(i-1);
+             switch(source.charAt(i)) {
+             case Token.NAME:
+             case Token.REGEXP:  // re-wrapped in '/'s in parser...
+-                i = printSourceString(source, i + 1, false, result);
++            	// Compress:
++				int jumpPos = getSourceStringEnd(source, i+1);
++				if (!compress || Token.OBJECTLIT == source.charAt(jumpPos)) {
++					i = printSourceString(source, i + 1, false, result);
++				} else {
++					i = tm.printCompressed(	source, i + 1, false, result, prevToken, 
++											inArgsList, braceNesting);
++				}
+                 continue;
+ 
+             case Token.STRING:
+@@ -381,7 +412,11 @@
+ 
+             case Token.FUNCTION:
+                 ++i; // skip function type
+-                result.append("function ");
++				primeInArgsList = true;
++				primeFunctionNesting = true;
++                result.append("function");
++                if (Token.LP != getNext(source, length, i))
++                    result.append(' ');
+                 break;
+ 
+             case FUNCTION_END:
+@@ -389,7 +424,7 @@
+                 break;
+ 
+             case Token.COMMA:
+-                result.append(", ");
++                result.append(compress ? "," : ", ");
+                 break;
+ 
+             case Token.LC:
+@@ -400,6 +435,7 @@
+                 break;
+ 
+             case Token.RC: {
++				tm.leaveNestingLevel(braceNesting);
+                 --braceNesting;
+                 /* don't print the closing RC if it closes the
+                  * toplevel function and we're called from
+@@ -417,18 +453,29 @@
+                     case Token.WHILE:
+                     case Token.ELSE:
+                         indent -= indentGap;
+-                        result.append(' ');
++                        if (!compress)
++	                        result.append(' ');
+                         break;
+                 }
+                 break;
+             }
+             case Token.LP:
++				if (primeInArgsList) {
++					inArgsList = true;
++					primeInArgsList = false;
++				}
++				if (primeFunctionNesting) {
++					tm.enterNestingLevel(braceNesting);
++					primeFunctionNesting = false;
++				}
+                 result.append('(');
+                 break;
+ 
+             case Token.RP:
++				if (inArgsList)
++					inArgsList = false;
+                 result.append(')');
+-                if (Token.LC == getNext(source, length, i))
++                if (!compress && Token.LC == getNext(source, length, i))
+                     result.append(' ');
+                 break;
+ 
+@@ -454,7 +501,7 @@
+                         newLine = false;
+                     }
+                 }
+-                if (newLine) {
++                if (newLine && !compressnl) {
+                     result.append('\n');
+                 }
+ 
+@@ -482,8 +529,9 @@
+                             less = indentGap;
+                     }
+ 
+-                    for (; less < indent; less++)
+-                        result.append(' ');
++					if (!compress)
++					    for (; less < indent; less++)
++					        result.append(' ');
+                 }
+                 break;
+             }
+@@ -500,15 +548,17 @@
+                 break;
+ 
+             case Token.IF:
+-                result.append("if ");
++                result.append(compress ? "if" : "if ");
+                 break;
+ 
+             case Token.ELSE:
+-                result.append("else ");
++                result.append(compress ? "else" : "else ");
+                 break;
+ 
+             case Token.FOR:
+-                result.append("for ");
++                result.append("for");
++                if (!compress || Token.NAME == getNext(source, length, i))
++                    result.append(' ');
+                 break;
+ 
+             case Token.IN:
+@@ -516,35 +566,37 @@
+                 break;
+ 
+             case Token.WITH:
+-                result.append("with ");
++                result.append(compress ? "with" : "with ");
+                 break;
+ 
+             case Token.WHILE:
+-                result.append("while ");
++                result.append(compress ? "while" : "while ");
+                 break;
+ 
+             case Token.DO:
+-                result.append("do ");
++                result.append(compress ? "do" : "do ");
+                 break;
+ 
+             case Token.TRY:
+-                result.append("try ");
++                result.append(compress ? "try" : "try ");
+                 break;
+ 
+             case Token.CATCH:
+-                result.append("catch ");
++                result.append(compress ? "catch" : "catch ");
+                 break;
+ 
+             case Token.FINALLY:
+-                result.append("finally ");
++                result.append(compress ? "finally" : "finally ");
+                 break;
+ 
+             case Token.THROW:
+-                result.append("throw ");
++                result.append("throw");
++                if (!compress || Token.NAME == getNext(source, length, i))
++                    result.append(' ');
+                 break;
+ 
+             case Token.SWITCH:
+-                result.append("switch ");
++                result.append(compress ? "switch" : "switch ");
+                 break;
+ 
+             case Token.BREAK:
+@@ -561,6 +613,8 @@
+ 
+             case Token.CASE:
+                 result.append("case ");
++                if (!compress || Token.NAME == getNext(source, length, i))
++                    result.append(' ');
+                 break;
+ 
+             case Token.DEFAULT:
+@@ -578,63 +632,65 @@
+                 break;
+ 
+             case Token.SEMI:
+-                result.append(';');
+-                if (Token.EOL != getNext(source, length, i)) {
++                if (Token.EOL == getNext(source, length, i)) {
++                    if (compressnl)
++                        result.append(';');
++                } else {
+                     // separators in FOR
+-                    result.append(' ');
++                    result.append(compress ? ";" : "; ");
+                 }
+                 break;
+ 
+             case Token.ASSIGN:
+-                result.append(" = ");
++                result.append(compress ? "=" : " = ");
+                 break;
+ 
+             case Token.ASSIGN_ADD:
+-                result.append(" += ");
++                result.append(compress ? "+=" : " += ");
+                 break;
+ 
+             case Token.ASSIGN_SUB:
+-                result.append(" -= ");
++                result.append(compress ? "-=" : " -= ");
+                 break;
+ 
+             case Token.ASSIGN_MUL:
+-                result.append(" *= ");
++                result.append(compress ? "*=" : " *= ");
+                 break;
+ 
+             case Token.ASSIGN_DIV:
+-                result.append(" /= ");
++                result.append(compress ? "/=" : " /= ");
+                 break;
+ 
+             case Token.ASSIGN_MOD:
+-                result.append(" %= ");
++                result.append(compress ? "%=" : " %= ");
+                 break;
+ 
+             case Token.ASSIGN_BITOR:
+-                result.append(" |= ");
++                result.append(compress ? "|=" : " |= ");
+                 break;
+ 
+             case Token.ASSIGN_BITXOR:
+-                result.append(" ^= ");
++                result.append(compress ? "^=" : " ^= ");
+                 break;
+ 
+             case Token.ASSIGN_BITAND:
+-                result.append(" &= ");
++                result.append(compress ? "&=" : " &= ");
+                 break;
+ 
+             case Token.ASSIGN_LSH:
+-                result.append(" <<= ");
++                result.append(compress ? "<<=" : " <<= ");
+                 break;
+ 
+             case Token.ASSIGN_RSH:
+-                result.append(" >>= ");
++                result.append(compress ? ">>=" : " >>= ");
+                 break;
+ 
+             case Token.ASSIGN_URSH:
+-                result.append(" >>>= ");
++                result.append(compress ? ">>>=" : " >>>= ");
+                 break;
+ 
+             case Token.HOOK:
+-                result.append(" ? ");
++                result.append(compress ? "?" : " ? ");
+                 break;
+ 
+             case Token.OBJECTLIT:
+@@ -652,59 +708,59 @@
+                     result.append(':');
+                 else
+                     // it's the middle part of a ternary
+-                    result.append(" : ");
++                    result.append(compress ? ":" : " : ");
+                 break;
+ 
+             case Token.OR:
+-                result.append(" || ");
++                result.append(compress ? "||" : " || ");
+                 break;
+ 
+             case Token.AND:
+-                result.append(" && ");
++                result.append(compress ? "&&" : " && ");
+                 break;
+ 
+             case Token.BITOR:
+-                result.append(" | ");
++                result.append(compress ? "|" : " | ");
+                 break;
+ 
+             case Token.BITXOR:
+-                result.append(" ^ ");
++                result.append(compress ? "^" : " ^ ");
+                 break;
+ 
+             case Token.BITAND:
+-                result.append(" & ");
++                result.append(compress ? "&" : " & ");
+                 break;
+ 
+             case Token.SHEQ:
+-                result.append(" === ");
++                result.append(compress ? "===" : " === ");
+                 break;
+ 
+             case Token.SHNE:
+-                result.append(" !== ");
++                result.append(compress ? "!==" : " !== ");
+                 break;
+ 
+             case Token.EQ:
+-                result.append(" == ");
++                result.append(compress ? "==" : " == ");
+                 break;
+ 
+             case Token.NE:
+-                result.append(" != ");
++                result.append(compress ? "!=" : " != ");
+                 break;
+ 
+             case Token.LE:
+-                result.append(" <= ");
++                result.append(compress ? "<=" : " <= ");
+                 break;
+ 
+             case Token.LT:
+-                result.append(" < ");
++                result.append(compress ? "<" : " < ");
+                 break;
+ 
+             case Token.GE:
+-                result.append(" >= ");
++                result.append(compress ? ">=" : " >= ");
+                 break;
+ 
+             case Token.GT:
+-                result.append(" > ");
++                result.append(compress ? ">" : " > ");
+                 break;
+ 
+             case Token.INSTANCEOF:
+@@ -712,15 +768,15 @@
+                 break;
+ 
+             case Token.LSH:
+-                result.append(" << ");
++                result.append(compress ? "<<" : " << ");
+                 break;
+ 
+             case Token.RSH:
+-                result.append(" >> ");
++                result.append(compress ? ">>" : " >> ");
+                 break;
+ 
+             case Token.URSH:
+-                result.append(" >>> ");
++                result.append(compress ? ">>>" : " >>> ");
+                 break;
+ 
+             case Token.TYPEOF:
+@@ -748,31 +804,39 @@
+                 break;
+ 
+             case Token.INC:
++				if (compress && Token.ADD == prevToken)
++					result.append(' ');
+                 result.append("++");
++                if (compress && Token.ADD == getNext(source, length, i))
++                    result.append(' ');
+                 break;
+ 
+             case Token.DEC:
++				if (compress && Token.SUB == prevToken)
++					result.append(' ');
+                 result.append("--");
++                if (compress && Token.SUB == getNext(source, length, i))
++                    result.append(' ');
+                 break;
+ 
+             case Token.ADD:
+-                result.append(" + ");
++                result.append(compress ? "+" : " + ");
+                 break;
+ 
+             case Token.SUB:
+-                result.append(" - ");
++                result.append(compress ? "-" : " - ");
+                 break;
+ 
+             case Token.MUL:
+-                result.append(" * ");
++                result.append(compress ? "*" : " * ");
+                 break;
+ 
+             case Token.DIV:
+-                result.append(" / ");
++                result.append(compress ? "/" : " / ");
+                 break;
+ 
+             case Token.MOD:
+-                result.append(" % ");
++                result.append(compress ? "%" : " % ");
+                 break;
+ 
+             case Token.COLONCOLON:
+@@ -800,7 +864,7 @@
+ 
+         if (!toSource) {
+             // add that trailing newline if it's an outermost function.
+-            if (!justFunctionBody)
++            if (!justFunctionBody && !compressnl)
+                 result.append('\n');
+         } else {
+             if (topFunctionType == FunctionNode.FUNCTION_EXPRESSION) {
+@@ -890,3 +954,111 @@
+     private static final boolean printSource = false;
+ 
+ }
 +
- /**
-  * The following class save decompilation information about the source.
-  * Source information is returned from the parser as a String
-@@ -70,6 +78,135 @@
-  * the final constant pool entry from information available at parse
-  * time.
-  */
 +
 +class TokenMapper {
-+	private ArrayList functionBracePositions = new ArrayList();
-+	private ArrayList scopeReplacedTokens = new ArrayList();
-+	private int lastTokenCount = 0;
++	private java.util.ArrayList functionBracePositions = 
++        new java.util.ArrayList();
++	private java.util.ArrayList scopeReplacedTokens = new java.util.ArrayList();
++	private int tokenCount = 10;
 +
-+	// FIXME: this isn't the brightest way to accomplish this. Fristly, we need
++	// FIXME: this isn't the brightest way to accomplish this. Firstly, we need
 +	// to be sure we aren't colliding with other things in the namespace!
-+	private String getMappedToken(String token, boolean newMapping){
++	private String getMappedToken(String token, boolean newMapping) {
 +		String nt = null;
-+		HashMap tokens = (HashMap)scopeReplacedTokens.get(scopeReplacedTokens.size()-1);
-+		if(newMapping){
-+			lastTokenCount++;
-+			nt = new String("_"+Integer.toHexString(lastTokenCount));
-+			if(nt.length() >= token.length()){
-+				nt = token;
-+			}
-+			// System.out.println(nt);
++        java.util.HashMap tokens = (java.util.HashMap)scopeReplacedTokens.get(scopeReplacedTokens.size()-1);
++		if (newMapping) {
++			nt = new String(Integer.toString(tokenCount++,26));
 +			tokens.put(token, nt);
 +			return nt;
 +		}
-+		if(hasTokenMapping(token)){
-+			return getTokenMapping(token);
-+		}else{
-+			return token;
-+		}
++        String mapping = getTokenMapping(token);
++        if (mapping==null)
++            return token;
++        return mapping;
 +	}
 +
-+	private boolean hasLocalTokenMapping(String token){
-+		if(scopeReplacedTokens.size()<1){
++	private boolean hasLocalTokenMapping(String token) {
++		if (scopeReplacedTokens.size() < 1)
 +			return false;
-+		}
-+		HashMap tokens = (HashMap)(scopeReplacedTokens.get(scopeReplacedTokens.size()-1));
-+		if(tokens.containsKey(token)){
++        java.util.HashMap tokens = (java.util.HashMap)(scopeReplacedTokens.get(scopeReplacedTokens.size()-1));
++		if (tokens.containsKey(token))
 +			return true;
-+		}
 +		return false;
 +	}
 +
-+	private boolean hasTokenMapping(String token){
-+		String blank = new String("");
-+		if(blank.equals(getTokenMapping(token))){
-+			return false;
-+		}
-+		return true;
-+	}
-+
-+	private String getTokenMapping(String token){
-+		for(int i=scopeReplacedTokens.size()-1; i>=0; i--){
-+			HashMap tokens = (HashMap)(scopeReplacedTokens.get(i));
-+			if(tokens.containsKey(token)){
++	private String getTokenMapping(String token) {
++		for (int i=scopeReplacedTokens.size()-1; i>=0; i--) {
++            java.util.HashMap tokens = (java.util.HashMap)(scopeReplacedTokens.get(i));
++			if (tokens.containsKey(token))
 +				return (String)tokens.get(token);
-+			}
 +		}
-+		return new String("");
++		return null;
 +	}
 +
 +	public int printCompressed(String 		source, 
@@ -184,37 +547,32 @@ diff -u -r1.19 Decompiler.java
 +								StringBuffer sb, 
 +								int 		prevToken, 
 +								boolean 	inArgsList, 
-+								int 		currentLevel){
++								int 		currentLevel) {
 +		boolean newMapping = false;
 +		int length = source.charAt(offset);
 +		++offset;
-+		if((0x8000 & length) != 0){
++		if ((0x8000 & length) != 0) {
 +			length = ((0x7FFF & length) << 16) | source.charAt(offset);
 +			++offset;
 +		}
 +
-+		if(sb != null){
++		if (sb != null) {
 +			String str = source.substring(offset, offset + length);
 +			String sourceStr = new String(str);
-+			if(((prevToken == Token.VAR)&&(!hasLocalTokenMapping(sourceStr)))||(inArgsList)){
++			if (((prevToken == Token.VAR)&&(!hasLocalTokenMapping(sourceStr)))||(inArgsList))
 +				newMapping = true;
-+			}
 +
 +
-+			if(((functionBracePositions.size()>0)&&(currentLevel>=(((Integer)functionBracePositions.get(functionBracePositions.size()-1)).intValue())))||(inArgsList)){
-+				if(prevToken != Token.DOT){
++			if (((functionBracePositions.size()>0)&&(currentLevel>=(((Integer)functionBracePositions.get(functionBracePositions.size()-1)).intValue())))||(inArgsList))
++				if(prevToken != Token.DOT)
 +					str = this.getMappedToken(str, newMapping);
-+				}
-+			}
-+			if((!inArgsList)&&(asQuotedString)){
-+				if((prevToken == Token.LC)||(prevToken == Token.COMMA)){
++			if ((!inArgsList)&&(asQuotedString))
++				if((prevToken == Token.LC)||(prevToken == Token.COMMA))
 +					str = sourceStr;
-+				}
-+			}
 +
 +			if(!asQuotedString){
 +				sb.append(str);
-+			}else{
++			} else {
 +				sb.append('"');
 +				sb.append(ScriptRuntime.escapeString(str));
 +				sb.append('"');
@@ -226,12 +584,12 @@ diff -u -r1.19 Decompiler.java
 +
 +	public void enterNestingLevel(int braceNesting){
 +		functionBracePositions.add(new Integer(braceNesting+1));
-+		scopeReplacedTokens.add(new HashMap());
++		scopeReplacedTokens.add(new java.util.HashMap());
 +	}
 +
 +	public void leaveNestingLevel(int braceNesting){
 +		Integer bn = new Integer(braceNesting);
-+		if((functionBracePositions.contains(bn))&&(scopeReplacedTokens.size()>0)){
++		if ((functionBracePositions.contains(bn))&&(scopeReplacedTokens.size()>0)) {
 +			// remove our mappings now!
 +			int scopedSize = scopeReplacedTokens.size();
 +			/*
@@ -249,638 +607,13 @@ diff -u -r1.19 Decompiler.java
 +		}
 +	}
 +}
-+
- public class Decompiler
- {
-     /**
-@@ -102,6 +239,8 @@
-     // the last RC of object literals in case of function expressions
-     private static final int FUNCTION_END = Token.LAST_TOKEN + 1;
- 
-+
-+
-     String getEncodedSource()
-     {
-         return sourceToString(0);
-@@ -266,6 +405,602 @@
-         return new String(sourceBuffer, offset, sourceTop - offset);
-     }
- 
-+	private static TokenMapper tm = new TokenMapper();
-+
-+	private static HashMap levelMappings = new HashMap();
-+
-+    public static String compress(String source, int flags,
-+                                   UintMap properties)
-+    {
-+        int length = source.length();
-+        if (length == 0) { return ""; }
-+
-+        int indent = properties.getInt(INITIAL_INDENT_PROP, 0);
-+        if (indent < 0) throw new IllegalArgumentException();
-+        int indentGap = properties.getInt(INDENT_GAP_PROP, 4);
-+        if (indentGap < 0) throw new IllegalArgumentException();
-+        int caseGap = properties.getInt(CASE_GAP_PROP, 2);
-+        if (caseGap < 0) throw new IllegalArgumentException();
-+
-+        StringBuffer result = new StringBuffer();
-+        boolean justFunctionBody = (0 != (flags & Decompiler.ONLY_BODY_FLAG));
-+        boolean toSource = (0 != (flags & Decompiler.TO_SOURCE_FLAG));
-+
-+        // Spew tokens in source, for debugging.
-+        // as TYPE number char
-+        if (printSource) {
-+            System.err.println("length:" + length);
-+            for (int i = 0; i < length; ++i) {
-+                // Note that tokenToName will fail unless Context.printTrees
-+                // is true.
-+                String tokenname = null;
-+                if (Token.printNames) {
-+                    tokenname = Token.name(source.charAt(i));
-+                }
-+                if (tokenname == null) {
-+                    tokenname = "---";
-+                }
-+                String pad = tokenname.length() > 7
-+                    ? "\t"
-+                    : "\t\t";
-+                System.err.println
-+                    (tokenname
-+                     + pad + (int)source.charAt(i)
-+                     + "\t'" + ScriptRuntime.escapeString
-+                     (source.substring(i, i+1))
-+                     + "'");
-+            }
-+            System.err.println();
-+        }
-+
-+        int braceNesting = 0;
-+        boolean afterFirstEOL = false;
-+        int i = 0;
-+		int prevToken = 0;
-+		boolean primeFunctionNesting = false;
-+		boolean inArgsList = false;
-+		boolean primeInArgsList = false;
-+        int topFunctionType;
-+        if (source.charAt(i) == Token.SCRIPT) {
-+            ++i;
-+            topFunctionType = -1;
-+        } else {
-+            topFunctionType = source.charAt(i + 1);
-+        }
-+
-+        if (!toSource) {
-+            // add an initial newline to exactly match js.
-+            // result.append('\n');
-+            for (int j = 0; j < indent; j++){
-+                // result.append(' ');
-+                result.append("");
-+			}
-+        } else {
-+            if (topFunctionType == FunctionNode.FUNCTION_EXPRESSION) {
-+                result.append('(');
-+            }
-+        }
-+
-+        while (i < length) {
-+			if(i>0){
-+				prevToken = source.charAt(i-1);
-+			}
-+			// System.out.println(Token.name(getNext(source, length, i)));
-+            switch(source.charAt(i)) {
-+            case Token.NAME:
-+            case Token.REGEXP:  // re-wrapped in '/'s in parser...
-+				int jumpPos = getSourceStringEnd(source, i+1);
-+				if(Token.OBJECTLIT == source.charAt(jumpPos)){
-+					i = printSourceString(source, i + 1, false, result);
-+				}else{
-+					i = tm.printCompressed(	source, i + 1, false, result, prevToken, 
-+											inArgsList, braceNesting);
-+				}
-+                continue;
-+
-+            case Token.STRING:
-+                i = printSourceString(source, i + 1, true, result);
-+                continue;
-+
-+            case Token.NUMBER:
-+                i = printSourceNumber(source, i + 1, result);
-+                continue;
-+
-+            case Token.TRUE:
-+                result.append("true");
-+                break;
-+
-+            case Token.FALSE:
-+                result.append("false");
-+                break;
-+
-+            case Token.NULL:
-+                result.append("null");
-+                break;
-+
-+            case Token.THIS:
-+                result.append("this");
-+                break;
-+
-+            case Token.FUNCTION:
-+                ++i; // skip function type
-+				primeInArgsList = true;
-+				primeFunctionNesting = true;
-+                result.append("function");
-+                if (Token.LP != getNext(source, length, i)) {
-+                    result.append(' ');
-+                }
-+                break;
-+
-+            case FUNCTION_END:
-+                // Do nothing
-+                break;
-+
-+            case Token.COMMA:
-+                result.append(",");
-+                break;
-+
-+            case Token.LC:
-+				++braceNesting;
-+                if (Token.EOL == getNext(source, length, i)){
-+                    indent += indentGap;
-+				}
-+                result.append('{');
-+                // // result.append('\n');
-+                break;
-+
-+            case Token.RC: {
-+				tm.leaveNestingLevel(braceNesting);
-+                --braceNesting;
-+
-+                /* don't print the closing RC if it closes the
-+                 * toplevel function and we're called from
-+                 * decompileFunctionBody.
-+                 */
-+                if(justFunctionBody && braceNesting == 0){
-+                    break;
-+				}
-+
-+                // // result.append('\n');
-+                result.append('}');
-+                // // result.append(' ');
-+                switch (getNext(source, length, i)) {
-+                    case Token.EOL:
-+                    case FUNCTION_END:
-+                        indent -= indentGap;
-+                        break;
-+                    case Token.WHILE:
-+                    case Token.ELSE:
-+                        indent -= indentGap;
-+                        // result.append(' ');
-+                        result.append("");
-+                        break;
-+                }
-+                break;
-+            }
-+            case Token.LP:
-+				if(primeInArgsList){
-+					inArgsList = true;
-+					primeInArgsList = false;
-+				}
-+				if(primeFunctionNesting){
-+					tm.enterNestingLevel(braceNesting);
-+					primeFunctionNesting = false;
-+				}
-+                result.append('(');
-+                break;
-+
-+            case Token.RP:
-+				if(inArgsList){
-+					inArgsList = false;
-+				}
-+                result.append(')');
-+				/*
-+                if (Token.LC == getNext(source, length, i)){
-+                    result.append(' ');
-+				}
-+				*/
-+                break;
-+
-+            case Token.LB:
-+                result.append('[');
-+                break;
-+
-+            case Token.RB:
-+                result.append(']');
-+                break;
-+
-+            case Token.EOL: {
-+                if (toSource) break;
-+                boolean newLine = true;
-+                if (!afterFirstEOL) {
-+                    afterFirstEOL = true;
-+                    if (justFunctionBody) {
-+                        /* throw away just added 'function name(...) {'
-+                         * and restore the original indent
-+                         */
-+                        result.setLength(0);
-+                        indent -= indentGap;
-+                        newLine = false;
-+                    }
-+                }
-+                if (newLine) {
-+                    result.append('\n');
-+                }
-+				/*
-+				*/
-+
-+                /* add indent if any tokens remain,
-+                 * less setback if next token is
-+                 * a label, case or default.
-+                 */
-+                if (i + 1 < length) {
-+                    int less = 0;
-+                    int nextToken = source.charAt(i + 1);
-+                    if (nextToken == Token.CASE
-+                        || nextToken == Token.DEFAULT)
-+                    {
-+                        less = indentGap - caseGap;
-+                    } else if (nextToken == Token.RC) {
-+                        less = indentGap;
-+                    }
-+
-+                    /* elaborate check against label... skip past a
-+                     * following inlined NAME and look for a COLON.
-+                     */
-+                    else if (nextToken == Token.NAME) {
-+                        int afterName = getSourceStringEnd(source, i + 2);
-+                        if (source.charAt(afterName) == Token.COLON)
-+                            less = indentGap;
-+                    }
-+
-+                    for (; less < indent; less++){
-+                        // result.append(' ');
-+                        result.append("");
-+					}
-+                }
-+                break;
-+            }
-+            case Token.DOT:
-+                result.append('.');
-+                break;
-+
-+            case Token.NEW:
-+                result.append("new ");
-+                break;
-+
-+            case Token.DELPROP:
-+                result.append("delete ");
-+                break;
-+
-+            case Token.IF:
-+                result.append("if");
-+                break;
-+
-+            case Token.ELSE:
-+                result.append("else");
-+                break;
-+
-+            case Token.FOR:
-+                result.append("for");
-+                break;
-+
-+            case Token.IN:
-+                result.append(" in ");
-+                break;
-+
-+            case Token.WITH:
-+                result.append("with");
-+                break;
-+
-+            case Token.WHILE:
-+                result.append("while");
-+                break;
-+
-+            case Token.DO:
-+                result.append("do");
-+                break;
-+
-+            case Token.TRY:
-+                result.append("try");
-+                break;
-+
-+            case Token.CATCH:
-+                result.append("catch");
-+                break;
-+
-+            case Token.FINALLY:
-+                result.append("finally");
-+                break;
-+
-+            case Token.THROW:
-+                result.append("throw ");
-+                break;
-+
-+            case Token.SWITCH:
-+                result.append("switch");
-+                break;
-+
-+            case Token.BREAK:
-+                result.append("break");
-+                if(Token.NAME == getNext(source, length, i)){
-+                    result.append(' ');
-+				}
-+                break;
-+
-+            case Token.CONTINUE:
-+                result.append("continue");
-+                if(Token.NAME == getNext(source, length, i)){
-+                    result.append(' ');
-+				}
-+                break;
-+
-+            case Token.CASE:
-+                result.append("case ");
-+                break;
-+
-+            case Token.DEFAULT:
-+                result.append("default");
-+                break;
-+
-+            case Token.RETURN:
-+                result.append("return");
-+                if(Token.SEMI != getNext(source, length, i)){
-+                    result.append(' ');
-+				}
-+                break;
-+
-+            case Token.VAR:
-+                result.append("var ");
-+                break;
-+
-+            case Token.SEMI:
-+                result.append(';');
-+                // result.append('\n');
-+				/*
-+                if (Token.EOL != getNext(source, length, i)) {
-+                    // separators in FOR
-+                    result.append(' ');
-+                }
-+				*/
-+                break;
-+
-+            case Token.ASSIGN:
-+                result.append("=");
-+                break;
-+
-+            case Token.ASSIGN_ADD:
-+                result.append("+=");
-+                break;
-+
-+            case Token.ASSIGN_SUB:
-+                result.append("-=");
-+                break;
-+
-+            case Token.ASSIGN_MUL:
-+                result.append("*=");
-+                break;
-+
-+            case Token.ASSIGN_DIV:
-+                result.append("/=");
-+                break;
-+
-+            case Token.ASSIGN_MOD:
-+                result.append("%=");
-+                break;
-+
-+            case Token.ASSIGN_BITOR:
-+                result.append("|=");
-+                break;
-+
-+            case Token.ASSIGN_BITXOR:
-+                result.append("^=");
-+                break;
-+
-+            case Token.ASSIGN_BITAND:
-+                result.append("&=");
-+                break;
-+
-+            case Token.ASSIGN_LSH:
-+                result.append("<<=");
-+                break;
-+
-+            case Token.ASSIGN_RSH:
-+                result.append(">>=");
-+                break;
-+
-+            case Token.ASSIGN_URSH:
-+                result.append(">>>=");
-+                break;
-+
-+            case Token.HOOK:
-+                result.append("?");
-+                break;
-+
-+            case Token.OBJECTLIT:
-+                // pun OBJECTLIT to mean colon in objlit property
-+                // initialization.
-+                // This needs to be distinct from COLON in the general case
-+                // to distinguish from the colon in a ternary... which needs
-+                // different spacing.
-+                result.append(':');
-+                break;
-+
-+            case Token.COLON:
-+                if (Token.EOL == getNext(source, length, i))
-+                    // it's the end of a label
-+                    result.append(':');
-+                else
-+                    // it's the middle part of a ternary
-+                    result.append(":");
-+                break;
-+
-+            case Token.OR:
-+                result.append("||");
-+                break;
-+
-+            case Token.AND:
-+                result.append("&&");
-+                break;
-+
-+            case Token.BITOR:
-+                result.append("|");
-+                break;
-+
-+            case Token.BITXOR:
-+                result.append("^");
-+                break;
-+
-+            case Token.BITAND:
-+                result.append("&");
-+                break;
-+
-+            case Token.SHEQ:
-+                result.append("===");
-+                break;
-+
-+            case Token.SHNE:
-+                result.append("!==");
-+                break;
-+
-+            case Token.EQ:
-+                result.append("==");
-+                break;
-+
-+            case Token.NE:
-+                result.append("!=");
-+                break;
-+
-+            case Token.LE:
-+                result.append("<=");
-+                break;
-+
-+            case Token.LT:
-+                result.append("<");
-+                break;
-+
-+            case Token.GE:
-+                result.append(">=");
-+                break;
-+
-+            case Token.GT:
-+                result.append(">");
-+                break;
-+
-+            case Token.INSTANCEOF:
-+				// FIXME: does this really need leading space?
-+                result.append(" instanceof ");
-+                break;
-+
-+            case Token.LSH:
-+                result.append("<<");
-+                break;
-+
-+            case Token.RSH:
-+                result.append(">>");
-+                break;
-+
-+            case Token.URSH:
-+                result.append(">>>");
-+                break;
-+
-+            case Token.TYPEOF:
-+                result.append("typeof ");
-+                break;
-+
-+            case Token.VOID:
-+                result.append("void ");
-+                break;
-+
-+            case Token.NOT:
-+                result.append('!');
-+                break;
-+
-+            case Token.BITNOT:
-+                result.append('~');
-+                break;
-+
-+            case Token.POS:
-+                result.append('+');
-+                break;
-+
-+            case Token.NEG:
-+                result.append('-');
-+                break;
-+
-+            case Token.INC:
-+				if(Token.ADD == prevToken){
-+					result.append(' ');
-+				}
-+                result.append("++");
-+                if(Token.ADD == getNext(source, length, i)){
-+                    result.append(' ');
-+				}
-+                break;
-+
-+            case Token.DEC:
-+				if(Token.SUB == prevToken){
-+					result.append(' ');
-+				}
-+                result.append("--");
-+                if(Token.SUB == getNext(source, length, i)){
-+                    result.append(' ');
-+				}
-+                break;
-+
-+            case Token.ADD:
-+                result.append("+");
-+                break;
-+
-+            case Token.SUB:
-+                result.append("-");
-+                break;
-+
-+            case Token.MUL:
-+                result.append("*");
-+                break;
-+
-+            case Token.DIV:
-+                result.append("/");
-+                break;
-+
-+            case Token.MOD:
-+                result.append("%");
-+                break;
-+
-+            case Token.COLONCOLON:
-+                result.append("::");
-+                break;
-+
-+            case Token.DOTDOT:
-+                result.append("..");
-+                break;
-+
-+            case Token.XMLATTR:
-+                result.append('@');
-+                break;
-+
-+            default:
-+                // If we don't know how to decompile it, raise an exception.
-+                throw new RuntimeException();
-+            }
-+            ++i;
-+        }
-+
-+        if (!toSource) {
-+            // add that trailing newline if it's an outermost function.
-+            // if (!justFunctionBody){
-+            //    result.append('\n');
-+			// }
-+        } else {
-+            if (topFunctionType == FunctionNode.FUNCTION_EXPRESSION) {
-+                result.append(')');
-+            }
-+        }
-+
-+        return result.toString();
-+    }
-+
-     /**
-      * Decompile the source information associated with this js
-      * function/script back into a string.  For the most part, this
-@@ -301,7 +1036,7 @@
- 
-         // Spew tokens in source, for debugging.
-         // as TYPE number char
--        if (printSource) {
-+        if(printSource){
-             System.err.println("length:" + length);
-             for (int i = 0; i < length; ++i) {
-                 // Note that tokenToName will fail unless Context.printTrees
 Index: src/org/mozilla/javascript/FunctionNode.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/FunctionNode.java,v
 retrieving revision 1.29
 diff -u -r1.29 FunctionNode.java
 --- src/org/mozilla/javascript/FunctionNode.java	29 Aug 2005 13:25:31 -0000	1.29
-+++ src/org/mozilla/javascript/FunctionNode.java	17 Jul 2006 03:09:28 -0000
++++ src/org/mozilla/javascript/FunctionNode.java	19 Jul 2006 00:04:14 -0000
 @@ -77,7 +77,15 @@
      public int getFunctionType() {
          return itsFunctionType;
@@ -903,7 +636,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/InterpretedFuncti
 retrieving revision 1.52
 diff -u -r1.52 InterpretedFunction.java
 --- src/org/mozilla/javascript/InterpretedFunction.java	28 May 2006 17:15:24 -0000	1.52
-+++ src/org/mozilla/javascript/InterpretedFunction.java	17 Jul 2006 03:09:28 -0000
++++ src/org/mozilla/javascript/InterpretedFunction.java	19 Jul 2006 00:04:14 -0000
 @@ -133,6 +133,9 @@
          if (idata.itsRegExpLiterals != null) {
              functionRegExps = createRegExpWraps(cx, scope);
@@ -920,7 +653,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Interpreter.java,
 retrieving revision 1.307
 diff -u -r1.307 Interpreter.java
 --- src/org/mozilla/javascript/Interpreter.java	19 Nov 2005 22:57:49 -0000	1.307
-+++ src/org/mozilla/javascript/Interpreter.java	17 Jul 2006 03:09:30 -0000
++++ src/org/mozilla/javascript/Interpreter.java	19 Jul 2006 00:04:17 -0000
 @@ -487,6 +487,7 @@
          itsData.itsFunctionType = theFunction.getFunctionType();
          itsData.itsNeedsActivation = theFunction.requiresActivation();
@@ -935,7 +668,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/InterpreterData.j
 retrieving revision 1.53
 diff -u -r1.53 InterpreterData.java
 --- src/org/mozilla/javascript/InterpreterData.java	30 Aug 2005 10:05:42 -0000	1.53
-+++ src/org/mozilla/javascript/InterpreterData.java	17 Jul 2006 03:09:30 -0000
++++ src/org/mozilla/javascript/InterpreterData.java	19 Jul 2006 00:04:17 -0000
 @@ -102,6 +102,9 @@
      String encodedSource;
      int encodedSourceStart;
@@ -946,156 +679,13 @@ diff -u -r1.53 InterpreterData.java
  
      int languageVersion;
  
-Index: src/org/mozilla/javascript/JavaMembers.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/JavaMembers.java,v
-retrieving revision 1.57
-diff -u -r1.57 JavaMembers.java
---- src/org/mozilla/javascript/JavaMembers.java	30 Aug 2005 10:05:42 -0000	1.57
-+++ src/org/mozilla/javascript/JavaMembers.java	17 Jul 2006 03:09:30 -0000
-@@ -95,6 +95,8 @@
-         try {
-             if (member instanceof BeanProperty) {
-                 BeanProperty bp = (BeanProperty) member;
-+                if (bp.getter == null)
-+                    return Scriptable.NOT_FOUND;
-                 rval = bp.getter.invoke(javaObject, Context.emptyArgs);
-                 type = bp.getter.method().getReturnType();
-             } else {
-@@ -430,11 +432,13 @@
-                 // Is this a getter?
-                 String name = (String) e.nextElement();
-                 boolean memberIsGetMethod = name.startsWith("get");
-+                boolean memberIsSetMethod = name.startsWith("set");
-                 boolean memberIsIsMethod = name.startsWith("is");
--                if (memberIsGetMethod || memberIsIsMethod) {
-+                if (memberIsGetMethod || memberIsIsMethod 
-+                        || memberIsSetMethod) {
-                     // Double check name component.
-                     String nameComponent
--                        = name.substring(memberIsGetMethod ? 3 : 2);
-+                        = name.substring(memberIsIsMethod ? 2 : 3);
-                     if (nameComponent.length() == 0)
-                         continue;
- 
-@@ -463,33 +467,41 @@
-                     if (!(member instanceof NativeJavaMethod))
-                         continue;
- 
-+                    // getter
-                     NativeJavaMethod njmGet = (NativeJavaMethod)member;
-                     MemberBox getter
-                         = extractGetMethod(njmGet.methods, isStatic);
--                    if (getter != null) {
--                        // We have a getter.  Now, do we have a setter?
--                        NativeJavaMethod njmSet = null;
--                        MemberBox setter = null;
--                        NativeJavaMethod setters = null;
--                        String setterName = "set".concat(nameComponent);
--                        if (ht.containsKey(setterName)) {
--                            // Is this value a method?
--                            member = ht.get(setterName);
--                            if (member instanceof NativeJavaMethod) {
--                                njmSet = (NativeJavaMethod)member;
-+                    
-+                    // setter
-+                    MemberBox setter = null;
-+                    NativeJavaMethod setters = null;
-+                    String setterName = "set".concat(nameComponent);
-+
-+                    if (ht.containsKey(setterName)) {
-+                        // Is this value a method?
-+                        member = ht.get(setterName);
-+                        if (member instanceof NativeJavaMethod) {
-+                            NativeJavaMethod njmSet = (NativeJavaMethod)member;
-+                            if (getter != null) {
-+                                // We have a getter. Now, do we have a matching 
-+                                // setter?
-                                 Class type = getter.method().getReturnType();
-                                 setter = extractSetMethod(type, njmSet.methods,
--                                                          isStatic);
--                                if (njmSet.methods.length > 1) {
--                                    setters = njmSet;
--                                }
-+                                                            isStatic);
-+                            } else {
-+                                // No getter, find any set method
-+                                setter = extractSetMethod(njmSet.methods, 
-+                                                            isStatic);
-+                            }
-+                            if (njmSet.methods.length > 1) {
-+                                setters = njmSet;
-                             }
-                         }
--                        // Make the property.
--                        BeanProperty bp = new BeanProperty(getter, setter,
--                                                           setters);
--                        toAdd.put(beanPropertyName, bp);
-                     }
-+                    // Make the property.
-+                    BeanProperty bp = new BeanProperty(getter, setter,
-+                                                       setters);
-+                    toAdd.put(beanPropertyName, bp);
-                 }
-             }
- 
-@@ -567,6 +579,23 @@
-         return null;
-     }
- 
-+    private static MemberBox extractSetMethod(MemberBox[] methods,
-+                                              boolean isStatic)
-+    {
-+
-+        for (int i = 0; i < methods.length; ++i) {
-+            MemberBox method = methods[i];
-+            if (!isStatic || method.isStatic()) {
-+                if (method.method().getReturnType() == Void.TYPE) {
-+                    if (method.argTypes.length == 1) {
-+                        return method;
-+                    }
-+                }
-+            }
-+        }
-+        return null;
-+    }
-+
-     Hashtable getFieldAndMethodsObjects(Scriptable scope, Object javaObject,
-                                         boolean isStatic)
-     {
-Index: src/org/mozilla/javascript/NativeFunction.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/NativeFunction.java,v
-retrieving revision 1.62
-diff -u -r1.62 NativeFunction.java
---- src/org/mozilla/javascript/NativeFunction.java	17 Jan 2005 13:06:33 -0000	1.62
-+++ src/org/mozilla/javascript/NativeFunction.java	17 Jul 2006 03:09:30 -0000
-@@ -70,6 +70,18 @@
-         }
-     }
- 
-+    final String compress(int indent, int flags)
-+    {
-+        String encodedSource = getEncodedSource();
-+        if (encodedSource == null) {
-+            return super.compress(indent, flags);
-+        } else {
-+            UintMap properties = new UintMap(1);
-+            properties.put(Decompiler.INITIAL_INDENT_PROP, indent);
-+            return Decompiler.compress(encodedSource, flags, properties);
-+        }
-+    }
-+
-     public int getLength()
-     {
-         int paramCount = getParamCount();
 Index: src/org/mozilla/javascript/Parser.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Parser.java,v
 retrieving revision 1.104
 diff -u -r1.104 Parser.java
 --- src/org/mozilla/javascript/Parser.java	1 Jun 2006 14:30:19 -0000	1.104
-+++ src/org/mozilla/javascript/Parser.java	17 Jul 2006 03:09:31 -0000
++++ src/org/mozilla/javascript/Parser.java	19 Jul 2006 00:04:19 -0000
 @@ -430,6 +430,9 @@
      {
          int syntheticType = functionType;
@@ -1122,21 +712,8 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/TokenStream.java,
 retrieving revision 1.63
 diff -u -r1.63 TokenStream.java
 --- src/org/mozilla/javascript/TokenStream.java	31 Jul 2005 13:48:46 -0000	1.63
-+++ src/org/mozilla/javascript/TokenStream.java	17 Jul 2006 03:09:31 -0000
-@@ -64,9 +64,12 @@
-     private final static int
-         EOF_CHAR = -1;
- 
-+	public StringBuffer lastComment;
-+
-     TokenStream(Parser parser, Reader sourceReader, String sourceString,
-                 int lineno)
-     {
-+		this.lastComment = new StringBuffer();
-         this.parser = parser;
-         this.lineno = lineno;
-         if (sourceReader != null) {
-@@ -284,6 +287,8 @@
++++ src/org/mozilla/javascript/TokenStream.java	19 Jul 2006 00:04:19 -0000
+@@ -284,6 +284,8 @@
      final int getLineno() { return lineno; }
  
      final String getString() { return string; }
@@ -1145,15 +722,7 @@ diff -u -r1.63 TokenStream.java
  
      final double getNumber() { return number; }
  
-@@ -736,12 +741,19 @@
- 
-             case '/':
-                 // is it a // comment?
-+				// FIXME: RAR: comment, need to set config to optionally keep
-+				// instead of skipping!
-                 if (matchChar('/')) {
-                     skipLine();
-                     continue retry;
+@@ -742,6 +744,11 @@
                  }
                  if (matchChar('*')) {
                      boolean lookForSlash = false;
@@ -1165,7 +734,7 @@ diff -u -r1.63 TokenStream.java
                      for (;;) {
                          c = getChar();
                          if (c == EOF_CHAR) {
-@@ -749,13 +761,47 @@
+@@ -749,13 +756,47 @@
                              return Token.ERROR;
                          } else if (c == '*') {
                              lookForSlash = true;
@@ -1213,151 +782,16 @@ diff -u -r1.63 TokenStream.java
                      }
                  }
  
-@@ -1176,7 +1222,7 @@
-     {
-         return new String(stringBuffer, 0, stringBufferTop);
-     }
--
-+    
-     private void addToString(int c)
-     {
-         int N = stringBufferTop;
-@@ -1367,6 +1413,8 @@
+@@ -1367,6 +1408,9 @@
      // code.
      private String string = "";
      private double number;
 +    
++    // Marcello: store jsdoc
 +    private String jsDoc = null;
  
      private char[] stringBuffer = new char[128];
      private int stringBufferTop;
-Index: toolsrc/org/mozilla/javascript/tools/shell/Main.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/toolsrc/org/mozilla/javascript/tools/shell/Main.java,v
-retrieving revision 1.65
-diff -u -r1.65 Main.java
---- toolsrc/org/mozilla/javascript/tools/shell/Main.java	30 Sep 2005 08:28:51 -0000	1.65
-+++ toolsrc/org/mozilla/javascript/tools/shell/Main.java	17 Jul 2006 03:09:31 -0000
-@@ -65,6 +65,7 @@
-     static protected int exitCode = 0;
-     static private final int EXITCODE_RUNTIME_ERROR = 3;
-     static private final int EXITCODE_FILE_NOT_FOUND = 4;
-+    static boolean outputCompressed = false;
-     static boolean processStdin = true;
-     static Vector fileList = new Vector(5);
-     private static SecurityProxy securityImpl;
-@@ -260,6 +261,10 @@
-                 shellContextFactory.call(iproxy);
-                 continue;
-             }
-+            if (arg.equals("-c")) {
-+				outputCompressed = true;
-+				continue;
-+			}
-             if (arg.equals("-w")) {
-                 errorReporter.setIsReportingWarnings(true);
-                 continue;
-@@ -395,10 +400,13 @@
-                                   String path, Object securityDomain)
-     {
-         Script script;
-+        Reader cin = null;
-+        String cout = null;
-+		String source = null;
-         if (path.endsWith(".class")) {
-             script = loadCompiledScript(cx, path, securityDomain);
-         } else {
--            String source = (String)readFileOrUrl(path, true);
-+            source = (String)readFileOrUrl(path, true);
-             if (source == null) {
-                 exitCode = EXITCODE_FILE_NOT_FOUND;
-                 return;
-@@ -418,11 +426,83 @@
-             }
-             script = loadScriptFromSource(cx, source, path, 1, securityDomain);
-         }
--        if (script != null) {
--            evaluateScript(script, cx, scope);
-+        if((script != null)||(source != null)){
-+			if(outputCompressed){
-+				try {
-+					URL url = new URL(path);
-+					global.getOut().println(url.toString());
-+					InputStream is = url.openStream();
-+					cin = new BufferedReader(new InputStreamReader(is));
-+				} catch (MalformedURLException mfex) {
-+					// global.getOut().println(mfex);
-+					cin = null;
-+				} catch (IOException ioex) {
-+					return;
-+				}
-+				if (cin == null) {
-+					// Try filename as file
-+					try {
-+						cin = new PushbackReader(new FileReader(path));
-+					} catch (FileNotFoundException ex) {
-+						// global.getErr().println(ex.toString());
-+						return;
-+					} catch (IOException ioe) {
-+						global.getErr().println(ioe.toString());
-+					}
-+				}
-+				cout = compressScript(cx, scope, cin, source, path, 1, securityDomain);
-+				global.getOut().println(cout);
-+			}else{
-+				evaluateScript(script, cx, scope);
-+			}
-         }
-     }
- 
-+
-+    public static String compressScript(Context cx, Scriptable scope,
-+                                         Reader in, String script,
-+                                         String sourceName,
-+                                         int lineno, Object securityDomain)
-+	{
-+        String result = null;
-+        try {
-+            if (in != null) {
-+                try {
-+                    try {
-+                        result = cx.compressReader(scope, in, sourceName, 
-+								                   lineno, securityDomain);
-+                    } finally {
-+                        in.close();
-+                    }
-+                } catch (IOException ioe) {
-+                    global.getErr().println(ioe.toString());
-+                }
-+            } else {
-+				// FIXME: this is wrong!!!!
-+				//        we should probably throw the string into a temp file
-+				//        and then have it read in again.
-+				result = script;
-+            }
-+        } catch (WrappedException we) {
-+            global.getErr().println(we.getWrappedException().toString());
-+            we.printStackTrace();
-+        } catch (EvaluatorException ee) {
-+            // Already printed message.
-+            exitCode = EXITCODE_RUNTIME_ERROR;
-+        } catch (RhinoException rex) {
-+            errorReporter.reportException(rex);
-+            exitCode = EXITCODE_RUNTIME_ERROR;
-+        } catch (VirtualMachineError ex) {
-+            // Treat StackOverflow and OutOfMemory as runtime errors
-+            ex.printStackTrace();
-+            String msg = ToolErrorReporter.getMessage(
-+                "msg.uncaughtJSException", ex.toString());
-+            exitCode = EXITCODE_RUNTIME_ERROR;
-+            Context.reportError(msg);
-+        }
-+        return result;
-+	}
-+
-     public static Script loadScriptFromSource(Context cx, String scriptSource,
-                                               String path, int lineno,
-                                               Object securityDomain)
 Index: .classpath
 ===================================================================
 RCS file: .classpath
@@ -1399,17 +833,3 @@ diff -N .project
 +		<nature>org.eclipse.jdt.core.javanature</nature>
 +	</natures>
 +</projectDescription>
-Index: .externalToolBuilders/org.eclipse.ant.AntLaunchConfigurationType.SHARED_INFO [Builder].launch
-===================================================================
-RCS file: .externalToolBuilders/org.eclipse.ant.AntLaunchConfigurationType.SHARED_INFO [Builder].launch
-diff -N .externalToolBuilders/org.eclipse.ant.AntLaunchConfigurationType.SHARED_INFO [Builder].launch
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ .externalToolBuilders/org.eclipse.ant.AntLaunchConfigurationType.SHARED_INFO [Builder].launch	1 Jan 1970 00:00:00 -0000
-@@ -0,0 +1,7 @@
-+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-+<launchConfiguration type="org.eclipse.ant.AntBuilderLaunchConfigurationType">
-+<booleanAttribute key="org.eclipse.debug.ui.private" value="true"/>
-+<booleanAttribute key="org.eclipse.ui.externaltools.ATTR_TRIGGERS_CONFIGURED" value="true"/>
-+<booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="true"/>
-+<stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.ant.ui.AntClasspathProvider"/>
-+</launchConfiguration>

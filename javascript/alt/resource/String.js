@@ -11,7 +11,16 @@ function StringResource(resource) {
 		str.append(line);
 		str.append("\n");
 	}
-	return str.toString();
+	this.str = str.toString();
+}
+StringResource.prototype = new ResourceWrapper();
+
+StringResource.prototype.get = function() {
+	return this.str;
+}
+StringResource.prototype.getCopy = function() {
+	// Strings are immutable
+	return this.str;
 }
 
 Loader.defineType(StringResource, 'txt');

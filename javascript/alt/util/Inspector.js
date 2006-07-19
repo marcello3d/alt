@@ -3,7 +3,7 @@ Rhino.require('alt.resource.Loader');
 Rhino.require('alt.resource.String');
 
 var JSInspector = Packages.cello.alt.util.Inspector;
-
+var Decompiler = Packages.org.mozilla.javascript.Decompiler;
 
 
 function isObject(o) {
@@ -31,6 +31,7 @@ function Inspector(object) {
 	this.seen = new Array();
 	this.objects = {};
 	this.classes = {};
+	this.classMap = new java.util.HashMap();
 	this.main = new InspectorObject(null, this, object, null);
 }
 Inspector.prototype.toHTML = function() {
@@ -88,9 +89,15 @@ function InspectorObject(name, inspector, object) {
 	var names = [];
 	// get JSInspector's properties
 	var props = JSInspector.getProperties(object);
+	var allprops = JSInspector.getAllProperties(object);
 	if (props.length>0)
 		for each (var x in props)
 			names[x] = true;
+	if (allprops.length>0) {
+		for each (var x in allprops)
+			if (names[x] == null)
+				Rhino.log("Hidden property "+x);
+	}
 	
 	for (var x in names) {
 		var oname = name==null ? x : name+'.'+x;
@@ -137,9 +144,13 @@ InspectorObject.prototype.toRow = function() {
 function JSDoc(name,func) {
 	this.returnType = null;
 	this.returnDesc = null;
-	var args = /function[^(]+\(([^)]*)\)/.exec(func);
+	var f = func.toString();
+	var args = /function[^(]+\(([^)]*)\)/.exec(f);
 	if (args && args[1])
 		this.args = args[1].split(/,\s/);
+		
+	if (!f.match(/return\s*[^;\s]+;/))
+		this.returnType = 'void';
 	this.params = [];
 	for each (var arg in this.args)
 		this.params[arg] = {type:null, desc: null };
@@ -271,6 +282,8 @@ InspectorFunction.prototype.toHTML = function() {
 	           {exceptions}
 	           <dt><b>Source:</b></dt>
 	           <dd><pre>{this.func}</pre></dd>
+	           <dt><b>Compressed Source:</b></dt>
+	           <dd><pre>{this.func.toSource(0,Decompiler.COMPRESS_FLAG)}</pre></dd>
 	           </dl>
 	         </span>
 	         </dd>
@@ -335,7 +348,12 @@ InspectorClass.prototype.toHTML = function() {
 	if (this.doc.author)
 		deprecated = <dl><dt><b>Deprecated</b></dt><dd>{this.doc.deprecated}</dd></dl>;
 	var s = <p>
-	<p><code>{this.func instanceof Function ? 'class' : 'module'} <b>{this.oname}</b></code></p>
+	<p><code>{this.func instanceof Function ? 'class' : 'module'} <b>{this.oname}</b><br/>
+	extends {this.func.constructor},<br/>
+	{this.func.prototype},<br/>
+	{this.func.prototype ? this.func.prototype.constructor : null},<br/>
+	{this.func.__proto__},<br/>
+	{this.func.__proto__.constructor}</code></p>
 	<p>{classDesc}</p>
 	<dl>
 	{since}
