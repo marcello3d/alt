@@ -4,7 +4,7 @@ RCS file: /cvsroot/mozilla/js/rhino/.cvsignore,v
 retrieving revision 1.2
 diff -u -r1.2 .cvsignore
 --- .cvsignore	11 Jul 2006 12:28:42 -0000	1.2
-+++ .cvsignore	19 Jul 2006 00:04:10 -0000
++++ .cvsignore	19 Jul 2006 09:03:56 -0000
 @@ -2,3 +2,5 @@
  lib
  build.local.properties
@@ -17,7 +17,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/BaseFunction.java
 retrieving revision 1.57
 diff -u -r1.57 BaseFunction.java
 --- src/org/mozilla/javascript/BaseFunction.java	30 Aug 2005 10:05:42 -0000	1.57
-+++ src/org/mozilla/javascript/BaseFunction.java	19 Jul 2006 00:04:14 -0000
++++ src/org/mozilla/javascript/BaseFunction.java	19 Jul 2006 09:03:56 -0000
 @@ -245,6 +245,8 @@
                  } else {
                      indent = 0;
@@ -33,7 +33,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Decompiler.java,v
 retrieving revision 1.19
 diff -u -r1.19 Decompiler.java
 --- src/org/mozilla/javascript/Decompiler.java	28 Aug 2005 23:25:22 -0000	1.19
-+++ src/org/mozilla/javascript/Decompiler.java	19 Jul 2006 00:04:14 -0000
++++ src/org/mozilla/javascript/Decompiler.java	19 Jul 2006 09:03:57 -0000
 @@ -82,6 +82,17 @@
       * Flag to indicate that the decompilation generates toSource result.
       */
@@ -273,7 +273,7 @@ diff -u -r1.19 Decompiler.java
 -                result.append(';');
 -                if (Token.EOL != getNext(source, length, i)) {
 +                if (Token.EOL == getNext(source, length, i)) {
-+                    if (compressnl)
++                    if (compressnl || !compress)
 +                        result.append(';');
 +                } else {
                      // separators in FOR
@@ -613,7 +613,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/FunctionNode.java
 retrieving revision 1.29
 diff -u -r1.29 FunctionNode.java
 --- src/org/mozilla/javascript/FunctionNode.java	29 Aug 2005 13:25:31 -0000	1.29
-+++ src/org/mozilla/javascript/FunctionNode.java	19 Jul 2006 00:04:14 -0000
++++ src/org/mozilla/javascript/FunctionNode.java	19 Jul 2006 09:03:57 -0000
 @@ -77,7 +77,15 @@
      public int getFunctionType() {
          return itsFunctionType;
@@ -636,7 +636,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/InterpretedFuncti
 retrieving revision 1.52
 diff -u -r1.52 InterpretedFunction.java
 --- src/org/mozilla/javascript/InterpretedFunction.java	28 May 2006 17:15:24 -0000	1.52
-+++ src/org/mozilla/javascript/InterpretedFunction.java	19 Jul 2006 00:04:14 -0000
++++ src/org/mozilla/javascript/InterpretedFunction.java	19 Jul 2006 09:03:57 -0000
 @@ -133,6 +133,9 @@
          if (idata.itsRegExpLiterals != null) {
              functionRegExps = createRegExpWraps(cx, scope);
@@ -653,7 +653,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Interpreter.java,
 retrieving revision 1.307
 diff -u -r1.307 Interpreter.java
 --- src/org/mozilla/javascript/Interpreter.java	19 Nov 2005 22:57:49 -0000	1.307
-+++ src/org/mozilla/javascript/Interpreter.java	19 Jul 2006 00:04:17 -0000
++++ src/org/mozilla/javascript/Interpreter.java	19 Jul 2006 09:03:58 -0000
 @@ -487,6 +487,7 @@
          itsData.itsFunctionType = theFunction.getFunctionType();
          itsData.itsNeedsActivation = theFunction.requiresActivation();
@@ -668,7 +668,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/InterpreterData.j
 retrieving revision 1.53
 diff -u -r1.53 InterpreterData.java
 --- src/org/mozilla/javascript/InterpreterData.java	30 Aug 2005 10:05:42 -0000	1.53
-+++ src/org/mozilla/javascript/InterpreterData.java	19 Jul 2006 00:04:17 -0000
++++ src/org/mozilla/javascript/InterpreterData.java	19 Jul 2006 09:03:58 -0000
 @@ -102,6 +102,9 @@
      String encodedSource;
      int encodedSourceStart;
@@ -685,7 +685,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Parser.java,v
 retrieving revision 1.104
 diff -u -r1.104 Parser.java
 --- src/org/mozilla/javascript/Parser.java	1 Jun 2006 14:30:19 -0000	1.104
-+++ src/org/mozilla/javascript/Parser.java	19 Jul 2006 00:04:19 -0000
++++ src/org/mozilla/javascript/Parser.java	19 Jul 2006 09:03:59 -0000
 @@ -430,6 +430,9 @@
      {
          int syntheticType = functionType;
@@ -712,7 +712,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/TokenStream.java,
 retrieving revision 1.63
 diff -u -r1.63 TokenStream.java
 --- src/org/mozilla/javascript/TokenStream.java	31 Jul 2005 13:48:46 -0000	1.63
-+++ src/org/mozilla/javascript/TokenStream.java	19 Jul 2006 00:04:19 -0000
++++ src/org/mozilla/javascript/TokenStream.java	19 Jul 2006 09:04:00 -0000
 @@ -284,6 +284,8 @@
      final int getLineno() { return lineno; }
  

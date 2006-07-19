@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Cellosoft Alt Framework : the Alternative web framework</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--Fireworks 8 Dreamweaver 8 target.  Created Sun Jun 11 16:05:11 GMT-0600 (Mountain Standard Time) 2006-->
+<link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body bgcolor="#ffffff">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><a href=""><img name="logo" src="http://images.cellosoft.com/marcello/projects/alt/logo.png" width="481" height="119" border="0" id="logo" alt="cellosoft Alt : the Alternative web framework" /></a> </p>
+<table border="0" align="center" cellpadding="10" cellspacing="0">
+  <tr>
+    <td width="440" class="main"><h1>JavaScript: E4X </h1>
+      <p>E4X, or ECMAScript for XML is an extension of JavaScript that makes XML part of JavaScript syntax and provides a number of mechanisms for traversing and modifying XML data.</p>
+      <h2>XML in Alt</h2>
+      <p>The Alt Framework makes heavy use of XML for both SQueaL's SQL Schema and the Onion ML markup system. E4X's native JavaScript approach became the logical approach for working with XML in the Alt Framework.</p>
+      <h2>E4X Documentation</h2>
+      <p>Finding useful resources or references on E4X is not easy, many simply pointing to the original highly technical ECMA specification. </p>
+      <p>The best documentation I have found is the Adobe documentation on ActionScript (also based on ECMAScript) which has just recently been given E4X support.</p>
+      <p>This most likely reason for a lack of documentation is the lack of usefulness. Only Firefox 1.5+ supports E4X natively in JavaScript, and the complexity of E4X makes it difficult to 'wrap' for other browsers.</p>
+      <h2>Quick Reference</h2>
+      <p>This reference is not intended to be official, it is simply my interpretation of various features in E4X.</p>
+      <h3>XML object</h3>
+      <p>Constructed by either writing literal XML code in your script: &lt;foo&gt;bar&lt;/foo&gt;, or with the string-based constructor: new String(&quot;&lt;foo&gt;bar&lt;/foo&gt;&quot;).</p>
+      <p>The literal XML syntax allows you to refer to JavaScript variables in XML blocks by using curly braces. E.g. <code>&lt;foo&gt;{somevar}&lt;/foo&gt;</code>. Note that for tag attributes you need to omit the quotes (e.g. <code>&lt;foo id={somevar}/&gt;</code>). Scripts can be specified for tag and attribute names as well (e.g. <code>&lt;{tagName} {attributeName}={attributeValue}/&gt;</code> is valid). </p>
+      <p>You can retrieve attributes from an XML object by using the syntax <code>xml.@name</code>, where <code>xml</code> is the XML object and <code>name</code> is the name of the attribute. </p>
+      <p>You can retrieve a child XML tag (also a XML object) with the syntax <code>xml.node</code>, where <code>xml</code> is the XML object, and <code>node</code> is the name of the child tag. If there are multiple children with the same tag, this exact same syntax instead returns a XMLList object.</p>
+      <h3>XMLList object</h3>
+      <p>This object acts like an array with one main difference: length is a method and not a property. That means to get the number of XML nodes in a XMLList object, you need to use <code>xmllist.length()</code>.</p>
+      <h2>E4X Websites</h2>
+      <h3>Recommended Resources </h3>
+      <p>These are the  links I recommend reading to get a feel for E4X from several sources.</p>
+      <p><a href="http://www.ibm.com/developerworks/library/ws-ajax1/" onmousedown="return rwt(this,'','','res','12','&amp;sig2=9hna1m2l7PwkP6d3eAUEBA')">AJAX and scripting Web services with E4X</a> - A tutorial from IBM's developerworks site. A good starting point for familiarizing yourself with E4X</p>
+      <p><a href="http://weblog.infoworld.com/udell/2004/09/29.html">Jon Udell: Introduction to E4X</a> - Another tutorial/introduction. This article looks at some of the filtering and search capabilities of E4X not covered in the IBM article.</p>
+      <p><a href="http://www.adobe.com/go/AS3_e4x_overview">Adobe ActionScript 3 E4X API/overview</a> - A full, readable reference to the E4X objects and their functionality. </p>
+      <h3>Other Resources</h3>
+      <p>For the sake of completeness, these are other sites I have found that discuss E4X, but are only worth reading if you are looking for more information </p>
+      <p><a href="http://en.wikipedia.org/wiki/E4X">Wikipedia: E4X</a> - This site provides an overview, description, and background of E4X, along with a few links, mostly listed here.</p>
+      <p><a href="http://www.w3schools.com/e4x/default.asp">W3 Schools  E4X Tutorial</a> - This site also has a quick overview of E4X and a comparison to other approaches. It shows some sample code and how to manipulate XML objects, but does not go into detail.</p>
+      <p><a href="http://www.faqts.com/knowledge_base/index.phtml/fid/1762">javascript.faqts</a> -  Poorly organized, but packed with details of E4X and how to work with it. In FAQ format, it has questions on what methods are defined for XML and XMLList objects, and various other questions.<a href="http://www.faqts.com/knowledge_base/view.phtml/aid/35888/fid/1762"></a></p>
+      
+      <p><a href="http://www.ecma-international.org/publications/standards/Ecma-357.htm">Standard ECMA-357</a> - The E4X Specification. This highly technical PDF is more geared toward implementing E4X than using it. </p>
+    </td>
+    <td valign="top"><ul class="menu">
+        <li><a href="about.html">About</a></li>
+      <li><a href="download.html">Download</a></li>
+      <li><a href="documentation.html">Documentation</a></li>
+      <li><a href="contribute.html">Contribute</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul></td>
+  </tr>
+</table>
+<p align="right"><a href="http://www.cellosoft.com/"><img name="copyright" src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
+</body>
+</html>

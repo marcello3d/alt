@@ -8,11 +8,14 @@
  pre {
    font-size: 0.8em;
  }
+ p {
+   margin-top: 0;
+ }
  </style>
 </head>
 <body>
 <h1>Module inspector (dynamic class analysis)</h1>
-<div>foo</div>
+<div id="content" />
 <p>Back to <a href="..">examples list</a></p>
 </body>
 </html>

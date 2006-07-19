@@ -1,0 +1,77 @@
+body {
+	background-color:#FFF;
+	color: #000;
+}
+.menu li {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 15pt;
+	font-weight: normal;
+	list-style-type: none;
+	color: #999;
+	letter-spacing: 0.2em;
+}
+a:link {
+	color:#06C;
+}
+a:hover {
+	color:#069;
+}
+a:visited, a:active {
+	color: #606;
+}
+.menu a:link,.menu a:visited {
+	color: #666;
+	text-decoration: none;
+	font-weight: normal;
+	border-bottom: 2px solid #fff;
+}
+.small {
+	font-size: 75%;
+}
+
+.menu a:hover,.menu a:visited:hover,.menu a:active {
+	background-color:#EEE;
+	text-decoration: none;
+	color: #333;
+	border-bottom: 2px solid #333;
+}
+body,td,p {
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 10pt;
+}
+.main p, .main dl {
+	text-align:justify;
+	padding: 0px 10px 0px 10px;
+}
+.main dl {
+	margin: 0px;
+}
+.main .center {
+	text-align: center;
+}
+.main h1 {
+	border-bottom: solid 2px #888;
+}
+.main h2, .main h3 {
+	font-style: italic;
+	font-weight: normal;
+}
+.main h2 {
+	border-bottom: dashed 1px #C99;
+}
+.main h3 {
+	color: #666;
+	border-bottom: dashed 1px #ddd;
+}
+.main pre {
+	padding: 0px 10px 0px 10px;
+	margin: 10px;
+	background-color:#fee;
+	border: solid 1px #aaa;
+}
+.main pre .comment {
+    color: #096;
+}
+.pad {
+	padding: 10px;
+}

@@ -14,8 +14,7 @@ function Path(request) {
 	*/
 	
 	this.servletPath = 
-	this.remainingPath = request.pathInfo ? request.pathInfo : 
-						 request.servletPath ? request.servletPath :
+	this.remainingPath = request.pathInfo || request.servletPath ||
 						 request.requestURI;
 						 
 	this.currentPath = '';

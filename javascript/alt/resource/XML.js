@@ -1,16 +1,29 @@
 
-Rhino.require('alt.resource.Loader', true);
+Rhino.require('alt.resource.Resource', true);
 Rhino.require('alt.resource.String');
 
-XML.prettyPrint = true;
-XML.prettyIndent = true;
-XML.ignoreWhitespace = false;
-XML.ignoreComments = false;
-
-function XMLResource(resource) {
-	var str = Loader.loadResource(resource, StringResource, true);
-	return new XML(str);
+/**
+ * Constructs a new XMLResource from a given resource object
+ */
+function XMLResource(resource, resourceName) {
+	var str = Loader.get(resourceName, StringResource);
+	
+	XML.prettyPrinting = false;
+	XML.prettyIndent = 0;
+	XML.ignoreWhitespace = false;
+	XML.ignoreComments = false;
+	this.xml = new XML(str);
 }
+XMLResource.prototype = new Resource;
+
+XMLResource.prototype.get = function() {
+	return this.xml;
+}
+
+XMLResource.prototype.getCopy = function() {
+	return this.xml.copy();
+}
+
+
 Loader.defineType(XMLResource, 'xml');
-Loader.defineType(XMLResource, 'html');
-Loader.defineType(XMLResource, 'htm');
+Loader.defineType(XMLResource, 'xhtml');

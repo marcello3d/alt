@@ -1,5 +1,5 @@
 
-Rhino.require('alt.resource.Loader', true);
+Rhino.require('alt.resource.Resource', true);
 
 
 function StringResource(resource) {
@@ -13,7 +13,7 @@ function StringResource(resource) {
 	}
 	this.str = str.toString();
 }
-StringResource.prototype = new ResourceWrapper();
+StringResource.prototype = new Resource;
 
 StringResource.prototype.get = function() {
 	return this.str;

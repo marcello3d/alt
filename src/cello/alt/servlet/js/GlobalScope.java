@@ -256,9 +256,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             // Load and evaluate the script in the current scope
             ScriptLoader loader = currentScript.getScriptLoader();
             JavaScript s = loader.loadScript(scriptName);
-            s.evaluate(cx, scope);
             
-            return Context.javaToJS(s,scope);
+            return s.evaluate(cx, scope);
         }
         /**
          * JavaScript function "evaluate".  In order to access the current 

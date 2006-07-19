@@ -51,7 +51,7 @@ public abstract class ScriptLoader {
      * @return  the JavaScript object
      * @throws ScriptNotFoundException  if the script was not found
      */
-    public JavaScript loadScript(String name) 
+    public synchronized JavaScript loadScript(String name) 
             throws ScriptNotFoundException {
         
         // Check if the script has been loaded
@@ -122,7 +122,8 @@ public abstract class ScriptLoader {
      * @return  the Resource object
      * @throws ResourceException  if the script was not found
      */
-    public Resource getResource(String path) throws ResourceException {
+    public synchronized Resource getResource(String path) 
+            throws ResourceException {
         
         // Check if the script has been loaded
         Resource resource = findLoadedResource(path);

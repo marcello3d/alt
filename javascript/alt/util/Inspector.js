@@ -1,415 +1,326 @@
 
 Rhino.require('alt.resource.Loader');
 Rhino.require('alt.resource.String');
+Rhino.require('alt.util.JSDoc');
 
 var JSInspector = Packages.cello.alt.util.Inspector;
 var Decompiler = Packages.org.mozilla.javascript.Decompiler;
 
 
-function isObject(o) {
-	if (o!=null && o instanceof Object)
-		for (var x in o)
-			return true;
-	return false;
-}
-function isClass(name,o) {
-	if (o == null) 
-		return false;
-	if (o instanceof Function)
-		for (var x in o.prototype)
-			return true;
-	if (o instanceof Object)
-		for each(var x in o)
-			if (x instanceof Function)
-				return true;
-	if (o instanceof Function && name.match(/^[A-Z]/))
-		return true;
-	return false;
-}
-
+/**
+ * Constructs a new Inspector object for a given base object
+ * @class
+ * This class provides a means for analyzing JavaScript data structure
+ * @param {Object} object   Object to inspect
+ */
 function Inspector(object) {
-	this.seen = new Array();
-	this.objects = {};
-	this.classes = {};
-	this.classMap = new java.util.HashMap();
-	this.main = new InspectorObject(null, this, object, null);
+	this.nodeMap = new java.util.HashMap();
+	this.main = new InspectorObject(this, object);
 }
-Inspector.prototype.toHTML = function() {
-	var classlinks = <table width="100%" border="1" cellspacing="0" cellpadding="2"></table>;
-	var classes = [];
-	for (var x in this.classes)
-		classes.push(x);
-	for each (var x in classes.sort()) {
-		var desc = '';
-		if (this.classes[x].doc.classDesc)
-			desc = this.classes[x].doc.classDesc;
-		classlinks.appendChild(<tr>
-		<td><a href={"#"+x}>{x}</a></td>
-		<td width="100%">{desc}</td>
-		</tr>);
-	}
-	return <>
-	 <p>Classes:</p>
-	 {classlinks}
-	 {Inspector.makeTable(this.classes)}
-	 <p>Global:</p>
-	 {this.main.toHTML()}
-	 <p>Modules:</p>
-	 {Inspector.makeTable(this.objects)}
-	</>;
+/**
+ * Inspects the children of this object
+ */
+Inspector.prototype.inspectChildren = function() {
+	this.main.inspectChildren();
+}
+/**
+ * Gets a mapping of full names to InspectorNodes
+ * @return {Object}  map of InspectorNode objects
+ */
+Inspector.prototype.getFlatMap = function() {
+	return this.main.getFlatMap();
+}
+/**
+ * Returns a string representation of this object
+ * @return {String} representation of this object
+ */
+Inspector.prototype.toString = function() {
+	return "[Inspector]";
 }
 
-Inspector.makeTable = function(items,header) {
-	var foundSome = false;
-	if (header==null)
-		header = new XML();
-	var s = <table width="100%" border="1" cellspacing="0" cellpadding="2">{header}</table>;
-	var sorted = [];
-	for (var x in items)
-		sorted.push(x);
-	if (sorted.length==0) 
+/**
+ * Constructs base inspector node
+ * @class
+ * This is the base class for inspector nodes used to signify classes, 
+ * functions, objects, and properties.
+ * @param {Inspector} inspector
+ * @param {Object} object
+ */
+function InspectorNode(inspector, object) {
+	this.inspector = inspector;
+	this.object = object;
+	this.parents = [];
+}
+/**
+ * Adds a parent to this node.
+ * 
+ * @param {InspectorNode}	parent	parent node
+ * @param {String}			name	the name of this node under the parent
+ */
+InspectorNode.prototype.addParent = function(parent, name) {
+	this.parents.push({parent: parent, name: name});
+}
+/**
+ * Returns a string representation of this object
+ * @return {String} representation of this object
+ */
+InspectorNode.prototype.toString = function() {
+	return "["+this.constructor.name+" "+this.getName()+"]";
+}
+
+
+InspectorNode.prototype.getType = function(type) {
+	for each (var o in this.parents) {
+		var node = o.parent.getType(type);
+		if (node) return node;
+	}
+	var map = this.inspector.getFlatMap();
+	if (map[type]) return map[type];
+	return null;
+}
+
+
+InspectorNode.prototype.getName = function() {
+	if (!this.parents)
+		return '';
+	if (this.parents.length==0) return "Anonymous";
+	if (this.parents.length==1) return this.parents[0].name;
+	var list = '';
+	for each (var o in this.parents) {
+		if (list)
+			list+='|';
+		list+=o.name;
+	}
+	return '['+list+']';
+}
+InspectorNode.prototype.getFullName = function() {
+	if (this.parents.length==0) 
 		return false;
-	sorted.sort();
-	for each (var x in sorted)
-		s.appendChild(items[x].toRow());
-	return s;
+	if (this.parents.length==1) {
+		var parentName = this.parents[0].parent.getFullName();
+		if (parentName)
+			return parentName + '.' + this.getName();
+		return this.getName();
+	}
+	var list = '';
+	for each (var o in this.parents) {
+		if (list)
+			list+='|';
+		list+=o.parent.getFullName();
+	}
+	return '['+list+'].'+this.getName();
 }
-function InspectorObject(name, inspector, object) {
-	//for (var i=0; i<inspector.seen.length; i++)
-	//	if (inspector.seen[i]==object)
-	//		return 'seen';
-	inspector.seen.push(object);
-	
-	this.name = name;
-	this.classes = {};
-	this.functions = {};
-	this.objects = {};
-	this.properties = {};
-	this.literal = object;
-	var names = [];
+/**
+ * Constructs a new inspector object.
+ * @class
+ * This class maps to a JavaScript object
+ * @param {Inspector}	inspector
+ * @param {Object}		object
+ */
+function InspectorObject(inspector, object) {
+	InspectorNode.call(this, inspector,object);
+	this.children = null;
+	this.inspectChildren();
+}
+InspectorObject.prototype = new InspectorNode;
+
+InspectorObject.prototype.getType = function(type) {
+	var childType = this.getChildType(type);
+	if (childType) return childType;
+	return InspectorNode.prototype.getType.call(this,type);
+}
+/**
+ * Returns the child of this node a given type
+ */
+InspectorObject.prototype.getChildType = function(type) {
+	return this.children[type];
+}
+/**
+ * Inspects the children of this node
+ */
+InspectorObject.prototype.inspectChildren = function(levels, flush) {
+	if (flush || this.children==null)
+		this.children = {};
+		
 	// get JSInspector's properties
-	var props = JSInspector.getProperties(object);
-	var allprops = JSInspector.getAllProperties(object);
-	if (props.length>0)
-		for each (var x in props)
-			names[x] = true;
-	if (allprops.length>0) {
-		for each (var x in allprops)
-			if (names[x] == null)
-				Rhino.log("Hidden property "+x);
+	var props = JSInspector.getProperties(this.object);
+	var allprops = JSInspector.getAllProperties(this.object);
+	
+	var names = {};
+	for each (var x in props) {
+		names[x] = true;
+		this.addChild(x, this.object[x]);
+	}
+		
+	for each (var x in allprops)
+		if (names[x] == null)
+			this.addChild(x, this.object[x], true);	
+}
+
+/**
+ * Creates and adds a child to this node (potentially using a cached node),
+ *  and adds a parent link to the child node.
+ * 
+ * @param {String} 			name	name of this node relative to the parent
+ * @param {Object}  		object	the child object
+ * @return {InspectorNode}  the constructed/cached node object
+ */
+InspectorObject.prototype.addChild = function(name, object, hidden) {
+	var constructor;
+	var node = this.inspector.nodeMap.get(object);
+	if (node != null) {
+		var reference = isReference(name, object);
+		if (reference != node instanceof InspectorReference)
+			node = null;
 	}
 	
-	for (var x in names) {
-		var oname = name==null ? x : name+'.'+x;
-		var child = object[x];
-		if (isClass(x, child)) {
-			inspector.classes[oname] = new InspectorClass(x, oname, inspector, child);
-		} else if (child instanceof Function) {
-			this.functions[x] = new InspectorFunction(x, child);
-		} else if (isObject(child)) {
-			inspector.objects[oname] = new InspectorObject(oname, inspector, child);
+	if (node==null){
+		if (hidden && this != this.inspector.main) {
+			return;
+		} else if (isReference(name, object)) {
+			constructor = InspectorReference;
+		} else if (isClass(name, object)) {
+			constructor = InspectorClass;
+		} else if (hidden) {
+			return null;
+		} else if (object instanceof Function) {
+			constructor = InspectorFunction;
+		} else if (isObject(object)) {
+			constructor = InspectorObject;
 		} else {
-			this.properties[x] = new InspectorProperty(x,child);
+			constructor = InspectorProperty;
 		}
+		node = new constructor(this.inspector, object);
+		this.inspector.nodeMap.put(object, node);
+	}
+	if (!hidden || constructor)
+		this.children[name] = node;
+	if (!hidden && node.addParent)
+		node.addParent(this, name);
+	return node;
+	
+	/**
+	 * Something is only an object if it's not null, instance of Object, and
+	 *  has some properties.
+	 * @param {Object}   o		the object
+	 * @return {boolean} true if o is an "object"
+	 */
+	function isObject(o) {
+		if (o!=null && o instanceof Object)
+			for (var x in o)
+				return true;
+		return false;
+	}
+	/**
+	 * Checks if a particular object is considered a class.
+	 * @param {String} name  the name of the object
+	 * @param {Object} o     the the object
+	 * @return {boolean}  true if o is a "class"
+	 */
+	function isClass(name,o) {
+		if (o == null) 
+			return false;
+		if (o instanceof Function)
+			for (var x in o.prototype)
+				return true;
+		return o instanceof Object && name.match(/^[A-Z]/);
+	}
+	function isReference(name,o) {
+		return isClass(name,o) && 
+					object instanceof Function && object.name != name;
 	}
 }
 
-InspectorObject.prototype.toHTML = function(head) {
-	
-	var xml = <>{this.literal}</>;
-	
-	var classes = Inspector.makeTable(this.classes,
-								<tr><th colspan="2">Inner Classes</th></tr>);
-	if (classes) xml.appendChild(classes);
-	
-	var objects = Inspector.makeTable(this.objects,
-								<tr><th colspan="2">Objects</th></tr>);
-	if (objects) xml.appendChild(objects);
-	
-	var properties = Inspector.makeTable(this.properties,
-								<tr><th colspan="2">Properties</th></tr>);
-	if (properties) xml.appendChild(properties);
-	
-	var functions = Inspector.makeTable(this.functions,
-								<tr><th colspan="2">Functions</th></tr>);
-	if (functions) 
-		xml.appendChild(functions);
-	
-	return xml;
-}
-InspectorObject.prototype.toRow = function() {
-	return <tr><td>{this.toHTML()}</td></tr>;
-}
-
-function JSDoc(name,func) {
-	this.returnType = null;
-	this.returnDesc = null;
-	var f = func.toString();
-	var args = /function[^(]+\(([^)]*)\)/.exec(f);
-	if (args && args[1])
-		this.args = args[1].split(/,\s/);
-		
-	if (!f.match(/return\s*[^;\s]+;/))
-		this.returnType = 'void';
-	this.params = [];
-	for each (var arg in this.args)
-		this.params[arg] = {type:null, desc: null };
-		
-	var doc = func.__jsdoc__;
-	if (doc) {
-		this.exceptions = [];
-		this.desc = '';
-		this.classDesc = '';
-		var inDesc = true;
-		for each (var line in doc.split(/\n/)) {
-			var match = /^@(\S+)\s*(.*)$/.exec(line);
-			if (!match) {
-				if (inDesc)
-					this.desc += line+'\n';
-				else
-					this.classDesc += line+'\n';
-			} else switch (match[1]) {
-				case 'deprecated':
-					this.deprecated = match[2] ? match[2] : true;
-					break;
-				case 'class':
-					inDesc = false;
-					break;
-				case 'type':
-					this.returnType = match[2];
-					break;
-				case 'return':
-				case 'returns':
-					this.returnDesc = match[2];
-					break;
-				case 'author':
-					this.author = match[2];
-					break;
-				case 'since':
-					this.since = match[2];
-					break;
-				case 'param':
-					var match2 = /(?:\{([^}]+)\})?\s*(\S+)\s*(.*)/.exec(match[2]);
-					var name = match2[2];
-					if (this.params[name]) {
-						if (match2[1])
-							this.params[name].type = match2[1];
-						this.params[name].desc = match2[3];
-					}
-					break;
-				case 'exception':
-					var match2 = /(\S+)\s*(.*)/.exec(match[2]);
-					this.exceptions.push({type:match2[1], desc:match2[2]});
-					break;
-			}
-		}
-		this.splitDesc = /^([\s\S]+?(?:\.\s|\.?$))([\s\S]*)$/.exec(this.desc);
+/**
+ * Gets a mapping of full names to InspectorNodes
+ * @return {Object}  map of InspectorNode objects
+ */
+InspectorObject.prototype.getFlatMap = function() {
+	var map = {};
+	for (var x in this.children) {
+		var child = this.children[x];
+		if (child.getFlatMap) {
+			var childmap = child.getFlatMap();
+			if (childmap)
+				for (var x2 in childmap)
+					map[x+'.'+x2] = childmap[x2];
+			else
+				map[x] = child;
+		} else 
+			map[x] = child;
 	}
+	return map;
 }
 
-function InspectorFunction(name, func, source) {
-	this.name = name;
+/**
+ * Constructs a new InspectorFunction object from a given function.
+ * @param {Inspector}   inspector
+ * @param {Function}	func
+ */
+function InspectorFunction(inspector, func) {
+	InspectorObject.call(this,inspector,func);
 	this.func = func;
-	this.doc = new JSDoc(name,func);
+	this.doc = new JSDoc(func);
 }
+InspectorFunction.prototype = new InspectorObject;
 
-var nextSpanId = 1;
-
-function toggleCode(name) {
-	return 'var s=document.getElementById("' + name + '").style;' +
-				's.display=s.display=="none"?"":"none";return false;';
-}
-
-InspectorFunction.prototype.toHTML = function() {
-	var id = nextSpanId++;
-	
-	var shortdesc = '';
-	var longdesc = '';
-	var args = '';
-	
-	var params = <></>;
-	var returns = <></>;
-	var exceptions = <></>;
-	if (this.doc.args) {
-		params = <dl><dt><b>Parameters:</b></dt></dl>;
-		for each (var arg in this.doc.args) {
-			if (args) 
-				args += ', ';
-			var type = this.doc.params[arg].type;
-			if (type)
-				args += '{'+type+'} ';
-			args += arg;
-
-			var desc = this.doc.params[arg].desc;
-			params.appendChild(
-			  <dd><code>{arg}</code>{desc?' - '+desc:''}</dd>
-			);
-		
-		}
-	}
-		
-	if (this.doc.desc) {
-		shortdesc = this.doc.splitDesc[1];
-		longdesc = new XML('<p>'+this.doc.splitDesc[2]+'</p>');
-		if (this.doc.returnDesc) 
-			returns = <dl>
-		                 <dt><b>Returns:</b></dt>
-		                 <dd><code>{this.doc.returnType}</code> 
-		                 {this.doc.returnDesc}
-		                 </dd>
-		               </dl>;
-		if (this.doc.exceptions.length>0) {
-			exceptions = <dl><dt><b>Exceptions:</b></dt></dl>;
-			for each (var exception in this.doc.exceptions) {
-				exceptions.appendChild(
-				  <dd>{exception.type} - {exception.desc}</dd>
-				);
-			}
-		}
-	}
-	return <dl style="margin:0">
-	         <dt>
-	          <code>
-	           <b><a href="#" onclick={toggleCode('span'+id)}>{this.name}</a></b>({args})
-	           </code>
-	          </dt>
-	         <dd>{shortdesc}
-	          <span id={'span'+id} style="display:none">
-	          {longdesc}
-	          <dl>
-	           {params}
-	           {returns}
-	           {exceptions}
-	           <dt><b>Source:</b></dt>
-	           <dd><pre>{this.func}</pre></dd>
-	           <dt><b>Compressed Source:</b></dt>
-	           <dd><pre>{this.func.toSource(0,Decompiler.COMPRESS_FLAG)}</pre></dd>
-	           </dl>
-	         </span>
-	         </dd>
-	       </dl>;
-		       /*
-	} else {
-		//	<pre id={'pre'+id} style="display:none">{f}</pre>;
-		return <code>
-		        <b>{this.name}</b>({this.doc.args})
-		       </code>;
-	}*/
-}
-InspectorFunction.prototype.toRow = function() {
-	return <tr>
-	        <td valign="top" align="right">
-	         <code> {this.doc.returnType ? this.doc.returnType : 'Object'}</code>
-	        </td>
-	        <td width="100%">{this.toHTML()}</td>
-	       </tr>;
-}
-
-function InspectorClass(name,oname,inspector,func) {
-	this.func = func;
-	this.doc = new JSDoc(name,func);
-	this.name = name;
-	this.oname = oname;
-	this.seen = [];
-	this.objects = {};
+/**
+ * Constructs a new InspectorClass object from a given function.
+ * @param {Inspector}   inspector
+ * @param {Function}	func		the class
+ */
+function InspectorClass(inspector,func) {
+	Rhino.log(this.constructor);
+	InspectorFunction.call(this,inspector,func);
 	
 	var thisObj = this;
-	this.constructor = {};
-	this.constructor[name] = {
-		toRow: function() { 
-			return <tr><td>{InspectorFunction.prototype.toHTML.call(thisObj)}</td></tr>;
-		}
-	};
 	
+	// Non-static class
 	if (func.prototype)
-		this.proto = new InspectorObject(oname, inspector, func.prototype);
-
-	for (var x in func) {
-		this.statics = new InspectorObject(oname, inspector, func);
-		break;
-	}
+		this.proto = new InspectorObject(inspector, func.prototype);
 }
-
-InspectorClass.prototype.toHTML = function() {
-	var f = this.func.toString();
-	var args = /function[^(]+\(([^)]*)\)/.exec(f);
-	var id = nextSpanId++;
-	
-	var classDesc = <></>;
-	var since = <></>;
-	var deprecated = <></>;
-	var author = <></>;
-	if (this.doc.classDesc)
-		classDesc = new XML('<p>'+this.doc.classDesc+'</p>');
-	if (this.doc.author)
-		author = <dl><dt><b>Author</b></dt><dd>{this.doc.author}</dd></dl>;
-	if (this.doc.since)
-		since = <dl><dt><b>Since</b></dt><dd>{this.doc.since}</dd></dl>;
-	if (this.doc.author)
-		deprecated = <dl><dt><b>Deprecated</b></dt><dd>{this.doc.deprecated}</dd></dl>;
-	var s = <p>
-	<p><code>{this.func instanceof Function ? 'class' : 'module'} <b>{this.oname}</b><br/>
-	extends {this.func.constructor},<br/>
-	{this.func.prototype},<br/>
-	{this.func.prototype ? this.func.prototype.constructor : null},<br/>
-	{this.func.__proto__},<br/>
-	{this.func.__proto__.constructor}</code></p>
-	<p>{classDesc}</p>
-	<dl>
-	{since}
-	{deprecated}
-	{author}
-	</dl>
-	</p>;
-	if (this.func instanceof Function) {
-		s.appendChild(Inspector.makeTable(this.constructor,
-			<tr><th>Constructor</th></tr>));
+InspectorClass.prototype = new InspectorFunction;
+InspectorClass.prototype.getSuperClass = function() {
+	if (this.func.prototype) {
+		var c = this.func.prototype.constructor;
+		var p = this.func.prototype.__proto__;
+		for each (var o in this.inspector.nodeMap.values().toArray()) {
+			if (o.prototype==p)
+				return o;
+		}
+		
+		if (c==this.func)
+			return false;
+		var node = this.inspector.nodeMap.get(c);
+		if (node!=null)
+			return node;
 	}
-	if (this.proto) {
-		
-		var classes = Inspector.makeTable(this.proto.classes,
-				<tr><th colspan="2">Inner Classes</th></tr>);
-		if (classes) s.appendChild(classes);
-		
-		var properties = Inspector.makeTable(this.proto.properties,
-				<tr><th colspan="2">Member Properties</th></tr>);
-		if (properties) s.appendChild(properties);
-		
-		var functions = Inspector.makeTable(this.proto.functions,
-				<tr><th colspan="2">Member Functions</th></tr>);
-		if (functions) s.appendChild(functions);
-	}
-	if (this.statics) {
-		
-		var classes = Inspector.makeTable(this.statics.classes,
-				<tr><th colspan="2">Inner Classes</th></tr>);
-		if (classes) s.appendChild(classes);
-		
-		var properties = Inspector.makeTable(this.statics.properties,
-				<tr><th colspan="2">Static Properties</th></tr>);
-		if (properties) s.appendChild(properties);
-		
-		var functions = Inspector.makeTable(this.statics.functions,
-				<tr><th colspan="2">Static Functions</th></tr>);
-		if (functions) s.appendChild(functions);
-	}
-	
-	return s;
+	return false;
 }
-InspectorClass.prototype.toRow = function() {
-	return <tr>
-	        <td valign="top" align="right"><a name={this.oname}/>{this.oname}</td>
-	        <td>{this.toHTML()}</td>
-	       </tr>;
+InspectorClass.prototype.getFlatMap = function() {
+	return null;
 }
 
-function InspectorProperty(name,object) {
-	this.name = name;
-	this.value = object;
+/**
+ * Constructs a new InspectorReference object from a given function.
+ * @param {Inspector}   inspector
+ * @param {Object}		function
+ */
+function InspectorReference(inspector,object) {
+	InspectorNode.call(this,inspector,object);
 }
-InspectorProperty.prototype.toHTML = function() {
-	return <code>{this.value}</code>;
+InspectorReference.prototype = new InspectorNode;
+InspectorReference.prototype.getReference = function() {
+	return this.inspector.nodeMap.get(this.object);
 }
-InspectorProperty.prototype.toRow = function() {
-	return <tr><td><code>{this.name}</code></td><td>Current value: <code>{this.value}</code></td></tr>;
+
+/**
+ * Constructs a new InspectorClass object from a given object.
+ * @param {Inspector}   inspector
+ * @param {Object}		object
+ */
+function InspectorProperty(inspector,object) {
+	InspectorNode.call(this,inspector,object);
 }
+InspectorProperty.prototype = new InspectorNode;
+
