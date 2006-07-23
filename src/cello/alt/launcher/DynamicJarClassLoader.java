@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-package cello.alt.util;
+package cello.alt.launcher;
 
 import java.io.File;
 import java.net.URL;

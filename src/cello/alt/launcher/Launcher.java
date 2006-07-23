@@ -23,7 +23,6 @@ package cello.alt.launcher;
 import java.io.File;
 import java.lang.reflect.Method;
 
-import cello.alt.util.DynamicJarClassLoader;
 
 /**
  * A dynamic class loader (based off helma.main.launcher from http://helma.org/)

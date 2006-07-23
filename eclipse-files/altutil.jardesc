@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <jardesc>
-    <jar path="C:/Documents and Settings/Marcello/My Documents/java/alt/lib/ext/altutil.jar"/>
-    <options buildIfNeeded="true" compress="true" descriptionLocation="/alt/eclipse-files/altutil.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" useSourceFolders="false"/>
+    <jar path="alt/lib/ext/altutil.jar"/>
+    <options buildIfNeeded="true" compress="true" descriptionLocation="/alt/eclipse-files/altutil.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="true" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
+    <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
+    <selectedProjects/>
     <manifest generateManifest="false" manifestLocation="/alt/eclipse-files/altutil.manifest" manifestVersion="1.0" reuseManifest="true" saveManifest="true" usesManifest="true">
         <sealing sealJar="false">
             <packagesToSeal/>
@@ -9,7 +11,6 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=alt/src&lt;cello.alt.util{ScriptableWrapper.java"/>
-        <javaElement handleIdentifier="=alt/src&lt;cello.alt.util{Inspector.java"/>
+        <javaElement handleIdentifier="=alt/src&lt;cello.alt.util"/>
     </selectedElements>
 </jardesc>
