@@ -31,7 +31,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 
-import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.AltServlet;
 import cello.alt.servlet.js.Module;
 import cello.alt.servlet.resource.MutableResource;
 import cello.alt.servlet.resource.Resource;
@@ -145,7 +145,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
         //System.out.println("evaluate : "+this);
         
         // Set current script
-        JavaScript previousScript = RhinoServlet.setCurrentScript(cx,this);
+        JavaScript previousScript = AltServlet.setCurrentScript(cx,this);
         
         // Clear any current dependencies
         resetDependencies();
@@ -164,7 +164,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
         
         
         // Restore previous current script
-        RhinoServlet.setCurrentScript(cx,previousScript);
+        AltServlet.setCurrentScript(cx,previousScript);
         
         return returnValue;
     }

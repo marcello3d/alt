@@ -8,6 +8,7 @@ dictator.paths({
 	session: 	'examples.Session',
 	Dictator: 	'examples.Dictator',
 	Delight: 	'examples.Delight',
-	SQueaL: 	'examples.SQueaL'
+	SQueaL: 	'examples.SQueaL',
+	Derby:		'examples.Derby'
 	
 });

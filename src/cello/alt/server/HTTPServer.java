@@ -32,7 +32,7 @@ import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.servlet.SessionHandler;
 
 /**
- * A simple Jetty6 wrapper for running RhinoServlet.  Features commandline
+ * A simple Jetty6 wrapper for running AltServlet.  Features commandline
  *  customization (port and initial scriptpath) 
  * 
  * @author Marcello
@@ -48,7 +48,7 @@ public class HTTPServer {
     public static final String NAME_VERSION = NAME+" "+VERSION;
     
     /**
-     * Starts a new Jetty6 server and adds the RhinoServlet to the default path.
+     * Starts a new Jetty6 server and adds the AltServlet to the default path.
      * 
      * @param host  the host:port to listen on
      * @param root  the initial scriptpath to load scripts from
@@ -77,9 +77,9 @@ public class HTTPServer {
         // Make servlet
         ServletHandler servlet = new ServletHandler();
         ServletHolder holder = 
-            servlet.addServletWithMapping("cello.alt.servlet.RhinoServlet", "/");
-        holder.setInitParameter("rhino.root", root);
-        holder.setInitParameter("rhino.main", main);
+            servlet.addServletWithMapping("cello.alt.servlet.AltServlet", "/");
+        holder.setInitParameter("alt.root", root);
+        holder.setInitParameter("alt.main", main);
         
         // Make session handler
         SessionHandler session = new SessionHandler();
@@ -106,8 +106,8 @@ public class HTTPServer {
     public static void main(String[] args) {
         try {
             String flag = null;
-            String root = "/javascript/";
-            String main = "alt.dictator.Main";
+            String root = "/js/";
+            String main = "alt.main.Main";
             String host = "4500";
             boolean gui = !GraphicsEnvironment.isHeadless();
             for (String arg : args)

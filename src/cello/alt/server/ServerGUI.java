@@ -57,7 +57,7 @@ import javax.swing.text.StyleConstants;
 
 import org.mortbay.jetty.Server;
 
-import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.AltServlet;
 
 /**
  * The ServerGUI is a simple graphical shell for running the HTTPServer class. 
@@ -83,7 +83,7 @@ public class ServerGUI extends JFrame {
      * @param main the entry point javascript file
      */
     public ServerGUI(String host, String root, String main) {
-        super(HTTPServer.NAME_VERSION+" - "+RhinoServlet.NAME_VERSION);
+        super(HTTPServer.NAME_VERSION+" - "+AltServlet.NAME_VERSION);
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

@@ -60,7 +60,7 @@ import cello.alt.servlet.script.ScriptLoader;
  *
  */
 
-public class RhinoServlet extends HttpServlet implements ScopeProvider {
+public class AltServlet extends HttpServlet implements ScopeProvider {
     
     private static final long serialVersionUID = 2280866936332806360L;
     private MultiScriptLoader loader = new MultiScriptLoader();
@@ -68,9 +68,9 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     private GlobalScope globalScope;
     
     /** Version string */
-    public static final String NAME_VERSION = "RhinoServlet v0.03 alpha";
+    public static final String NAME_VERSION = "AltServlet v0.04 alpha";
     
-    private String mainScript = "Main";
+    private String mainScript = "alt.main.Main";
     /** 
      * Protected access from ScriptableObject (Don't enum, read-only, and
      *  permanent).
@@ -86,9 +86,9 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     private ExecutorService pool;
     
     /**
-     * Constructs a new RhinoServer
+     * Constructs a new AltServlet
      */
-    public RhinoServlet() {
+    public AltServlet() {
         // do nothing
     }
     
@@ -105,7 +105,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
      *
      */
     public void startDebugger() {
-        Main.mainEmbedded(ContextFactory.getGlobal(),this,"RhinoServlet");
+        Main.mainEmbedded(ContextFactory.getGlobal(),this,NAME_VERSION);
     }
     
     private String getInitParameter(String name, String def) {
@@ -116,7 +116,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     }
     
     /**
-     * Initialize this RhinoServlet.
+     * Initialize this AltServlet.
      */
     @Override
     public void init() {
@@ -126,10 +126,12 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
         
         ServletContext context = getServletContext();
 
-        addScriptLoader(new ContextScriptLoader(loader, context, "/WEB-INF/scripts/"));
-        addScriptLoader(new ContextScriptLoader(loader, context, getInitParameter("rhino.root","/")));
+        addScriptLoader(new ContextScriptLoader(loader, context, 
+        		"/WEB-INF/scripts/"));
+        addScriptLoader(new ContextScriptLoader(loader, context, 
+        		getInitParameter("alt.root","/js/")));
 
-        mainScript = getInitParameter("rhino.main","Main");
+        mainScript = getInitParameter("alt.main", "alt.main.Main");
 
         if (!ContextFactory.hasExplicitGlobal())
             ContextFactory.initGlobal(new DynamicFactory());
@@ -182,14 +184,14 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
     }
     
     /**
-     * Gets the current thread's RhinoServer from a Context
+     * Gets the current thread's AltServer from a Context
      * @param cx  the javascript Context
-     * @return  the RhinoServer, or null
+     * @return  the AltServer, or null
      */
-    public static RhinoServlet getServlet(Context cx) {
-        Object o = cx.getThreadLocal("rhinoServer");
-        if (o==null || !(o instanceof RhinoServlet)) return null;
-        return (RhinoServlet)o;
+    public static AltServlet getServlet(Context cx) {
+        Object o = cx.getThreadLocal("altServlet");
+        if (o==null || !(o instanceof AltServlet)) return null;
+        return (AltServlet)o;
     }
     /**
      * Gets the current thread's script from a Context.
@@ -301,7 +303,7 @@ public class RhinoServlet extends HttpServlet implements ScopeProvider {
             long startTime = System.nanoTime();
             Context cx = Context.enter();
             cx.setOptimizationLevel(-1);
-            cx.putThreadLocal("rhinoServer",RhinoServlet.this);
+            cx.putThreadLocal("altServlet",AltServlet.this);
             try {
 
                 // retrieve JavaScript...

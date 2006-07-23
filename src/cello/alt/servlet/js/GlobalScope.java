@@ -34,16 +34,16 @@ import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.AltServlet;
 import cello.alt.servlet.resource.ResourceException;
 import cello.alt.servlet.script.JavaScript;
 import cello.alt.servlet.script.ScriptLoader;
 import cello.alt.servlet.script.ScriptNotFoundException;
 
 /**
- * Top-level scope object for RhinoServlet.  This defines the standard objects,
+ * Top-level scope object for AltServlet.  This defines the standard objects,
  *  a global static "Rhino" object that gives access for controlling 
- *  RhinoServlet.  It also adds a self-pointing global property "global", and
+ *  AltServlet.  It also adds a self-pointing global property "global", and
  *  makes Rhino.require a protected global variable.
  *  
  * @author Marcello
@@ -57,27 +57,27 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
     private RootModule rootModule;
     
     /**
-     * Constructs a new GlobalScope object referencing a particular RhinoServlet
+     * Constructs a new GlobalScope object referencing a particular AltServlet
      * @param server  the server
      */
-    public GlobalScope(RhinoServlet server) {
+    public GlobalScope(AltServlet server) {
         Context cx = Context.enter();
         cx.initStandardObjects(this);
         Context.exit();
 
         // Two properties of global: a self pointer
-        defineProperty("global", this, RhinoServlet.PROTECTED);
+        defineProperty("global", this, AltServlet.PROTECTED);
         //  and a "static" class for managing Rhino
         RhinoClass rhinoClass = new RhinoClass(server);
-        defineProperty("Rhino", rhinoClass, RhinoServlet.PROTECTED);
+        defineProperty("Rhino", rhinoClass, AltServlet.PROTECTED);
         
         // Static class for managing servlet
         ServletClass servletClass = new ServletClass(server);
-        defineProperty("Servlet", servletClass, RhinoServlet.PROTECTED);
+        defineProperty("Servlet", servletClass, AltServlet.PROTECTED);
         
         // Add require as a global method
         defineProperty("require", rhinoClass.get("require",rhinoClass),
-                RhinoServlet.PROTECTED);
+                AltServlet.PROTECTED);
 
         rootModule = new RootModule(this);
     }
@@ -133,13 +133,13 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
          * Constructs a new ServletClass object
          * @param server  the RhinoServlet
          */
-        private ServletClass(RhinoServlet server) {
+        private ServletClass(AltServlet server) {
             defineProperty("context", new NativeJavaInterface(this, 
                     server.getServletContext(), ServletContext.class), 
-                    RhinoServlet.PROTECTED);
+                    AltServlet.PROTECTED);
             defineProperty("config", new NativeJavaInterface(this, 
                     server.getServletConfig(), ServletConfig.class), 
-                    RhinoServlet.PROTECTED);
+                    AltServlet.PROTECTED);
    
         }
 
@@ -155,13 +155,13 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
     private static class RhinoClass extends ScriptableObject {
         /** For Eclipse warning */
         private static final long serialVersionUID = 4816919208983818311L;
-        private RhinoServlet server;
+        private AltServlet server;
         
         /**
          * Constructs a new RhinoClass object
          * @param server
          */
-        private RhinoClass(RhinoServlet server) {
+        private RhinoClass(AltServlet server) {
             this.server = server;
             defineFunctionProperties( 
                     new String[] {  "require",
@@ -174,7 +174,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                                     "debug",
                                     "log"},
                                     RhinoClass.class,
-                                    RhinoServlet.PROTECTED);
+                                    AltServlet.PROTECTED);
                                     
         }
         
@@ -215,7 +215,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
 
 
             // Get the current script (the one that called require())
-            JavaScript currentScript = RhinoServlet.getCurrentScript(cx);
+            JavaScript currentScript = AltServlet.getCurrentScript(cx);
 
             // This should only be null if this method is called from outside of
             // a JavaScript evaluate() method
@@ -264,7 +264,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 scope = (Scriptable)args[1];
 
             // Get the current script (the one that called evaluate())
-            JavaScript currentScript = RhinoServlet.getCurrentScript(cx);
+            JavaScript currentScript = AltServlet.getCurrentScript(cx);
             
             // This should never be null
             if (currentScript == null)
@@ -303,7 +303,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 scope = (Scriptable)args[1];
 
             // Get the current script (the one that called evaluate())
-            JavaScript currentScript = RhinoServlet.getCurrentScript(cx);
+            JavaScript currentScript = AltServlet.getCurrentScript(cx);
             
             // This should never be null
             if (currentScript == null)
@@ -334,7 +334,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             String resourceName = Context.toString(args[0]);
             
             // Get the current script (the one that called require())
-            JavaScript currentScript = RhinoServlet.getCurrentScript(cx);
+            JavaScript currentScript = AltServlet.getCurrentScript(cx);
 
             // This should only be null if this method is called from outside of
             // a JavaScript evaluate() method
@@ -359,7 +359,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         public static Object getRequestScope(Context cx, Scriptable thisObj, 
                 Object[] args, Function funObj) {
 
-            return RhinoServlet.getRequestScope(cx);
+            return AltServlet.getRequestScope(cx);
         }        
         /**
          * The JavaScript function "addScriptPath" has two formats:

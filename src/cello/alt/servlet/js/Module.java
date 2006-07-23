@@ -23,7 +23,7 @@ package cello.alt.servlet.js;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
-import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.AltServlet;
 
 /**
  * 
@@ -74,8 +74,8 @@ public class Module extends ScriptableObject {
             parent.getFullName() + '.' +  name;
         
         // Create a self-pointer
-        defineProperty("module", this, RhinoServlet.PROTECTED);
-        defineProperty("parent", parent, RhinoServlet.PROTECTED);
+        defineProperty("module", this, AltServlet.PROTECTED);
+        defineProperty("parent", parent, AltServlet.PROTECTED);
         
         parent.addChild(this);
     }
@@ -86,7 +86,7 @@ public class Module extends ScriptableObject {
      */
     protected void addChild(Module module) {
         // Add the child scope as a member of the parent
-        defineProperty(module.getName(), module, RhinoServlet.VISIBLE);
+        defineProperty(module.getName(), module, AltServlet.VISIBLE);
     }
 
     /**

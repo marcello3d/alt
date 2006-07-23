@@ -22,7 +22,7 @@ package cello.alt.servlet.js;
 
 import org.mozilla.javascript.ScriptableObject;
 
-import cello.alt.servlet.RhinoServlet;
+import cello.alt.servlet.AltServlet;
 
 /**
  * Root Module object overrides some functionality of regular Modules.
@@ -42,7 +42,7 @@ public class RootModule extends Module {
         this.globalScope = globalScope;
         setPrototype(globalScope);
         // Create a self-pointer
-        defineProperty("module", this, RhinoServlet.PROTECTED);
+        defineProperty("module", this, AltServlet.PROTECTED);
     }
 
     /**
@@ -53,7 +53,7 @@ public class RootModule extends Module {
     protected void addChild(Module module) {
         // Add to global
         globalScope.defineProperty(module.getName(), module, 
-                RhinoServlet.VISIBLE);
+                AltServlet.VISIBLE);
     }
     /**
      * @see ScriptableObject#getClassName()
