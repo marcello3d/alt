@@ -110,7 +110,7 @@ alt.squeal.Field.prototype.getSQLType = function() {
 alt.squeal.Field.prototype.getSQLDefinition = function() {
 	return this.getSQLType() +
 		(this.required ? ' NOT NULL' : ' NULL') + 
-		(this.defaultValue ? ' DEFAULT "'+cello.SQLSchema.escapeString(this.defaultValue)+'"' : '');
+		(this.defaultValue ? ' DEFAULT "'+alt.squeal.sql.escapeString(this.defaultValue.toString())+'"' : '');
 }
 
 /**
@@ -129,7 +129,7 @@ alt.squeal.Table.prototype.synchronize = function(conn, log) {
 
 	if (!table_status || !table_status.hasRows()) {
 		// Create the table
-		log("Creating table "+name+".");
+		log("Creating table "+this.name+".");
 		
 		var database = this.getDatabase();
 		if (database)
@@ -288,9 +288,9 @@ alt.squeal.Table.prototype.synchronize = function(conn, log) {
 		this.tables[name].synchronize(conn,log);
 	
 	function query(q, error_ok) {
-		return cello.SQLSchema.sql.query(conn,q,error_ok,log);
+		return alt.squeal.sql.query(conn,q,error_ok,log);
 	}
 	function alter(q, error_ok) {
-		return cello.SQLSchema.sql.alter(conn,q,error_ok,log);
+		return alt.squeal.sql.alter(conn,q,error_ok,log);
 	}
 }

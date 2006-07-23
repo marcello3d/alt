@@ -17,12 +17,11 @@ Rhino.require('alt.squeal.Field');
 Rhino.require('alt.squeal.ID');
 
 /**
- * Creates a new SQueaL object based on a cello.SimpleXML source.
+ * Creates a new SQueaL object based on a XML source.
  * @class
- * The main cello.SQLSchema class
+ * The main SQLSchema class
  * @constructor
- * @requires cello.SimpleXML
- * @param {cello.SimpleXML} xml base cello.SimpleXML object to use as reference
+ * @param {XML} xml base cello.SimpleXML object to use as reference
  */
 function SQLSchema(xml) {
  
@@ -75,37 +74,41 @@ SQLSchema.prototype.add = function(xml) {
 	
 	this.databases = {};
 	
-	for each (var child in xml.children())
-		switch (child.name().toString()) {
-			case 'types':
-				for each (var type in child.children())
-					handleType(this, type);
-				break;
-			case 'database':
-				var db = child.@name;
-
-				if (!this.databases[db])
-					this.databases[db] = new Database(db, this);
-					
-					
-				for each (var grandchild in child.children()) 
-					switch (grandchild.name().toString()) {
-						case 'table':
-							handleTable(this.databases[db], grandchild);
-							break;
-						case 'type':
-							handleType(this.databases[db], grandchild);
-							break;
-						default:
-							throw new Exception("Expected (table|type), got '"+grandchild.name()+"'.");
-					}
-				break;
-			case 'table':
-				handleTable(this, child);
-				break;
-			default:
-				throw new Exception("Unknown tag '"+child.name()+"'.");
-		}
+	for each (var child in xml.children()) {
+		if (child.name())
+			switch (child.name().toString()) {
+				case 'types':
+					for each (var type in child.children()) 
+						if (type)
+							handleType(this, type);
+					break;
+				case 'database':
+					var db = child.@name;
+	
+					if (!this.databases[db])
+						this.databases[db] = new Database(db, this);
+						
+						
+					for each (var grandchild in child.children()) 
+						if (grandchild)
+							switch (grandchild.name().toString()) {
+								case 'table':
+									handleTable(this.databases[db], grandchild);
+									break;
+								case 'type':
+									handleType(this.databases[db], grandchild);
+									break;
+								default:
+									throw new Exception("Expected (table|type), got '"+grandchild.name()+"'.");
+							}
+					break;
+				case 'table':
+					handleTable(this, child);
+					break;
+				default:
+					throw new Exception("Unknown tag '"+child.name()+"'.");
+			}
+	}
 
 	/**
 	 * Handles a cello.SimpleXML "type" node
@@ -144,9 +147,8 @@ SQLSchema.prototype.add = function(xml) {
 	 * @throws Exception if there was an error in the table
 	 */
 	function handleTable(parent, xml) {
-		
 		// Get name
-		var name = xml.@name;
+		var name = xml.@name.toString();
 		
 		var type = 'sql:int';
 		

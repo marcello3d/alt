@@ -257,11 +257,6 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             // Read arguments
             if (args.length==0) return false;
             String scriptName = Context.toString(args[0]);
-            
-            // Get scope
-            Scriptable scope = thisObj;
-            if (args.length>=2 && args[1] instanceof Scriptable)
-                scope = (Scriptable)args[1];
 
             // Get the current script (the one that called evaluate())
             JavaScript currentScript = AltServlet.getCurrentScript(cx);
@@ -273,6 +268,11 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             // Load and evaluate the script in the current scope
             ScriptLoader loader = currentScript.getScriptLoader();
             JavaScript s = loader.loadScript(scriptName);
+            
+            // Get scope
+            Scriptable scope = s.getModule();
+            if (args.length>=2 && args[1] instanceof Scriptable)
+                scope = (Scriptable)args[1];
             
             return s.evaluate(cx, scope);
         }

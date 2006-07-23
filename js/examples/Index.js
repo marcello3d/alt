@@ -9,6 +9,6 @@ dictator.paths({
 	Dictator: 	'examples.Dictator',
 	Delight: 	'examples.Delight',
 	SQueaL: 	'examples.SQueaL',
-	Derby:		'examples.Derby'
+	HSQL:		'examples.HSQL'
 	
 });

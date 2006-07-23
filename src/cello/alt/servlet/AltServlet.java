@@ -311,8 +311,7 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
                 
                 // Isolate the request from the module namespace
                 ScriptableObject requestScope = makeChildScope("RequestScope " +
-                        (requestCount++), 
-                        globalScope.getScriptModule(mainScript));
+                        (requestCount++),s.getModule());
                 
                 cx.putThreadLocal("globalScope", globalScope);
                 cx.putThreadLocal("requestScope", requestScope);

@@ -1,38 +1,31 @@
 
-
-Rhino.require('alt.squeal.SQLSchema');
-Rhino.require('alt.squeal.sql.SQL');
 Rhino.require('alt.squeal.sql.Synchronize');
 Rhino.require('alt.squeal.toHTML');
+Rhino.require('alt.resource.XML');
 
-
-var xml = Loader.get('sample-squeal.xml');
+XML.ignoreWhitespace = true;
+var xml = alt.resource.Loader.get('sample-squeal.xml');
 
 var sql = new alt.squeal.SQLSchema(xml);
-
-sql.add(xml);
-
-Rhino.require('alt.delight.Delight');
 
 new Packages.org.hsqldb.jdbcDriver();
 var db = java.sql.DriverManager.getConnection("jdbc:hsqldb:file:db/testdb");
 
-var delight = new alt.delight.Delight(sql, db);
+var list = <ul/>;
 
+function log(message) {
+	Rhino.log(message);
+	list.appendChild(<li>{message}</li>);
+}
 
-o.print('<span class="squeal">' + sql.toHTML() + '</span>');
+sql.synchronize(db, log);
 
+var xml = Loader.load("HSQL.xml");
 
-var xml = <html>
-<body>
-<p>DB:{db}</p>
-</body>
-</html>;
-
-
-
+xml..p.(@id=="db").appendChild(db);
+xml..p.(@id=="log").appendChild(list);
+xml..p.(@id=="squeal").appendChild(sql.toHTML());
 
 response.contentType = "text/html; charset=UTF-8";
 response.status = response.SC_OK;
-
 response.writer.print(xml);

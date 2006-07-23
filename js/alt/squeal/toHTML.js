@@ -19,14 +19,11 @@ Rhino.require('alt.squeal.Table', true);
  * @type String
  */
 SQLSchema.prototype.toHTML = function() {
-	var s = '<table class="schema">';
-	
-	s += SQLSchema.typesToHTML(this.types);
-	s += SQLSchema.arrayToHTML(this.tables, "Tables",5);
-	s += SQLSchema.arrayToHTML(this.databases, "Databases",5);
-	
-	s += '</table>';
-	return s;
+	return <table class="schema">
+			 {SQLSchema.typesToHTML(this.types)}
+			 {SQLSchema.arrayToHTML(this.tables, "Tables",5)}
+			 {SQLSchema.arrayToHTML(this.databases, "Databases",5)}
+		   </table>;
 }
 
 /** 
@@ -36,15 +33,15 @@ SQLSchema.prototype.toHTML = function() {
  */
 SQLSchema.arrayToHTML = function(array, entry, columns) {
 	if (array) {
-		var span = '';
-		if (columns>2)
-			span =  ' colspan="'+(columns-1)+'"';
-		var s = '   <tr class="header"><th>'+entry+'</th><th'+span+'>...</th></tr>\n';
-		for (var x in array)
-			s+='    <tr class="row"><td>' + array[x].name + '</td><td'+span+'>' + array[x].toHTML() + '</td></tr>\n';
+		var s = <><tr class="header">
+					<th>{entry}</th>
+					<th colspan="4">...</th>
+				  </tr></>;
+		for each (var x in array)
+			s.appendChild(<tr class="row"><td>{x.name}</td><td colspan="4">{x.toHTML()}</td></tr>);
 		return s;
 	}
-	return '';
+	return <></>;
 }
 /** 
  * @private
@@ -55,7 +52,7 @@ SQLSchema.arrayToHTML = function(array, entry, columns) {
  */
 SQLSchema.fieldsToHTML = function(fields) {
 	if (fields) {
-		var s = '   <tr class="header"><th>Field</th><th>type</th><th>Required</th><th>Default</th><th>Index</th></tr>\n';
+		var s = <><tr class="header"><th>Field</th><th>type</th><th>Required</th><th>Default</th><th>Index</th></tr></>;
 		for (var x in fields) {
 			var field = fields[x];
 			var type = "Unknown";
@@ -68,15 +65,18 @@ SQLSchema.fieldsToHTML = function(fields) {
 			} catch (ex) {
 				type="[error:"+ex+"]";
 			}
-			s += '    <tr class="'+(field.hidden?'hidden':'row')+'"><td>'+field.name+'</td><td>'+
-				field.type+' '+type+'</td><td>'+
-				(field.required?'Yes':'No')+'</td><td>'+
-				(field.defaultValue?'"'+field.defaultValue+'"':'No')+'</td><td>'+
-				(field.index ? field.index : 'No')+'</td></tr>\n';
+			s.appendChild(
+				<tr class={field.hidden?'hidden':'row'}>
+				 <td>{field.name}</td>
+				 <td>{field.type} {type}</td>
+				 <td>{field.required?'Yes':'No'}</td>
+				 <td>{field.defaultValue?'"'+field.defaultValue+'"':'No'}</td>
+				 <td>{field.index || 'No'}</td>
+				</tr>);
 		}
 		return s;
 	}
-	return '';
+	return <></>;
 }
 
 /** 
@@ -88,18 +88,21 @@ SQLSchema.fieldsToHTML = function(fields) {
  */
 SQLSchema.typesToHTML = function(types) {
 	if (types) {
-		var s = '   <tr class="header"><th>Types</th><th>Base</th><th>Validation</th><th>Default</th></tr>\n';
+		var s = <><tr class="header"><th>Types</th><th>Base</th><th>Validation</th><th>Default</th></tr></>;
 	
 		for (var name in types) {
 			var type = types[name];
-			s += '    <tr class="type"><td>'+type.name+'</td><td>'+
-				type.base+'</td><td>'+
-				(type.valid?'"'+type.valid+'"':'No')+'</td><td>'+
-				(type.defaultValue?'"'+type.defaultValue+'"':'No')+'</td></tr>\n';
+			s.appendChild(
+				<tr class="type">
+				 <td>{type.name}</td>
+				 <td>{type.base}</td>
+				 <td>{type.valid?'"'+type.valid+'"':'No'}</td>
+				 <td>{type.defaultValue?'"'+type.defaultValue+'"':'No'}</td>
+				</tr>);
 		}
 		return s;
 	}
-	return '';
+	return <></>;
 }
 
 
@@ -120,15 +123,10 @@ Node.prototype.toHTML = function() {
  * @type String
  */
 Database.prototype.toHTML = function() {
-
-	var s = '<table class="database">';
-	
-	s += SQLSchema.typesToHTML(this.types);
-	s += SQLSchema.arrayToHTML(this.tables, "Tables", 5);
-		
-	s += '</table>';
-	
-	return s;
+	return <table class="database">
+			 {SQLSchema.typesToHTML(this.types)}
+			 {SQLSchema.arrayToHTML(this.tables, "Tables", 5)}
+		   </table>;
 }
 /** 
  * HTML definition of a table (recursively retrieves HTML definitions for children).
@@ -137,16 +135,11 @@ Database.prototype.toHTML = function() {
  */
 Table.prototype.toHTML = function() {
 
-	var s = '  <table class="table">';
-	
-
-	s += SQLSchema.fieldsToHTML(this.fields);
-	s += SQLSchema.typesToHTML(this.types);
-	s += SQLSchema.arrayToHTML(this.tables,	"Tables", 5);
-	s += SQLSchema.arrayToHTML(this.views,	"Views",  5);
-	
-	s += '  </table>';
-	
-	return s;
+	return <table class="table">
+			 {SQLSchema.fieldsToHTML(this.fields)}
+			 {SQLSchema.typesToHTML(this.types)}
+			 {SQLSchema.arrayToHTML(this.tables,	"Tables", 5)}
+			 {SQLSchema.arrayToHTML(this.views,		"Views",  5)}
+		   </table>;
 }
 

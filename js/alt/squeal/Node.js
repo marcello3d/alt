@@ -7,9 +7,9 @@ Rhino.require('alt.squeal.Exception');
  * @param {Node}	parent	The parent node of this node (or null)
  */ 
 function Node(name, parent) {
-	this.name = name;
+	this.name = name+"";
 	this.parent = parent ? parent : null;
-	this.fullname = name;
+	this.fullname = this.name;
 	if (parent && parent.fullname)
 		this.fullname = parent.fullname + '.' + name;
 }

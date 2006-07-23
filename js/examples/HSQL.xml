@@ -1,3 +1,6 @@
+<?xml version="1.0"?>
+<html>
+<head>
 
 <style type="text/css">
 body, p, td, th, li {
@@ -31,4 +34,10 @@ a {
 	font-style: italic;
 }
  </style>
- 
+</head>
+<body>
+<p id="db"/>
+<p id="log"/>
+<p id="squeal" class="squeal"/>
+</body>
+</html>

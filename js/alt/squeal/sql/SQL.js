@@ -15,9 +15,9 @@ Rhino.require('alt.squeal.sql.Exception');
  * @type String
  */
 alt.squeal.Table.prototype.getSQLName = function() {
+	var reg = /[^a-z0-9_]/i;
 	var sqlname = this.name.replace(reg,'_');
 	var node = this.parent;
-	var reg = /[^a-z_]/i;
 	while (node != null) {
 		if (node instanceof alt.squeal.Database)
 			sqlname = node.name.replace(reg,'_') + '.' + sqlname;
@@ -57,8 +57,7 @@ function escapeString(string) {
  * @throws cello.SQLSchema.SQLException if there was an error and error_ok is not true
  */
 function query(conn,query, error_ok, log) {
-	if (log) log("Executing query [<code>"+query+"</code>]");
-	writeln("query:"+query);
+	if (log) log(<>Executing query [<code>{query}</code>]</>);
 	
 	try {
 		var stmt = conn.createStatement();
@@ -104,9 +103,8 @@ function query(conn,query, error_ok, log) {
  * @throws cello.SQLSchema.SQLException if there was an error and error_ok is not true
  */
 function alter(conn, query, error_ok, log) {
-	if (log) log("Executing command [<code>"+query+"</code>]");
-	writeln("alter:"+query);
-
+	if (log) log(<>Executing command [<code>{query}</code>]</>);
+	
 	try {
 		var stmt = conn.createStatement();
 		return stmt.executeUpdate(query);

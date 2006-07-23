@@ -7,11 +7,6 @@ Rhino.require('alt.resource.String');
  */
 function XMLResource(resource, resourceName) {
 	var str = Loader.get(resourceName, StringResource);
-	
-	XML.prettyPrinting = false;
-	XML.prettyIndent = 0;
-	XML.ignoreWhitespace = false;
-	XML.ignoreComments = false;
 	this.xml = new XML(str);
 }
 XMLResource.prototype = new Resource;
