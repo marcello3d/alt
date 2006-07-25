@@ -7,6 +7,3 @@ Rhino.require('alt.squeal.SQLSchema',	true);
 Rhino.require('alt.delight.Delight',	true);
 Rhino.require('alt.onion.Onion',		true);
 Rhino.require('alt.resource.Loader',	true);
-
-/*
-*/
