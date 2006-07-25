@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry path="src" kind="src"/>
-	<classpathentry path="lib/ext/mysql-connector-java-3.0.17-ga-bin.jar" kind="lib"/>
-	<classpathentry path="lib/jetty/commons-logging.jar" kind="lib"/>
-	<classpathentry sourcepath="C:/java/jetty-6.0.0beta17/modules/jetty/src/main/java" path="lib/jetty/jetty.jar" kind="lib"/>
-	<classpathentry sourcepath="C:/java/jetty-6.0.0beta17/modules/util/src/main/java" path="lib/jetty/jetty-util.jar" kind="lib"/>
-	<classpathentry sourcepath="C:/java/jetty-6.0.0beta17/modules/servlet-api-2.5/src/main/java" path="lib/jetty/servlet-api-2.5.jar" kind="lib"/>
-	<classpathentry path="lib/ext/xbean.jar" kind="lib"/>
-	<classpathentry path="lib/ext/jsr173_1.0_api.jar" kind="lib"/>
-	<classpathentry path="lib/jetty/hsqldb.jar" kind="lib"/>
 	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
-	<classpathentry sourcepath="C:/java/commons-fileupload-1.1.1/src/java" path="lib/ext/commons-fileupload-1.1.1.jar" kind="lib"/>
-	<classpathentry path="lib/ext/commons-io-1.2.jar" kind="lib"/>
-	<classpathentry sourcepath="/rhinocvs/src" path="lib/core/rhino.jar" kind="lib"/>
+	<classpathentry path="jetty/lib/jetty-6.0.0rc0.jar" kind="lib"/>
+	<classpathentry path="jetty/lib/jetty-util-6.0.0rc0.jar" kind="lib"/>
+	<classpathentry path="jetty/lib/servlet-api-2.5.jar" kind="lib"/>
+	<classpathentry path="js/WEB-INF/lib/rhino.jar" kind="lib"/>
 	<classpathentry path="bin" kind="output"/>
 </classpath>

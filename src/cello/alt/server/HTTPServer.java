@@ -58,7 +58,8 @@ public class HTTPServer {
      */
     public static Server startServer(String host, String root, String main) throws Exception {
 
-        
+    	return null;
+        /*
         Server server = new Server();
         
         SocketConnector connector = new SocketConnector();
@@ -99,6 +100,7 @@ public class HTTPServer {
         server.setHandler(contexts);
         
         return server;
+        */
     }
     /**
      * @param args

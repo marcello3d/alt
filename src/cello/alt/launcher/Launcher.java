@@ -41,9 +41,8 @@ public class Launcher {
             // Get base directory
             File base = new File(System.getProperty("alt.home","."));
             File libdirs[] = {
-                    new File(base, "lib/core"),
-                    new File(base, "lib/jetty"),
-                    new File(base, "lib/ext")
+                    new File(base, "jetty/lib"),
+                    new File(base, "jetty/lib/ext")
             };
             
             // Construct a loader
