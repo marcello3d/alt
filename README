@@ -1,8 +1,6 @@
 --------------------------------------------------------------------------------
 
-RhinoServlet for the Alt Framework
-
- v0.03 alpha
+Alt Framework / Alt Servlet
 
 by Marcello Bastea-Forte
 
@@ -12,8 +10,8 @@ Website: http://marcello.cellosoft.com/projects/alt/
 
 --------------------------------------------------------------------------------
 
-The RhinoServlet is a Rhino-based (http://www.mozilla.org/rhino/) servlet
-intended to create a platform for developing JavaScript-based web applications.
+AltServlet is a Rhino-based (http://www.mozilla.org/rhino/) servlet intended to 
+create a platform for developing JavaScript-based web applications.
 
 It implements a solid module system that parallel's Java's own package system,
 making it easy to write clean modular JavaScript code.
@@ -21,52 +19,33 @@ making it easy to write clean modular JavaScript code.
 The primary purpose is a basis for the the Alt Framework, but it is not limited
 to this.
 
-A jetty6-based (http://jetty.mortbay.org/jetty6/) wrapper is used to run the
-HTTP server.
+Jetty 6.0.0rc0 (http://jetty.mortbay.org/jetty6/) is included to make it easy to
+get the Alt Framework up and running, but Alt Servlet works with any Java 
+application server, just copy the 'js' folder to your webapps folder.
 
 --------------------------------------------------------------------------------
 
-Please Note!  RhinoServlet requires Java 1.5.0 (aka Java 5.0).
+Please Note!  AltServlet requires Java 1.5.0 (aka Java 5.0).
 
 --------------------------------------------------------------------------------
 
 Let's jump in!
 
-Double click server.jar (or execute java -jar server.jar) to open the  GUI, 
- click the "Start Server" button.
+Double click server.jar (or execute java -jar server.jar) to open the  GUI,.
 
-Point your web browser to http://localhost:4500/ and enjoy!
+Point your web browser to http://localhost:8080/ and enjoy!
 
-You can open up the javascript/Main.js file in your favorite text editor, any
- changes you make to the file will automatically be applied the next time you
- refresh http://localhost:4500/ in your browser.
- 
+You can start browsing the source by looking in the js folder.
+
 That's it!
-
---------------------------------------------------------------------------------
-
-The RhinoServlet is made up of several components:
-
-	cello.alt.servlet.RhinoServlet
-		This is a the main HttpServlet used to serve up HTTP pages
-
-	cello.alt.server.HTTPServer
-		This uses Jetty to run a HTTP server with RhinoServlet on the root
-		It has command line options and an optional GUI.
-		
-	cello.alt.launcher.Launcher
-		This provides an automatic Jar Classloader for the HTTPServer, it is
-		used by altlauncher.jar to allow you to start the server by 
-		double-clicking on OSs that support it. (java -jar altlauncher.jar)
-		
   
 --------------------------------------------------------------------------------
 		
-Scripting in RhinoServlet
+Scripting in AltServlet
 
 Rhino provides an interesting mix of Java and JavaScript.  While you can write
-pure JavaScript with RhinoServlet, the true power (and more or less a 
-requirement) lies in using its ability to script Java.
+pure JavaScript with AltServlet, the true power (and more or less a requirement) 
+lies in using its ability to script Java.
 
 Rhino makes all Java classes and functions transparent in JavaScript, and in
 almost all cases, you can simply write Java code verbatim in JavaScript.  To 
@@ -107,7 +86,7 @@ You can also read about all the standard Java classes here:
 
 --------------------------------------------------------------------------------
 
-RhinoServlet is a standard HttpServlet, and essentially provides all the glue
+AltServlet is a standard HttpServlet, and essentially provides all the glue
 for writing a JavaScript-based Servlet.
 
 It looks for a Main.js file in the scriptpath (defaults to the javascript/ 
@@ -121,14 +100,14 @@ engine are created as JavaScript properties request and response, respectively.
 Because HTTPServer uses Jetty to power its servlet engine, I recommend reading
 its documentation on these two objects:
 
-  http://jetty.mortbay.org/jetty6/servlet-api-2.5/javax/servlet/http/HttpServletRequest.html
-  http://jetty.mortbay.org/jetty6/servlet-api-2.5/javax/servlet/http/HttpServletResponse.html
+http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletRequest.html
+http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletResponse.html
 
 --------------------------------------------------------------------------------
 
-RhinoServlet Module system
+Alt Servlet Module system
 
-The module system is RhinoServlet's hidden power.  It provides a clean and 
+The module system is AltServlet's hidden power.  It provides a clean and 
 effective way for handling modular JavaScript code and allows for a simple 
 script compile-caching system that keeps all scripts up to date while not 
 needlessly reloading scripts.
@@ -156,10 +135,10 @@ Note that this will only load Foo.js and Bar.js, Sbu.js will only be loaded if
 you write "abc.xyz.*" as well.
 
 As you can see, this is almost identical to Java's package system.  Furthermore,
-like the classpath, RhinoServlet has a scriptpath.  By default you can configure
+like the classpath, AltServlet has a scriptpath.  By default you can configure
 one scriptpath, but you can add more in your code with Rhino.addScript function.
 
-Unlike Java, RhinoServlet will not automatically look for scripts.  They need to
+Unlike Java, AltServlet will not automatically look for scripts.  They need to
 be explicitly require'd (or at least the module require'd with .*) for them to 
 be loaded.  This applies to scripts within the same module.
 
@@ -188,15 +167,15 @@ its prototype.  If you were then to go and modify Foo to add a function:
   function Foo() { ... }
   Foo.prototype.sbu = function() { ... }
 
-RhinoServlet would recognize that Foo was modified and reload it, but Bar would
+AltServlet would recognize that Foo was modified and reload it, but Bar would
 still be pointing at the old Foo, the Foo that is missing the sbu() function.
 
-This is also solved by RhinoServlet!  Using cascading dependencies, if Bar
+This is also solved by AltServlet!  Using cascading dependencies, if Bar
 instead called require with its second argument set to true:
 
   require("Foo", true);
 
-Then RhinoServlet knows that Bar needs to be reloaded whenever Foo is reloaded.
+Then AltServlet knows that Bar needs to be reloaded whenever Foo is reloaded.
 This solves the problem without affecting the efficiency of 80% of the require'd
 scripts that do not actually need the cascade reload feature.
 
@@ -204,13 +183,13 @@ scripts that do not actually need the cascade reload feature.
 
 Developer notes:
 
-The RhinoServlet implements a static class, Rhino, which contains several 
+The AltServlet implements a static class, Rhino, which contains several 
  useful properties:
 
   Rhino.require(scriptname[, cascadeDependency])
 
     Creates a dependency on the current file.  That is, if Main.js requires
-    "module.Test", RhinoServlet will look for a Test.js in a module/ directory
+    "module.Test", AltServlet will look for a Test.js in a module/ directory
     in the script path.  Then, every time Main.js is used, it will first check
     if module/Test.js has been updated before continuing.
     
@@ -224,10 +203,6 @@ The RhinoServlet implements a static class, Rhino, which contains several
     the depender will also reload, even if it has not changed.  This is 
     necessary if you intend to extend classes.  This argument is optional and
     defaults to false.
-    
-    This method is also global, so you can simply write require() instead of
-    Rhino.require.
-
   Object Rhino.evaluate(scriptname[, scope])
   
     Loads and evaluates a particular script.  The scriptname follows the same
@@ -236,10 +211,9 @@ The RhinoServlet implements a static class, Rhino, which contains several
     You can specify what scope the script is evaluated in (that is, what the
     "this" value will be).  This defaults to the current scope.
 
-  (java.net.URL) Rhino.getResource(resourcepath)
+  cello.alt.servlet.resource.Resource Rhino.getResource(resourcepath)
   
-    Gets a resource from the scriptpath.  This currently returns null. 
-    Eventually it will return a URL, like Class.getResource does.
+    Gets a resource from the scriptpath.
   
   Rhino.addScriptPath(pathname)
   
@@ -260,7 +234,7 @@ The RhinoServlet implements a static class, Rhino, which contains several
   
     Loads a Java class as a JavaScript module.  (Currently does not work.)
 
-RhinoServlet implements dynamic scope.  This means allows modules to be defined
+AltServlet implements dynamic scope.  This means allows modules to be defined
 in their own scope and for separate requests to each have their own scope.
 
 This can be illustrated as follows:
@@ -308,15 +282,16 @@ Library notes:
    And a very in-depth tutorial can be found online here:
     http://java.sun.com/developer/onlineTraining/Database/JDBC20Intro/JDBC20.html
   
-  This library potentially uses XMLBeans to use E4X in Rhino:
-   http://xmlbeans.apache.org/
-   
-   Download and add xbean.jar to the lib directory to add E4X support.
+   This library uses XMLBeans for E4X in Rhino:
+    http://xmlbeans.apache.org/
 
 --------------------------------------------------------------------------------
 
 
 History:
+
+Version 0.03:
+  - Just making a note that this is completely outdated.
 
 Version 0.02 alpha (2006.06.22):
   - reworked module system/loader from scratch

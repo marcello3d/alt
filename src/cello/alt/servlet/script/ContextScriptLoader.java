@@ -72,7 +72,6 @@ public class ContextScriptLoader extends ScriptLoader {
         
         this.context = context;
         this.basePath = basePath;
-        System.out.println(context.getResourcePaths(basePath));
     }
 
     /**

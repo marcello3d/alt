@@ -45,7 +45,6 @@ import org.mozilla.javascript.tools.debugger.ScopeProvider;
 import cello.alt.servlet.js.DynamicFactory;
 import cello.alt.servlet.js.GlobalScope;
 import cello.alt.servlet.js.NamedScriptableObject;
-import cello.alt.servlet.js.NativeJavaInterface;
 import cello.alt.servlet.script.ContextScriptLoader;
 import cello.alt.servlet.script.DirectoryScriptLoader;
 import cello.alt.servlet.script.JarScriptLoader;
@@ -324,13 +323,8 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
                 cx.putThreadLocal("globalScope", globalScope);
                 cx.putThreadLocal("requestScope", requestScope);
                 // Define thread-local variables
-                requestScope.defineProperty("request", 
-                        new NativeJavaInterface(requestScope, request, 
-                                HttpServletRequest.class), VISIBLE);
-                
-                requestScope.defineProperty("response", 
-                        new NativeJavaInterface(requestScope, response, 
-                                HttpServletResponse.class), VISIBLE);
+                requestScope.defineProperty("request", request,VISIBLE);
+                requestScope.defineProperty("response", response, VISIBLE);
                 
                 // Evaluate the script in this scope
                 s.evaluate(cx, requestScope);

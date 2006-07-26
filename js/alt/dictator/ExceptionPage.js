@@ -28,9 +28,9 @@ if (response.committed) {
 		out.println(exception);
 		var match;
 		var index = 0;
-		while (match = /at (script[^)]*)\(([^:]+.js:[^)]+)\)/g.exec(stack,index)) {
+		while (match = /at (?:(script[^)]*)|org\.mozilla\.javascript\.gen\.[^)]*)\(([^:]+.js:[^)]+)\)/g.exec(stack,index)) {
 			index = match.index;
-			out.println('    '+match[1]+" "+match[2]);
+			out.println('    '+(match[1]||'')+" "+match[2]);
 		}
 		out.println("</pre></blockquote>");
 		out.println("  <p>Java stack trace:</p>");
