@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+  <display-name>Alt Framework Servlet</display-name>
+  <description>
+     Alt Framework JavaScript Application platform.
+  </description>
+
+  <servlet>
+    <servlet-name>altservlet</servlet-name>
+    <servlet-class>cello.alt.servlet.AltServlet</servlet-class>
+    <init-param>
+      <param-name>alt.main</param-name>
+      <param-value>alt.main.Main</param-value>
+    </init-param>
+    <init-param>
+      <param-name>alt.root</param-name>
+      <param-value>/</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+
+  <servlet-mapping>
+    <servlet-name>altservlet</servlet-name>
+    <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+
+</web-app>
