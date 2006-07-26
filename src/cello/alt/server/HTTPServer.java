@@ -22,7 +22,6 @@ package cello.alt.server;
 
 import java.awt.GraphicsEnvironment;
 import java.io.FileInputStream;
-import java.util.Map;
 
 import org.mortbay.jetty.Server;
 import org.mortbay.xml.XmlConfiguration;
