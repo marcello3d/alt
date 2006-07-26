@@ -2,9 +2,9 @@
 <classpath>
 	<classpathentry path="src" kind="src"/>
 	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
-	<classpathentry path="jetty/lib/jetty-6.0.0rc0.jar" kind="lib"/>
-	<classpathentry path="jetty/lib/jetty-util-6.0.0rc0.jar" kind="lib"/>
-	<classpathentry path="jetty/lib/servlet-api-2.5.jar" kind="lib"/>
 	<classpathentry path="js/WEB-INF/lib/rhino.jar" kind="lib"/>
+	<classpathentry sourcepath="V:/java/jetty-6.0.0rc0/modules/jetty/src/main/java" path="jetty/lib/jetty-6.0.0rc0.jar" kind="lib"/>
+	<classpathentry path="jetty/lib/jetty-util-6.0.0rc0.jar" kind="lib"/>
+	<classpathentry path="jetty/lib/servlet-api-2.5-6.0.0rc0.jar" kind="lib"/>
 	<classpathentry path="bin" kind="output"/>
 </classpath>

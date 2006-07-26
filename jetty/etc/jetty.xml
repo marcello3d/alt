@@ -2,6 +2,9 @@
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" 
 	"http://jetty.mortbay.org/configure.dtd">
 
+<!-- Modified for Alt Framework from Jetty 6.0.0rc0 -->
+
+
 <!-- =============================================================== -->
 <!-- Configure the Jetty Server                                      -->
 <!-- =============================================================== -->
@@ -84,10 +87,12 @@
          <Array type="org.mortbay.jetty.Handler">
            <Item>
              <New id="contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection"/>
-           </Item>
+           </Item> 
+           <!--
            <Item>
              <New id="defaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
            </Item>
+            -->
            <Item>
              <New id="requestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
            </Item>
@@ -104,7 +109,7 @@
       <Arg><Ref id="contexts"/></Arg>
       <Arg><SystemProperty name="jetty.home" default="."/>/js</Arg>
       <Arg>/</Arg>
-      <Set name="defaultsDescriptor"><SystemProperty name="jetty.home" default="."/>/etc/webdefault.xml</Set>
+      <Set name="defaultsDescriptor"><SystemProperty name="jetty.home" default="."/>/jetty/etc/webdefault.xml</Set>
       
       <Get name="SessionHandler">
         <Set name="SessionManager">
@@ -135,7 +140,7 @@
     <!-- =========================================================== -->
     <Set name="stopAtShutdown">true</Set>
     <!-- ensure/prevent Server: header being sent to browsers        -->
-    <Set name="sendServerVersion">true</Set>
+    <Set name="sendServerVersion">false</Set>
 
 </Configure>
 

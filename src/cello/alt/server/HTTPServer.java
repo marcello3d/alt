@@ -21,15 +21,11 @@
 package cello.alt.server;
 
 import java.awt.GraphicsEnvironment;
+import java.io.FileInputStream;
+import java.util.Map;
 
-import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.bio.SocketConnector;
-import org.mortbay.jetty.handler.ContextHandler;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.servlet.ServletHandler;
-import org.mortbay.jetty.servlet.ServletHolder;
-import org.mortbay.jetty.servlet.SessionHandler;
+import org.mortbay.xml.XmlConfiguration;
 
 /**
  * A simple Jetty6 wrapper for running AltServlet.  Features commandline
@@ -58,49 +54,9 @@ public class HTTPServer {
      */
     public static Server startServer(String host, String root, String main) throws Exception {
 
-    	return null;
-        /*
-        Server server = new Server();
-        
-        SocketConnector connector = new SocketConnector();
-        int colon = host.lastIndexOf(':');
-        if (colon<0)
-            connector.setPort(Integer.parseInt(host));
-        else
-        {
-            connector.setHost(host.substring(0,colon));
-            connector.setPort(Integer.parseInt(host.substring(colon+1)));
-        }
-        server.setConnectors(new Connector[]{connector});
-        
-        server.setConnectors (new Connector[]{connector});   
-
-        // Make servlet
-        ServletHandler servlet = new ServletHandler();
-        ServletHolder holder = 
-            servlet.addServletWithMapping("cello.alt.servlet.AltServlet", "/");
-        holder.setInitParameter("alt.root", root);
-        holder.setInitParameter("alt.main", main);
-        
-        // Make session handler
-        SessionHandler session = new SessionHandler();
-        session.setHandler(servlet);
-
-        // Make context handler
-        ContextHandler context = new ContextHandler();
-        context.setContextPath("/");
-        context.setResourceBase(".");
-        
-        context.setHandler(session);
-        
-
-        // Add handler
-        ContextHandlerCollection contexts = new ContextHandlerCollection();
-        contexts.addHandler(context);
-        server.setHandler(contexts);
-        
-        return server;
-        */
+    	XmlConfiguration xml = new XmlConfiguration(new FileInputStream("jetty/etc/jetty.xml"));
+    	xml.configure();
+    	return (Server)xml.getIdMap().get("Server");
     }
     /**
      * @param args

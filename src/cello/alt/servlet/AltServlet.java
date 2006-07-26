@@ -71,6 +71,10 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
     public static final String NAME_VERSION = "AltServlet v0.04 alpha";
     
     private String mainScript = "alt.main.Main";
+    
+    private int optimization = -1;
+    private int timeout = 5000;
+    
     /** 
      * Protected access from ScriptableObject (Don't enum, read-only, and
      *  permanent).
@@ -129,9 +133,13 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
         addScriptLoader(new ContextScriptLoader(loader, context, 
         		"/WEB-INF/scripts/"));
         addScriptLoader(new ContextScriptLoader(loader, context, 
-        		getInitParameter("alt.root","/js/")));
+        		getInitParameter("alt.root","/")));
 
         mainScript = getInitParameter("alt.main", "alt.main.Main");
+        optimization = Integer.parseInt(
+        		getInitParameter("rhino.optimization","5"));
+        timeout = Integer.parseInt(
+        		getInitParameter("alt.timeout","5000"));
 
         if (!ContextFactory.hasExplicitGlobal())
             ContextFactory.initGlobal(new DynamicFactory());
@@ -302,7 +310,7 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
         public Void call() {
             long startTime = System.nanoTime();
             Context cx = Context.enter();
-            cx.setOptimizationLevel(-1);
+            cx.setOptimizationLevel(optimization);
             cx.putThreadLocal("altServlet",AltServlet.this);
             try {
 
@@ -349,12 +357,17 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
     public void service(HttpServletRequest request, 
             HttpServletResponse response) {
         
-        Future<Void> future = pool.submit(new Service(request, response));
-        try {
-            future.get(10000, TimeUnit.MILLISECONDS);
-        } catch (Throwable t) {
-            handleError(response,t);
-        }
+    	Service service = new Service(request, response);
+    	if (timeout<0)
+    		service.call();
+    	else {
+	        Future<Void> future = pool.submit(service);
+	        try {
+	            future.get(timeout, TimeUnit.MILLISECONDS);
+	        } catch (Throwable t) {
+	            handleError(response,t);
+	        }
+    	}
     }
 
 
