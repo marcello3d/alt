@@ -27,13 +27,21 @@ import java.awt.Dimension;
 import java.awt.Event;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.channels.Channels;
 import java.nio.channels.Pipe;
+import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -44,6 +52,7 @@ import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
@@ -64,7 +73,7 @@ import cello.alt.servlet.AltServlet;
  * 
  * @author Marcello
  */
-public class ServerGUI extends JFrame {
+public class ServerGUI extends JFrame  {
 
     private static final long serialVersionUID = -8748896100821559082L;
 
@@ -72,6 +81,10 @@ public class ServerGUI extends JFrame {
     private JTextField rootField;
     private JTextField mainField;
     private JEditorPane console;
+    private FileInputStream propIn;
+    private FileOutputStream propOut;
+    private File preferenceFile;
+    private Properties properties;
     private Server server = null;
     private StartStopAction startStopAction = null;
     
@@ -94,6 +107,19 @@ public class ServerGUI extends JFrame {
         
         c.setLayout(new BorderLayout());
         
+        preferenceFile = new File("servergui.properties");
+      
+        properties = new Properties();
+        
+        
+        if (preferenceFile.exists()){
+        	loadPreferences();
+        }
+        
+        host = properties.getProperty("host", host);
+        root = properties.getProperty("root", root);
+        main = properties.getProperty("main", main);
+        
         hostField = new JTextField(host);
         rootField = new JTextField(root);
         mainField = new JTextField(main);
@@ -103,6 +129,13 @@ public class ServerGUI extends JFrame {
         c.add(makeConsole(), BorderLayout.CENTER);
         
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+       
+        addWindowListener(new WindowAdapter(){
+        	@Override
+			public void windowClosing(WindowEvent e){
+        		savePreferences();
+        			}
+        	});
         
 
         try {
@@ -129,7 +162,63 @@ public class ServerGUI extends JFrame {
      *
      */
     public void start() {
-        startStopAction.actionPerformed(new ActionEvent(this,0,null));
+        // First time login or no existing preference file (Wizard)
+    	if (!preferenceFile.exists()) {   
+        	// Option Box asking for Port Number 
+			String s = (String)JOptionPane.showInputDialog(this, 
+					"Enter Port Number and Click 'OK' to Start Server", 
+					"Port Number Entry", JOptionPane.PLAIN_MESSAGE, null, null, 
+					properties.getProperty("host", "4500"));
+			if ((s != null) && (s.length() > 0)) {   
+				properties.setProperty("host", s);
+				hostField.setText(s);
+			} else {
+				properties.setProperty("host", "4500");
+			}
+        }
+    	// If null or on then auto start
+    	if ((properties.getProperty("server_state") == null) ||
+    			(properties.getProperty("server_state").equals("on"))) {  
+    		startStopAction.actionPerformed(new ActionEvent(this,0,null));
+   		}
+   }
+    
+    private void savePreferences() {
+    	try {
+			propOut = new FileOutputStream(preferenceFile);
+		} catch (FileNotFoundException fnfe) {
+			System.err.println( "Couldn't load property output file" + fnfe);
+		}
+    	properties.setProperty("host", hostField.getText());
+        properties.setProperty("root", rootField.getText());
+        properties.setProperty("main", mainField.getText());
+        if (server == null)
+    		properties.setProperty("server_state", "off");
+    	else
+    		properties.setProperty("server_state", "on");
+    	try {
+    		properties.store(propOut, "Server GUI settings");
+			propOut.close();
+		} catch (IOException ie) {
+			System.err.println("Can't close output file now, try again later: " 
+						+ ie);
+		}
+    }
+    
+    private void loadPreferences() {
+        try
+		{
+        	propIn = new FileInputStream(preferenceFile);
+            properties.load(propIn);
+            propIn.close();
+		}
+		catch( FileNotFoundException fnfe ) {
+			System.err.println( "Couldn't load file:" + fnfe ); 
+		}
+		catch( IOException ie) {
+			System.err.println( "couldnt load property input file" + ie);
+		}
+        
     }
     private JComponent makeToolbar() {
         JToolBar tb = new JToolBar();
@@ -192,13 +281,14 @@ public class ServerGUI extends JFrame {
         }
         
         /**
-         * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
+         * @see ActionListener#actionPerformed(java.awt.event.ActionEvent)
          */
         public void actionPerformed(ActionEvent ev) {
             boolean starting = true;
             try {
                 if (server==null) {
-                    System.out.println("Attempting to start server on "+hostField.getText()+"...");
+                    System.out.println("Attempting to start server on "+ 
+                    		hostField.getText()+"...");
                     System.out.flush();
                     server = HTTPServer.startServer(
                             hostField.getText(),
@@ -218,7 +308,8 @@ public class ServerGUI extends JFrame {
             } catch (Exception ex) {
                 if (starting)
                     server = null;
-                System.err.println("Exception "+(starting?"starting":"stopping")+" server:");
+                System.err.println("Exception "+(starting?"starting":"stopping")
+                		+" server:");
                 ex.printStackTrace(System.err);
             }
         }
