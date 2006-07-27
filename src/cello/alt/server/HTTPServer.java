@@ -22,7 +22,9 @@ package cello.alt.server;
 
 import java.awt.GraphicsEnvironment;
 import java.io.FileInputStream;
+import java.util.Map;
 
+import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.xml.XmlConfiguration;
 
@@ -55,7 +57,19 @@ public class HTTPServer {
 
     	XmlConfiguration xml = new XmlConfiguration(new FileInputStream("jetty/etc/jetty.xml"));
     	xml.configure();
-    	return (Server)xml.getIdMap().get("Server");
+    	Map map = xml.getIdMap();
+    	Object o = map.get("connector");
+    	if (o != null && o instanceof Connector) {
+	    	Connector connector = (Connector)o;
+	        int colon = host.lastIndexOf(':');
+	        if (colon<0) {
+	            connector.setPort(Integer.parseInt(host));
+	        } else {
+	            connector.setHost(host.substring(0,colon));
+	            connector.setPort(Integer.parseInt(host.substring(colon+1)));
+	        }
+    	}
+    	return (Server)map.get("Server");
     }
     /**
      * @param args

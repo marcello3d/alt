@@ -171,7 +171,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                                     "getResource",
                                     "getRequestScope",
                                     "synchronize",
-                                    "debug",
+                                    //"debug",
                                     "log"},
                                     RhinoClass.class,
                                     AltServlet.PROTECTED);
@@ -379,9 +379,11 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         /**
          * Starts the Rhino debugger
          */
+        /*
         public void debug() {
             server.startDebugger();
         }
+        */
         /**
          * The JavaScript function "log"
          * @param msg

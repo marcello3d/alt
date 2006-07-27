@@ -39,12 +39,12 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.tools.debugger.Main;
 import org.mozilla.javascript.tools.debugger.ScopeProvider;
 
 import cello.alt.servlet.js.DynamicFactory;
 import cello.alt.servlet.js.GlobalScope;
 import cello.alt.servlet.js.NamedScriptableObject;
+import cello.alt.servlet.js.NativeJavaInterface;
 import cello.alt.servlet.script.ContextScriptLoader;
 import cello.alt.servlet.script.DirectoryScriptLoader;
 import cello.alt.servlet.script.JarScriptLoader;
@@ -103,14 +103,21 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
         return globalScope;
     }
 
-    /**
+    /*
      * Initializes the rhino debugger
      *
      */
+    /*
     public void startDebugger() {
         Main.mainEmbedded(ContextFactory.getGlobal(),this,NAME_VERSION);
-    }
+    }*/
     
+    /**
+     * Gets an init parameter with a given default.
+     * @param name  the name of the parameter
+     * @param def   the default value if that parameter is not defined
+     * @return the value of the init parameter
+     */
     private String getInitParameter(String name, String def) {
         String s = getServletConfig().getInitParameter(name);
         if (s==null)
@@ -136,9 +143,9 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
 
         mainScript = getInitParameter("alt.main", "alt.main.Main");
         optimization = Integer.parseInt(
-        		getInitParameter("rhino.optimization","5"));
+        		getInitParameter("rhino.optimization","-1"));
         timeout = Integer.parseInt(
-        		getInitParameter("alt.timeout","5000"));
+        		getInitParameter("alt.timeout","10"));
 
         if (!ContextFactory.hasExplicitGlobal())
             ContextFactory.initGlobal(new DynamicFactory());
@@ -148,8 +155,8 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
     
     /**
      * Adds a string-based script path to list of supported script paths. This
-     *  may construct a DirectoryScriptLoader or JarScriptLoader depending on the
-     *  type of the file.
+     *  may construct a DirectoryScriptLoader or JarScriptLoader depending on 
+     *  the type of the file.
      * @param path  the path to add
      * @throws IOException  if there is an error reading the path
      */
@@ -252,10 +259,12 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
             out.println("<html>");
             out.println(" <head><title>Execution Error: 500</title></head>");
             out.println(" <body>");
-            out.println("  <h2>Uncaught "+ex.getClass().getSimpleName()+"</h2>");
+            out.println("  <h2>Uncaught "+
+            		ex.getClass().getSimpleName()+"</h2>");
             if (ex instanceof JavaScriptException) {
                 JavaScriptException jse = (JavaScriptException)ex;
-                out.println("  <p>JavaScript Exception: "+Context.toString(jse.getValue())+"</p>");
+                out.println("  <p>JavaScript Exception: "+
+                		Context.toString(jse.getValue())+"</p>");
             }
             out.println("  <p>Stack trace:</p>");
             out.print("  <blockquote><pre>");
@@ -317,14 +326,20 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
                 JavaScript s = loader.loadScript(mainScript);
                 
                 // Isolate the request from the module namespace
-                ScriptableObject requestScope = makeChildScope("RequestScope " +
+                ScriptableObject requestScope = makeChildScope("RequestScope-" +
                         (requestCount++),s.getModule());
                 
                 cx.putThreadLocal("globalScope", globalScope);
                 cx.putThreadLocal("requestScope", requestScope);
                 // Define thread-local variables
-                requestScope.defineProperty("request", request,VISIBLE);
-                requestScope.defineProperty("response", response, VISIBLE);
+                requestScope.defineProperty("request", 
+                        new NativeJavaInterface(requestScope, request, 
+                                HttpServletRequest.class), VISIBLE);
+                
+                requestScope.defineProperty("response", 
+                        new NativeJavaInterface(requestScope, response, 
+                                HttpServletResponse.class), VISIBLE);
+                
                 
                 // Evaluate the script in this scope
                 s.evaluate(cx, requestScope);
@@ -357,7 +372,7 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
     	else {
 	        Future<Void> future = pool.submit(service);
 	        try {
-	            future.get(timeout, TimeUnit.MILLISECONDS);
+	            future.get(timeout, TimeUnit.SECONDS);
 	        } catch (Throwable t) {
 	            handleError(response,t);
 	        }
