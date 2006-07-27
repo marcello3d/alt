@@ -21,7 +21,8 @@ to this.
 
 Jetty 6.0.0rc0 (http://jetty.mortbay.org/jetty6/) is included to make it easy to
 get the Alt Framework up and running, but Alt Servlet works with any Java 
-application server, just copy the 'js' folder to your webapps folder.
+application server such as Apache Tomcat, just copy the 'js' folder to your 
+webapps folder.
 
 --------------------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ Please Note!  AltServlet requires Java 1.5.0 (aka Java 5.0).
 
 Let's jump in!
 
-Double click server.jar (or execute java -jar server.jar) to open the  GUI,.
+Double click launcher.jar (or execute java -jar launcher.jar) to open the  GUI.
 
 Point your web browser to http://localhost:8080/ and enjoy!
 
@@ -39,6 +40,11 @@ You can start browsing the source by looking in the js folder.
 
 That's it!
   
+--------------------------------------------------------------------------------
+
+The following text is included because it is useful but some information may be 
+outdated.
+
 --------------------------------------------------------------------------------
 		
 Scripting in AltServlet
