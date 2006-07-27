@@ -40,7 +40,7 @@ public class HTTPServer {
     /** The name version information of the HTTPServer */
     public static final String NAME = "HTTPServer";
     /** The version number information of the HTTPServer */
-    public static final String VERSION = "v0.03 alpha";
+    public static final String VERSION = "v0.04 alpha";
     /** The combined version information of the HTTPServer */
     public static final String NAME_VERSION = NAME+" "+VERSION;
     
