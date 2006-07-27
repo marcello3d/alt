@@ -1,9 +1,9 @@
 Rhino.require('alt.util.Inspector');
 Rhino.require('alt.resource.XML');
 
-var xml = alt.resource.Loader.load('design.xml');
+var xml = Loader.load('manage.xml');
 
-xml..body.h2 += dictator.requestPath.currentPath;
+xml..body.h2 += dictator.path.current;
 
 xml..body[0] +=
  <table border="1">

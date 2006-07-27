@@ -33,7 +33,7 @@
              and for threadless continuations.
         -->
         <Item>
-          <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+          <New id="connector" class="org.mortbay.jetty.nio.SelectChannelConnector">
             <Set name="port">8080</Set>
             <Set name="maxIdleTime">30000</Set>
             <Set name="lowResourceMaxIdleTime">3000</Set>
@@ -92,15 +92,6 @@
              <New id="defaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/>
            </Item>
            <Item>
-             <New id="sessionHandler" class=" org.mortbay.jetty.servlet.SessionHandler">
-		      <Arg>
-		       <New class="org.mortbay.jetty.servlet.HashSessionManager">
-		         <Set name="maxInactiveInterval">3600</Set>
-		       </New>
-		      </Arg>
- 	         </New>
-           </Item>
-           <Item>
              <New id="requestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/>
            </Item>
          </Array>
@@ -117,10 +108,6 @@
       <Arg><SystemProperty name="jetty.home" default="."/>/js</Arg>
       <Arg>/</Arg>
       <Set name="defaultsDescriptor"><SystemProperty name="jetty.home" default="."/>/jetty/etc/webdefault.xml</Set>
-      <!--
-      <Set name="SessionHandler">
-      	<Ref id="sessionHandler"/>
-      </Set>
       <Get name="SessionHandler">
         <Set name="SessionManager">
           <New class="org.mortbay.jetty.servlet.HashSessionManager">
@@ -128,7 +115,6 @@
           </New>
         </Set>
       </Get>
-      -->
     </New>
     
     <!-- =========================================================== -->

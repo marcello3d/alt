@@ -1,23 +1,159 @@
-Index: .cvsignore
+Index: src/org/mozilla/javascript/FunctionNode.java
 ===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/.cvsignore,v
-retrieving revision 1.2
-diff -u -r1.2 .cvsignore
---- .cvsignore	11 Jul 2006 12:28:42 -0000	1.2
-+++ .cvsignore	19 Jul 2006 09:03:56 -0000
-@@ -2,3 +2,5 @@
- lib
- build.local.properties
- downloaded
-+bin
-+.externalToolBuilders
+RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/FunctionNode.java,v
+retrieving revision 1.29
+diff -u -r1.29 FunctionNode.java
+--- src/org/mozilla/javascript/FunctionNode.java	29 Aug 2005 13:25:31 -0000	1.29
++++ src/org/mozilla/javascript/FunctionNode.java	26 Jul 2006 23:16:25 -0000
+@@ -77,7 +77,15 @@
+     public int getFunctionType() {
+         return itsFunctionType;
+     }
++    
++    public void setJSDoc(String s) {
++        this.jsDoc = s;
++    }
++    public String getJSDoc() {
++        return jsDoc;
++    }
+ 
++    String jsDoc = null;
+     String functionName;
+     boolean itsNeedsActivation;
+     int itsFunctionType;
+Index: src/org/mozilla/javascript/Interpreter.java
+===================================================================
+RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Interpreter.java,v
+retrieving revision 1.307
+diff -u -r1.307 Interpreter.java
+--- src/org/mozilla/javascript/Interpreter.java	19 Nov 2005 22:57:49 -0000	1.307
++++ src/org/mozilla/javascript/Interpreter.java	26 Jul 2006 23:16:27 -0000
+@@ -487,6 +487,7 @@
+         itsData.itsFunctionType = theFunction.getFunctionType();
+         itsData.itsNeedsActivation = theFunction.requiresActivation();
+         itsData.itsName = theFunction.getFunctionName();
++        itsData.jsDoc = theFunction.getJSDoc();
+         if (!theFunction.getIgnoreDynamicScope()) {
+             if (compilerEnv.isUseDynamicScope()) {
+                 itsData.useDynamicScope = true;
+Index: src/org/mozilla/javascript/InterpretedFunction.java
+===================================================================
+RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/InterpretedFunction.java,v
+retrieving revision 1.52
+diff -u -r1.52 InterpretedFunction.java
+--- src/org/mozilla/javascript/InterpretedFunction.java	28 May 2006 17:15:24 -0000	1.52
++++ src/org/mozilla/javascript/InterpretedFunction.java	26 Jul 2006 23:16:25 -0000
+@@ -133,6 +133,17 @@
+         if (idata.itsRegExpLiterals != null) {
+             functionRegExps = createRegExpWraps(cx, scope);
+         }
++        if (idata.jsDoc != null) {
++            defineProperty("__jsdoc__", 
++            		Context.toString(idata.getJSDoc()), 
++            		ScriptableObject.DONTENUM);
++            defineProperty("__source__", 
++            		Context.toString(idata.getSourceName()),
++            		ScriptableObject.DONTENUM);
++            defineProperty("__lines__", 
++            		Context.javaToJS(idata.getLineNumbers(), scope),
++            		ScriptableObject.DONTENUM);
++        }
+     }
+ 
+     public String getFunctionName()
+Index: src/org/mozilla/javascript/TokenStream.java
+===================================================================
+RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/TokenStream.java,v
+retrieving revision 1.63
+diff -u -r1.63 TokenStream.java
+--- src/org/mozilla/javascript/TokenStream.java	31 Jul 2005 13:48:46 -0000	1.63
++++ src/org/mozilla/javascript/TokenStream.java	26 Jul 2006 23:16:28 -0000
+@@ -284,6 +284,8 @@
+     final int getLineno() { return lineno; }
+ 
+     final String getString() { return string; }
++    
++    final String getJSDoc() { String s = jsDoc; jsDoc = null; return s; }
+ 
+     final double getNumber() { return number; }
+ 
+@@ -742,6 +744,11 @@
+                 }
+                 if (matchChar('*')) {
+                     boolean lookForSlash = false;
++                    // Marcello: JSDoc patch
++                    boolean potentialJSDoc = true;
++                    boolean inJSDoc = false;
++                    boolean readJSDoc = false;
++                    int jsDocStep = 1; // 0: space, 1: star, 2: space, 3: text
+                     for (;;) {
+                         c = getChar();
+                         if (c == EOF_CHAR) {
+@@ -749,13 +756,47 @@
+                             return Token.ERROR;
+                         } else if (c == '*') {
+                             lookForSlash = true;
++                            if (potentialJSDoc) {
++                                inJSDoc = true;
++                                potentialJSDoc = false;
++                                stringBufferTop = 0;
++                                continue;
++                            }
+                         } else if (c == '/') {
+                             if (lookForSlash) {
++                                if (inJSDoc)
++                                    this.jsDoc = getStringFromBuffer();
+                                 continue retry;
+                             }
+                         } else {
+                             lookForSlash = false;
+                         }
++                        potentialJSDoc = false;
++                        if (inJSDoc) {
++                            // If we hit a newline restart step
++                            if (c=='\n' && jsDocStep>=1) {
++                                jsDocStep = 0;
++                                if (readJSDoc)
++                                    addToString(c);
++                                continue;
++                            } else if (jsDocStep<3) {
++                                // Ignore asterisks if we're in step 0/1
++                                if (c=='*') {
++                                    if (jsDocStep==0)
++                                        jsDocStep=1;
++                                    if (jsDocStep==1) 
++                                        continue;
++                                // Ignore spaces in steps 0,1,2
++                                } else if (isJSSpace(c)) {
++                                    if (jsDocStep==1)
++                                        jsDocStep = 2;
++                                    continue;
++                                }   
++                            }
++                            jsDocStep = 3;
++                            addToString(c);
++                            readJSDoc = true;
++                        }
+                     }
+                 }
+ 
+@@ -1367,6 +1408,9 @@
+     // code.
+     private String string = "";
+     private double number;
++    
++    // Marcello: store jsdoc
++    private String jsDoc = null;
+ 
+     private char[] stringBuffer = new char[128];
+     private int stringBufferTop;
 Index: src/org/mozilla/javascript/BaseFunction.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/BaseFunction.java,v
 retrieving revision 1.57
 diff -u -r1.57 BaseFunction.java
 --- src/org/mozilla/javascript/BaseFunction.java	30 Aug 2005 10:05:42 -0000	1.57
-+++ src/org/mozilla/javascript/BaseFunction.java	19 Jul 2006 09:03:56 -0000
++++ src/org/mozilla/javascript/BaseFunction.java	26 Jul 2006 23:16:25 -0000
 @@ -245,6 +245,8 @@
                  } else {
                      indent = 0;
@@ -33,7 +169,7 @@ RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Decompiler.java,v
 retrieving revision 1.19
 diff -u -r1.19 Decompiler.java
 --- src/org/mozilla/javascript/Decompiler.java	28 Aug 2005 23:25:22 -0000	1.19
-+++ src/org/mozilla/javascript/Decompiler.java	19 Jul 2006 09:03:57 -0000
++++ src/org/mozilla/javascript/Decompiler.java	26 Jul 2006 23:16:25 -0000
 @@ -82,6 +82,17 @@
       * Flag to indicate that the decompilation generates toSource result.
       */
@@ -211,7 +347,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.IN:
-@@ -516,35 +566,37 @@
+@@ -516,27 +566,27 @@
                  break;
  
              case Token.WITH:
@@ -245,10 +381,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.THROW:
--                result.append("throw ");
-+                result.append("throw");
-+                if (!compress || Token.NAME == getNext(source, length, i))
-+                    result.append(' ');
+@@ -544,7 +594,7 @@
                  break;
  
              case Token.SWITCH:
@@ -257,7 +390,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.BREAK:
-@@ -561,6 +613,8 @@
+@@ -561,6 +611,8 @@
  
              case Token.CASE:
                  result.append("case ");
@@ -266,7 +399,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.DEFAULT:
-@@ -578,63 +632,65 @@
+@@ -578,63 +630,65 @@
                  break;
  
              case Token.SEMI:
@@ -348,7 +481,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.OBJECTLIT:
-@@ -652,59 +708,59 @@
+@@ -652,59 +706,59 @@
                      result.append(':');
                  else
                      // it's the middle part of a ternary
@@ -422,7 +555,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.INSTANCEOF:
-@@ -712,15 +768,15 @@
+@@ -712,15 +766,15 @@
                  break;
  
              case Token.LSH:
@@ -441,7 +574,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.TYPEOF:
-@@ -748,31 +804,39 @@
+@@ -748,31 +802,39 @@
                  break;
  
              case Token.INC:
@@ -486,7 +619,7 @@ diff -u -r1.19 Decompiler.java
                  break;
  
              case Token.COLONCOLON:
-@@ -800,7 +864,7 @@
+@@ -800,7 +862,7 @@
  
          if (!toSource) {
              // add that trailing newline if it's an outermost function.
@@ -495,7 +628,7 @@ diff -u -r1.19 Decompiler.java
                  result.append('\n');
          } else {
              if (topFunctionType == FunctionNode.FUNCTION_EXPRESSION) {
-@@ -890,3 +954,111 @@
+@@ -890,3 +952,111 @@
      private static final boolean printSource = false;
  
  }
@@ -607,68 +740,13 @@ diff -u -r1.19 Decompiler.java
 +		}
 +	}
 +}
-Index: src/org/mozilla/javascript/FunctionNode.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/FunctionNode.java,v
-retrieving revision 1.29
-diff -u -r1.29 FunctionNode.java
---- src/org/mozilla/javascript/FunctionNode.java	29 Aug 2005 13:25:31 -0000	1.29
-+++ src/org/mozilla/javascript/FunctionNode.java	19 Jul 2006 09:03:57 -0000
-@@ -77,7 +77,15 @@
-     public int getFunctionType() {
-         return itsFunctionType;
-     }
-+    
-+    public void setJSDoc(String s) {
-+        this.jsDoc = s;
-+    }
-+    public String getJSDoc() {
-+        return jsDoc;
-+    }
- 
-+    String jsDoc = null;
-     String functionName;
-     boolean itsNeedsActivation;
-     int itsFunctionType;
-Index: src/org/mozilla/javascript/InterpretedFunction.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/InterpretedFunction.java,v
-retrieving revision 1.52
-diff -u -r1.52 InterpretedFunction.java
---- src/org/mozilla/javascript/InterpretedFunction.java	28 May 2006 17:15:24 -0000	1.52
-+++ src/org/mozilla/javascript/InterpretedFunction.java	19 Jul 2006 09:03:57 -0000
-@@ -133,6 +133,9 @@
-         if (idata.itsRegExpLiterals != null) {
-             functionRegExps = createRegExpWraps(cx, scope);
-         }
-+        if (idata.jsDoc != null) {
-+            defineProperty("__jsdoc__", idata.jsDoc, ScriptableObject.DONTENUM);
-+        }
-     }
- 
-     public String getFunctionName()
-Index: src/org/mozilla/javascript/Interpreter.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Interpreter.java,v
-retrieving revision 1.307
-diff -u -r1.307 Interpreter.java
---- src/org/mozilla/javascript/Interpreter.java	19 Nov 2005 22:57:49 -0000	1.307
-+++ src/org/mozilla/javascript/Interpreter.java	19 Jul 2006 09:03:58 -0000
-@@ -487,6 +487,7 @@
-         itsData.itsFunctionType = theFunction.getFunctionType();
-         itsData.itsNeedsActivation = theFunction.requiresActivation();
-         itsData.itsName = theFunction.getFunctionName();
-+        itsData.jsDoc = theFunction.getJSDoc();
-         if (!theFunction.getIgnoreDynamicScope()) {
-             if (compilerEnv.isUseDynamicScope()) {
-                 itsData.useDynamicScope = true;
 Index: src/org/mozilla/javascript/InterpreterData.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/InterpreterData.java,v
 retrieving revision 1.53
 diff -u -r1.53 InterpreterData.java
 --- src/org/mozilla/javascript/InterpreterData.java	30 Aug 2005 10:05:42 -0000	1.53
-+++ src/org/mozilla/javascript/InterpreterData.java	19 Jul 2006 09:03:58 -0000
++++ src/org/mozilla/javascript/InterpreterData.java	26 Jul 2006 23:16:27 -0000
 @@ -102,6 +102,9 @@
      String encodedSource;
      int encodedSourceStart;
@@ -679,13 +757,25 @@ diff -u -r1.53 InterpreterData.java
  
      int languageVersion;
  
+@@ -154,6 +157,11 @@
+         return itsSourceFile;
+     }
+ 
++    public String getJSDoc()
++    {
++        return jsDoc;
++    }
++
+     public boolean isGeneratedScript()
+     {
+         return ScriptRuntime.isGeneratedScript(itsSourceFile);
 Index: src/org/mozilla/javascript/Parser.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Parser.java,v
 retrieving revision 1.104
 diff -u -r1.104 Parser.java
 --- src/org/mozilla/javascript/Parser.java	1 Jun 2006 14:30:19 -0000	1.104
-+++ src/org/mozilla/javascript/Parser.java	19 Jul 2006 09:03:59 -0000
++++ src/org/mozilla/javascript/Parser.java	26 Jul 2006 23:16:28 -0000
 @@ -430,6 +430,9 @@
      {
          int syntheticType = functionType;
@@ -706,130 +796,3 @@ diff -u -r1.104 Parser.java
  
          int functionIndex = currentScriptOrFn.addFunction(fnNode);
  
-Index: src/org/mozilla/javascript/TokenStream.java
-===================================================================
-RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/TokenStream.java,v
-retrieving revision 1.63
-diff -u -r1.63 TokenStream.java
---- src/org/mozilla/javascript/TokenStream.java	31 Jul 2005 13:48:46 -0000	1.63
-+++ src/org/mozilla/javascript/TokenStream.java	19 Jul 2006 09:04:00 -0000
-@@ -284,6 +284,8 @@
-     final int getLineno() { return lineno; }
- 
-     final String getString() { return string; }
-+    
-+    final String getJSDoc() { String s = jsDoc; jsDoc = null; return s; }
- 
-     final double getNumber() { return number; }
- 
-@@ -742,6 +744,11 @@
-                 }
-                 if (matchChar('*')) {
-                     boolean lookForSlash = false;
-+                    // Marcello: JSDoc patch
-+                    boolean potentialJSDoc = true;
-+                    boolean inJSDoc = false;
-+                    boolean readJSDoc = false;
-+                    int jsDocStep = 1; // 0: space, 1: star, 2: space, 3: text
-                     for (;;) {
-                         c = getChar();
-                         if (c == EOF_CHAR) {
-@@ -749,13 +756,47 @@
-                             return Token.ERROR;
-                         } else if (c == '*') {
-                             lookForSlash = true;
-+                            if (potentialJSDoc) {
-+                                inJSDoc = true;
-+                                potentialJSDoc = false;
-+                                stringBufferTop = 0;
-+                                continue;
-+                            }
-                         } else if (c == '/') {
-                             if (lookForSlash) {
-+                                if (inJSDoc)
-+                                    this.jsDoc = getStringFromBuffer();
-                                 continue retry;
-                             }
-                         } else {
-                             lookForSlash = false;
-                         }
-+                        potentialJSDoc = false;
-+                        if (inJSDoc) {
-+                            // If we hit a newline restart step
-+                            if (c=='\n' && jsDocStep>=1) {
-+                                jsDocStep = 0;
-+                                if (readJSDoc)
-+                                    addToString(c);
-+                                continue;
-+                            } else if (jsDocStep<3) {
-+                                // Ignore asterisks if we're in step 0/1
-+                                if (c=='*') {
-+                                    if (jsDocStep==0)
-+                                        jsDocStep=1;
-+                                    if (jsDocStep==1) 
-+                                        continue;
-+                                // Ignore spaces in steps 0,1,2
-+                                } else if (isJSSpace(c)) {
-+                                    if (jsDocStep==1)
-+                                        jsDocStep = 2;
-+                                    continue;
-+                                }   
-+                            }
-+                            jsDocStep = 3;
-+                            addToString(c);
-+                            readJSDoc = true;
-+                        }
-                     }
-                 }
- 
-@@ -1367,6 +1408,9 @@
-     // code.
-     private String string = "";
-     private double number;
-+    
-+    // Marcello: store jsdoc
-+    private String jsDoc = null;
- 
-     private char[] stringBuffer = new char[128];
-     private int stringBufferTop;
-Index: .classpath
-===================================================================
-RCS file: .classpath
-diff -N .classpath
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ .classpath	1 Jan 1970 00:00:00 -0000
-@@ -0,0 +1,10 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<classpath>
-+	<classpathentry excluding="deprecatedsrc/|deprecatedsrc/org/mozilla/javascript/|docs/|examples/|examples/E4X/|src/|src/org/mozilla/classfile/|src/org/mozilla/javascript/|src/org/mozilla/javascript/continuations/|src/org/mozilla/javascript/debug/|src/org/mozilla/javascript/jdk11/|src/org/mozilla/javascript/jdk13/|src/org/mozilla/javascript/optimizer/|src/org/mozilla/javascript/regexp/|src/org/mozilla/javascript/resources/|src/org/mozilla/javascript/serialize/|src/org/mozilla/javascript/xml/|toolsrc/|toolsrc/org/mozilla/javascript/tools/|toolsrc/org/mozilla/javascript/tools/debugger/|toolsrc/org/mozilla/javascript/tools/idswitch/|toolsrc/org/mozilla/javascript/tools/jsc/|toolsrc/org/mozilla/javascript/tools/resources/|toolsrc/org/mozilla/javascript/tools/shell/|xmlimplsrc/|xmlimplsrc/org/mozilla/javascript/xmlimpl/|src/|toolsrc/|xmlimplsrc/" path="" kind="src"/>
-+	<classpathentry path="src" kind="src"/>
-+	<classpathentry path="toolsrc" kind="src"/>
-+	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
-+	<classpathentry path="xmlimplsrc" kind="src"/>
-+	<classpathentry path="C:/Documents and Settings/Marcello/My Documents/java/alt/lib/ext/xbean.jar" kind="lib"/>
-+	<classpathentry path="bin" kind="output"/>
-+</classpath>
-Index: .project
-===================================================================
-RCS file: .project
-diff -N .project
---- /dev/null	1 Jan 1970 00:00:00 -0000
-+++ .project	1 Jan 1970 00:00:00 -0000
-@@ -0,0 +1,17 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<projectDescription>
-+	<name>rhinocvs</name>
-+	<comment></comment>
-+	<projects>
-+	</projects>
-+	<buildSpec>
-+		<buildCommand>
-+			<name>org.eclipse.jdt.core.javabuilder</name>
-+			<arguments>
-+			</arguments>
-+		</buildCommand>
-+	</buildSpec>
-+	<natures>
-+		<nature>org.eclipse.jdt.core.javanature</nature>
-+	</natures>
-+</projectDescription>

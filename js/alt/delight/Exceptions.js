@@ -5,7 +5,7 @@ Rhino.require('alt.Exception');
 /**
  * Constructs a new delight exception
  * @class
- * Base exception class for 
+ * Base exception class for delight exceptions
  * @constructor
  * @param {String}	msg		exception message
  */

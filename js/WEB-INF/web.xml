@@ -20,6 +20,16 @@
       <param-name>alt.root</param-name>
       <param-value>/</param-value>
     </init-param>
+    <init-param>
+      <param-name>rhino.optimization</param-name>
+      <param-value>-1</param-value> 
+    </init-param>
+    <init-param>
+      <param-name>alt.timeout</param-name>
+      <param-value>-1</param-value> 
+    </init-param>
+    
+    
     <load-on-startup>1</load-on-startup>
   </servlet>
 

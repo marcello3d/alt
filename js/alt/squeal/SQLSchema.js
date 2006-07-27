@@ -21,7 +21,7 @@ Rhino.require('alt.squeal.ID');
  * @class
  * The main SQLSchema class
  * @constructor
- * @param {XML} xml base cello.SimpleXML object to use as reference
+ * @param {XML} xml base XML object to use as reference
  */
 function SQLSchema(xml) {
  
@@ -58,14 +58,14 @@ SQLSchema.prototype.isValid = function() {
 
 /**
  * Add definitions from a cello.SimpleXML object.
- * @param {cello.SimpleXML} xml cello.SimpleXML object to add definitions from
+ * @param {XML} xml XML object to add definitions from
  * @throws Exception if there was an error adding definitions
  */
 SQLSchema.prototype.add = function(xml) {		
 	this.verified = false;
 	
 	if (!(xml instanceof XML))
-		throw new Exception("XML type");
+		throw new Exception("Not XML type");
 
 	if (!xml.schema)
 		throw new Exception("Invalid XML (must have schema tag)");

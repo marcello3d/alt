@@ -3,7 +3,7 @@ Rhino.log("Request: "+request.remoteAddr + " "+request.method+" "+
 		request.requestURI);
 
 // Define some paths
-dictator.paths({
+dictator.map({
 	manage:     'alt.manage.Index',
 	examples:   'examples.Index',
 	tests:      'tests.Index'

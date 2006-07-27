@@ -1,12 +1,10 @@
 
 Rhino.require('alt.dictator.Path');
 
-// This should not change per Servlet instance
+// This should not change per Servlet instance so we can make it global
 var mainScript = Servlet.config.getInitParameter('dictator.index');
 if (mainScript == null)
 	mainScript = 'Index';
-
-var nopFunction = function() {};
 
 /**
  * Constructs a new Dictator object.  In general it is a better idea to simply
@@ -15,7 +13,7 @@ var nopFunction = function() {};
  * 
  */
 function Dictator() {
-	this.requestPath = null;
+	this.path = null;
 	this.handled = false;
 	this.index('alt.dictator.IndexPage', true);
 	this.error('alt.dictator.ExceptionPage');
@@ -24,13 +22,14 @@ function Dictator() {
 /**
  * Main entry point/launcher for Dictator module.  There is no need to call this
  *  method directly, it is used by the {@link alt.dictator.Main} script.
+ * 
  * @param {javax.servlet.http.HttpServletRequest}  request    the http request
  * @param {javax.servlet.http.HttpServletResponse} response   the http response
- * @param                                   scope      the scope to use
+ * @param                                          scope      the scope to use
  */
 Dictator.prototype.handle = function(request, response, scope) {
 	// Make path object
-	this.requestPath = new Path(request);
+	this.path = new Path(request);
 	this.scope = scope;
 	
 	// Handle the script
@@ -68,12 +67,10 @@ Dictator.prototype.index = function(script, recordPaths) {
 }
 
 /**
- * This function maps a single path name to a particular script name.  If the
- *  next element in the path matches path, the script will be executed 
- *  immediately.  
- * 
- * The recommendation is to use the paths() method instead of calling this 
- *  method because paths() is optimized to handle multiple paths efficently.
+ * This function maps path names to a scripts.  If the next element in the path 
+ *  matches anything in the map, the script will be evaluated immediately.  Once
+ *  a script is evaluated by this method, any further calls to map or filter 
+ *  will be ignored.
  * 
  * Site security tip: only call this method on paths the current user has access
  *  and authentication checking is a snap!
@@ -81,7 +78,7 @@ Dictator.prototype.index = function(script, recordPaths) {
  * Example:  
  * Main.js:
  * <pre>
- *  dictator.path('archive', 'yoursite.pages.ArchivePage');
+ *  dictator.map({archive: 'yoursite.pages.ArchivePage'});
  * </pre>
  * ArchivePage.js:
  * <pre>
@@ -92,34 +89,33 @@ Dictator.prototype.index = function(script, recordPaths) {
  * 
  * 
  * @param {String}   path    the path that loads this script
- * @param {String}   script  the name of the script as used by Rhino.require()
+ * @param {String}   script  the name of the script as used by Rhino.require
  */
-Dictator.prototype.path = function(path, script) {
+Dictator.prototype.map = function(scripts) {
 	// Get the next path string
-	if (this.requestPath.next == path)
-		this.handleScript(script);
-	if (this.recordPaths)
-		this.recordPath(path,script);
-}
-Dictator.prototype.paths = function(scripts) {
-	// Get the next path string
-	var script = scripts[this.requestPath.next];
+	var script = scripts[this.path.next];
 	// Found a path
-	if (script != null)
+	if (script != null) {
+		this.path.pop();
 		this.handleScript(script);
+	}
 	if (this.recordPaths)
 		for (var path in scripts)
 			this.recordPath(path,scripts[path]);
 }
+/**
+ * @private
+ */
 Dictator.prototype.recordPath = function (path,script) {
 	if (this.recordedPaths == null)
 		this.recordedPaths = {};
 	this.recordedPaths[path] = script;
 }
+/**
+ * @private
+ */
 Dictator.prototype.handleScript = function(script) {
 	try {
-		var lastPath = this.requestPath.pop();
-		
 		// Clear list
 		this.recordedPaths = null;
 		
@@ -128,7 +124,7 @@ Dictator.prototype.handleScript = function(script) {
 		
 		// Was anything generated?
 		if (!this.handled && this.recordedPaths != null) {
-			if (this.requestPath.next == '') {
+			if (this.path.next == '') {
 				Rhino.evaluate(this.indexScript, this.scope);
 				this.setHandled();
 			}
@@ -139,6 +135,12 @@ Dictator.prototype.handleScript = function(script) {
 		this.handleException(ex);
 	}
 }
+/**
+ * Filter evaluates a particular script.  Unlike map, this method does not
+ *  take a path variable nor does it prevent other filters or maps from being
+ *  evaluated.
+ * @param {String} script  the name of the script as used by Rhino.require
+ */
 Dictator.prototype.filter = function(script) {
 	try {
 		// Evaluate the script (do not set as handled)
@@ -147,6 +149,9 @@ Dictator.prototype.filter = function(script) {
 		this.handleException(ex);
 	}
 }
+/**
+ * @private
+ */
 Dictator.prototype.handleException = function(ex) {
 	// Make new scope that prototypes the old scope with exception 
 	// as a member of the new scope.
@@ -168,18 +173,24 @@ Dictator.prototype.handleException = function(ex) {
 		}
 	}
 }
+/**
+ * @private
+ */
 Dictator.prototype.setHandled = function() {
 	// Destroy all the functions that do anything
-	      this.path = 
-	     this.paths = 
+	       this.map = 
 	     this.index = 
 	    this.filter = 
-	this.setHandled = nopFunction;
+	this.setHandled = function() {};
 	
 	// Store handled flag
 	this.handled = true;
 }
 
+/**
+ * Returns a string representation of this Dictator object.
+ * @return {String} the string representation
+ */
 Dictator.prototype.toString = function() {
 	return "[alt.dictator.Dictator]";
 }
