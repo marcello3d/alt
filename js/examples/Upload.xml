@@ -11,7 +11,7 @@
 <div id="upload">
 <form action="." enctype="multipart/form-data" method="post">  
 <p>
-<label for="file">File:</label> <input type="file" name="the_file" size="30" />
+<label for="file">File:</label> <input id="file" type="file" name="the_file" size="30" />
 </p>
 <p><input type="submit" name="submit" value="Upload" 
 			onclick="this.disabled=true;this.value='Uploading...'" /></p>

@@ -1,2 +1,2 @@
-java -jar server.jar
+java -jar launcher.jar
 pause
