@@ -264,17 +264,19 @@ public class ServerGUI extends JFrame  {
                            );
                     server.start();
                     this.putValue(Action.NAME, "Stop Server");
-                    System.out.println("Started server.");
                     System.out.flush();
+                    System.err.flush();
+                    System.out.println("\nStarted server.");
                 } else {
                     starting = false;
                     System.out.println("Stopping server...");
                     System.out.flush();
                     server.stop();
                     server = null;
+                    System.out.flush();
+                    System.err.flush();
                     this.putValue(Action.NAME, "Start Server");
                     System.out.println("Stopped server.");
-                    System.out.flush();
                 }
             } catch (Exception ex) {
                 if (starting)
