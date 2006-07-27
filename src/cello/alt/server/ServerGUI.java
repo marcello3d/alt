@@ -33,7 +33,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,8 +80,6 @@ public class ServerGUI extends JFrame  {
     private JTextField rootField;
     private JTextField mainField;
     private JEditorPane console;
-    private FileInputStream propIn;
-    private FileOutputStream propOut;
     private File preferenceFile;
     private Properties properties;
     private Server server = null;
@@ -112,17 +109,17 @@ public class ServerGUI extends JFrame  {
         properties = new Properties();
         
         
-        if (preferenceFile.exists()){
-        	loadPreferences();
-        }
+        if (preferenceFile.exists())
+        	try {
+	        	loadPreferences();
+			} catch (IOException ie) {
+				System.err.println( "Error loading configuration: " + ie);
+			}
         
-        host = properties.getProperty("host", host);
-        root = properties.getProperty("root", root);
-        main = properties.getProperty("main", main);
+        hostField = new JTextField(properties.getProperty("host", host));
+        rootField = new JTextField(properties.getProperty("root", root));
+        mainField = new JTextField(properties.getProperty("main", main));
         
-        hostField = new JTextField(host);
-        rootField = new JTextField(root);
-        mainField = new JTextField(main);
         startStopAction = new StartStopAction();
         
         c.add(makeToolbar(), BorderLayout.NORTH);
@@ -132,11 +129,14 @@ public class ServerGUI extends JFrame  {
        
         addWindowListener(new WindowAdapter(){
         	@Override
-			public void windowClosing(WindowEvent e){
-        		savePreferences();
-        			}
-        	});
-        
+			public void windowClosing(WindowEvent e) {
+        		try {
+        			savePreferences();
+	    		} catch (IOException ie) {
+	    			System.err.println("Error saving configuration: " + ie);
+	    		}
+        	}
+        });
 
         try {
             // Create reader threads
@@ -153,9 +153,7 @@ public class ServerGUI extends JFrame  {
             ex.printStackTrace();
         }
         
-        
         this.pack();
-
     }
     /**
      * Starts the server
@@ -169,56 +167,25 @@ public class ServerGUI extends JFrame  {
 					"Enter Port Number and Click 'OK' to Start Server", 
 					"Port Number Entry", JOptionPane.PLAIN_MESSAGE, null, null, 
 					properties.getProperty("host", "4500"));
-			if ((s != null) && (s.length() > 0)) {   
-				properties.setProperty("host", s);
+			if ((s != null) && (s.length() > 0))
 				hostField.setText(s);
-			} else {
-				properties.setProperty("host", "4500");
-			}
         }
-    	// If null or on then auto start
-    	if ((properties.getProperty("server_state") == null) ||
-    			(properties.getProperty("server_state").equals("on"))) {  
+    	// If on then auto start
+    	if (properties.getProperty("server_state","on").equals("on"))  
     		startStopAction.actionPerformed(new ActionEvent(this,0,null));
-   		}
    }
     
-    private void savePreferences() {
-    	try {
-			propOut = new FileOutputStream(preferenceFile);
-		} catch (FileNotFoundException fnfe) {
-			System.err.println( "Couldn't load property output file" + fnfe);
-		}
+    private void savePreferences() throws IOException {
     	properties.setProperty("host", hostField.getText());
         properties.setProperty("root", rootField.getText());
         properties.setProperty("main", mainField.getText());
-        if (server == null)
-    		properties.setProperty("server_state", "off");
-    	else
-    		properties.setProperty("server_state", "on");
-    	try {
-    		properties.store(propOut, "Server GUI settings");
-			propOut.close();
-		} catch (IOException ie) {
-			System.err.println("Can't close output file now, try again later: " 
-						+ ie);
-		}
+    	properties.setProperty("server_state", server==null ? "off" : "on");
+		properties.store(new FileOutputStream(preferenceFile), 
+				"Alt Framework Server GUI configuration");
     }
     
-    private void loadPreferences() {
-        try
-		{
-        	propIn = new FileInputStream(preferenceFile);
-            properties.load(propIn);
-            propIn.close();
-		}
-		catch( FileNotFoundException fnfe ) {
-			System.err.println( "Couldn't load file:" + fnfe ); 
-		}
-		catch( IOException ie) {
-			System.err.println( "couldnt load property input file" + ie);
-		}
-        
+    private void loadPreferences() throws IOException {
+        properties.load(new FileInputStream(preferenceFile));
     }
     private JComponent makeToolbar() {
         JToolBar tb = new JToolBar();
@@ -297,6 +264,8 @@ public class ServerGUI extends JFrame  {
                            );
                     server.start();
                     this.putValue(Action.NAME, "Stop Server");
+                    System.out.println("Started server.");
+                    System.out.flush();
                 } else {
                     starting = false;
                     System.out.println("Stopping server...");
@@ -304,6 +273,8 @@ public class ServerGUI extends JFrame  {
                     server.stop();
                     server = null;
                     this.putValue(Action.NAME, "Start Server");
+                    System.out.println("Stopped server.");
+                    System.out.flush();
                 }
             } catch (Exception ex) {
                 if (starting)
