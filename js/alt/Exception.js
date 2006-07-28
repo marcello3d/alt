@@ -10,8 +10,18 @@
  * @param {String} msg The message for this exception
  */
 function Exception(msg) {
+    Error.call(this,msg);
 	this.msg = msg;
+	this.name = "alt.Exception";
+	// FIXME: Hack to get a decent stack trace
+	try {
+	    Rhino.throwMessage(msg);
+	} catch (ex) {
+	    for (var x in ex)
+	       this[x] = ex[x];
+	}
 }
+Exception.prototype = new Error;
 /**
  * Returns the message associated with this exception
  * @returns the message of this exception
@@ -26,6 +36,6 @@ Exception.prototype.getMessage = function() {
  * @type String
  */
 Exception.prototype.toString = function() {
-	return "[alt.Exception: "+this.msg+"]";
+	return this.name+": "+this.getMessage();
 }
 

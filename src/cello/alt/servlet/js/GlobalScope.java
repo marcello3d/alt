@@ -171,6 +171,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                                     "getResource",
                                     "getRequestScope",
                                     "synchronize",
+                                    "throwMessage",
                                     //"debug",
                                     "log"},
                                     RhinoClass.class,
@@ -393,7 +394,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         }
         
         /**
-         * The JavaScript function "log"
+         * The JavaScript function "synchronize"
          * @param cx 
          * @param thisObj 
          * @param args 
@@ -410,6 +411,13 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             }
             
             return lock;
+        }
+        /**
+         * The JavaScript function "log" 
+         * @param message 
+         */
+        public void throwMessage(String message) {
+        	throw new RuntimeException(message);
         }
 
 

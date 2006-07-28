@@ -26,7 +26,7 @@
     </init-param>
     <init-param>
       <param-name>alt.timeout</param-name>
-      <param-value>-1</param-value> 
+      <param-value>10</param-value> 
     </init-param>
     
     

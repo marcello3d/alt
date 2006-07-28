@@ -10,12 +10,11 @@ Rhino.require('alt.Exception');
  * @param {String}	msg		exception message
  */
 function Exception(msg) {
-	this.msg = msg;
+    alt.Exception.call(this,msg);
+    
+	this.name = "alt.delight.Exception";
 }
-Exception.prototype = new alt.Exception();
-Exception.prototype.toString = function() {
-	return "[alt.delight.Exception: "+this.msg+"]";
-}
+Exception.prototype = new alt.Exception;
 
 /**
  * Constructs a new ValidationException.
@@ -26,10 +25,11 @@ Exception.prototype.toString = function() {
  * @param {String}	field	the field name that failed
  */
 function ValidationException(msg,field) {
-	this.msg = msg;
+    Exception.call(this,msg);
 	this.field = field;
+	this.name = "alt.delight.ValidationException";
 }
-ValidationException.prototype = new Exception();
+ValidationException.prototype = new Exception;
 /**
  * Get the field associated with the exception
  * @returns the field name
@@ -37,10 +37,6 @@ ValidationException.prototype = new Exception();
 ValidationException.prototype.getField = function() {
 	return this.field;
 }
-ValidationException.prototype.toString = function() {
-	return "[alt.delight.ValidationException: "+this.msg+"]";
-}
-
 /**
  * Constructs a new AddException.
  * @class
@@ -49,12 +45,10 @@ ValidationException.prototype.toString = function() {
  * @param {String}	msg		exception message
  */
 function AddException(msg) {
-	this.msg = msg;
+    Exception.call(this,msg);
+	this.name = "alt.delight.AddException";
 }
-AddException.prototype = new Exception();
-AddException.prototype.toString = function() {
-	return "[alt.delight.AddException: "+this.msg+"]";
-}
+AddException.prototype = new Exception;
 
 /**
  * Constructs a new SetException.  
@@ -67,13 +61,14 @@ AddException.prototype.toString = function() {
  * @param {Object}	value	the value 
  */
 function SetException(msg,field,value) {
-	this.msg = msg;
+    Exception.call(this,msg);
 	this.field = field;
 	this.value = value;
+	this.name = "alt.delight.SetException";
 }
-SetException.prototype = new Exception();
+SetException.prototype = new Exception;
 SetException.prototype.toString = function() {
-	return "[alt.delight.SetException: "+this.msg+" (setting "+this.field+" to "+this.value+")]";
+	return this.name+": "+this.msg+" (setting "+this.field+" to "+this.value+")";
 }
 
 /**
@@ -84,12 +79,13 @@ SetException.prototype.toString = function() {
  * @param {String}	field	the field name
  */
 function GetException(msg,field) {
-	this.msg = msg;
+    Exception.call(this,msg);
 	this.field = field;
+	this.name = "alt.delight.GetException";
 }
-GetException.prototype = new Exception();
+GetException.prototype = new Exception;
 GetException.prototype.toString = function() {
-	return "[GetException: "+this.msg+" (getting "+this.field+")]";
+	return this.name+": "+this.msg+" (getting "+this.field+")";
 }
 
 /**
@@ -100,11 +96,12 @@ GetException.prototype.toString = function() {
  * @param {Table}	table	the table
  */
 function InnerTableException(msg,table) {
-	this.msg = msg;
+    Exception.call(this,msg);
 	this.table = table;
+	this.name = "alt.delight.InnerTableException";
 }
-InnerTableException.prototype = new Exception();
+InnerTableException.prototype = new Exception;
 InnerTableException.prototype.toString = function() {
-	return "[alt.delight.InnerTableException: "+this.msg+" (in "+this.table+")]";
+	return this.name+": "+this.msg+" (in "+this.table+")";
 }
 
