@@ -31,7 +31,8 @@ tests.Tester.test(this,
 	 'tests.RequestScope',
 	 'tests.HashTest',
 	 'tests.Iterator',
-	 'tests.E4X'],
+	 'tests.E4X',
+	 'tests.JarJS'],
 	writeln, writeColorln('green'), writeColorln('red')
 	);
 

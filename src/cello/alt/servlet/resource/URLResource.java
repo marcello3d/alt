@@ -22,6 +22,7 @@ package cello.alt.servlet.resource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -54,6 +55,9 @@ public class URLResource implements MutableResource {
         this.loader = loader;
         this.path = path;
         this.url = url;
+        if (url==null) {
+        	System.err.println("path="+path);
+        }
     }
     
     /**

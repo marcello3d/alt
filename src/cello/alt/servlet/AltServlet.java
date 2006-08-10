@@ -49,6 +49,7 @@ import cello.alt.servlet.script.DirectoryScriptLoader;
 import cello.alt.servlet.script.JarScriptLoader;
 import cello.alt.servlet.script.JavaScript;
 import cello.alt.servlet.script.MultiScriptLoader;
+import cello.alt.servlet.script.ResourceScriptLoader;
 import cello.alt.servlet.script.ScriptLoader;
 
 /**
@@ -129,8 +130,10 @@ public class AltServlet extends HttpServlet {
         
         ServletContext context = getServletContext();
 
-        addScriptLoader(new ContextScriptLoader(loader, context, 
-        		"/WEB-INF/scripts/"));
+        addScriptLoader(new ResourceScriptLoader(loader, "/"));
+        //addScriptLoader(new ContextScriptLoader(loader, context, 
+        //		"/WEB-INF/scripts/"));
+        
         addScriptLoader(new ContextScriptLoader(loader, context, 
         		getInitParameter("alt.root","/")));
 
