@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
 
@@ -36,8 +38,10 @@ a {
  </style>
 </head>
 <body>
+<h1>HSQL demo</h1>
 <p id="db"/>
 <p id="log"/>
 <p id="squeal" class="squeal"/>
+<p>Back to <a href="..">examples list</a></p>
 </body>
 </html>

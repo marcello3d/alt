@@ -89,7 +89,7 @@ function query(conn,query, error_ok, log) {
 		};
 	} catch (ex) {
 		if (error_ok) return null;
-		throw new Exception(ex.toString(),query);
+		throw new Exception(ex,query);
 	}
 	return result;
 }
@@ -110,7 +110,7 @@ function alter(conn, query, error_ok, log) {
 		return stmt.executeUpdate(query);
 	} catch (ex) {
 		if (error_ok) return null;
-		throw new Exception(ex.toString(),query);
+		throw new Exception(ex,query);
 	}
 }
 /**

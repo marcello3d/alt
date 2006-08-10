@@ -110,7 +110,7 @@ alt.squeal.Field.prototype.getSQLType = function() {
 alt.squeal.Field.prototype.getSQLDefinition = function() {
 	return this.getSQLType() +
 		(this.required ? ' NOT NULL' : ' NULL') + 
-		(this.defaultValue ? ' DEFAULT "'+alt.squeal.sql.escapeString(this.defaultValue.toString())+'"' : '');
+		(this.defaultValue && this.defaultValue.toString() ? ' DEFAULT "'+alt.squeal.sql.escapeString(this.defaultValue.toString())+'"' : '');
 }
 
 /**
@@ -157,7 +157,7 @@ alt.squeal.Table.prototype.synchronize = function(conn, log) {
 		q += ")";
 		
 		// Send query to database
-		alter(q, true);
+		alter(q, false);
 	} else {
 
 		var found_columns = new Array();

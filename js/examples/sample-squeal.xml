@@ -3,14 +3,28 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:noNamespaceSchemaLocation="squeal.xsd"> 
 <types>
- <type name="username" base="sql:char(15)" valid="min:3;max:15;ereg:[a-zA-Z0-9]" />
- <type name="password" base="sql:char(10)" valid="min:6;max:15;ereg:[a-zA-Z0-9]" />
- <type name="email" base="sql:char(255)" valid="min:3;max:15;ereg:.+@.+" />
+ <description>
+  Defines some basic types
+ </description>
+
+ <type name="username" base="sql:char(15)">
+  <constrain type="length" min="3" max="15"/>
+  <constrain type="ereg" value="^[a-zA-Z0-9]+$"/>
+ </type>
+ <type name="password" base="sql:char(10)">
+  <constrain type="length" min="6" max="15"/>
+  <constrain type="ereg" value="^[a-zA-Z0-9]+$"/>
+ </type>
+ <type name="email" base="sql:char(255)">
+  <constrain type="length" min="5" max="255"/>
+  <constrain type="ereg" value="^.+@.+$"/>
+ </type>
  <type name="string" base="sql:varchar(255)" /> 
- <type name="title" base="string" default="txt:No title" />
+ 
+ <type name="title" base="string" default="'No title'" />
  <type name="message" base="sql:text" />
  <type name="date" base="sql:datetime">
-   <value name="default" value="sql:now()" />
+   <value name="default" value="sql:NOW()" />
    <value name="yesterday" value="sql:DATE_SUB(NOW(),INTERVAL 1 DAY)" />
  </type>
 </types>
@@ -28,7 +42,11 @@
   <link name="recipient" table="user" index="true" required="true" />
   <link name="sender" table="user" index="true" required="false" />
   <field name="date" type="date" required="true" />
-  <field name="status" type="sql:enum('unread','read','replied')" />
+  <field name="status" type="enum">
+   <option name="Unread"  value="unread" />
+   <option name="Read"    value="read"   />
+   <option name="Replied" value="replied"/>
+  </field>
   <field name="subject" type="title" />
   <field name="body" type="message" />
  </table>

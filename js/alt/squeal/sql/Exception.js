@@ -7,8 +7,9 @@ Alt.require('alt.squeal.Exception', true);
  * @param {String} msg		the message associated with this exception
  * @param {String} query	the query that caused this exception
  */
-function Exception(msg,query) {
-	this.msg = msg;
+function Exception(ex,query) {
+    alt.squeal.Exception.call(this,ex.message);
+	this.ex = ex;
 	this.query = query;
 }
 Exception.prototype = new alt.squeal.Exception();

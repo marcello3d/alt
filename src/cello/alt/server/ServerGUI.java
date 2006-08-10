@@ -203,7 +203,7 @@ public class ServerGUI extends JFrame  {
         
         
         desc = "The root directory to look for scripts.";
-        label = new JLabel("rhino.root:");
+        label = new JLabel("alt.root:");
         label.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         label.setToolTipText(desc);
         rootField.setToolTipText(desc);
@@ -211,7 +211,7 @@ public class ServerGUI extends JFrame  {
         tb.add(rootField);
         
         desc = "The script to load with every page request.";
-        label = new JLabel("rhino.main:");
+        label = new JLabel("alt.main:");
         label.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         label.setToolTipText(desc);
         mainField.setToolTipText(desc);
