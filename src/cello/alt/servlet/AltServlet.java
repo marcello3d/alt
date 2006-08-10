@@ -39,7 +39,6 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.tools.debugger.ScopeProvider;
 
 import cello.alt.servlet.js.DynamicFactory;
 import cello.alt.servlet.js.GlobalScope;
@@ -59,7 +58,7 @@ import cello.alt.servlet.script.ScriptLoader;
  *
  */
 
-public class AltServlet extends HttpServlet implements ScopeProvider {
+public class AltServlet extends HttpServlet {
     
     private static final long serialVersionUID = 2280866936332806360L;
     private MultiScriptLoader loader = new MultiScriptLoader();
@@ -96,12 +95,6 @@ public class AltServlet extends HttpServlet implements ScopeProvider {
     }
     
 
-    /**
-     * @see org.mozilla.javascript.tools.debugger.ScopeProvider#getScope()
-     */
-    public Scriptable getScope() {
-        return globalScope;
-    }
 
     /*
      * Initializes the rhino debugger

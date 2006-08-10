@@ -1,5 +1,5 @@
 
-Rhino.require("alt.squeal.Node");
+Alt.require("alt.squeal.Node");
 
 /**
  * Constructor for View object.

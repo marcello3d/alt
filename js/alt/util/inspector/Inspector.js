@@ -1,5 +1,5 @@
 
-Rhino.require('alt.util.inspector.JSDoc');
+Alt.require('alt.util.inspector.JSDoc');
 
 var JSInspector = Packages.cello.alt.util.Inspector;
 var Decompiler = Packages.org.mozilla.javascript.Decompiler;

@@ -1,5 +1,5 @@
 
-Rhino.log("Request: "+request.remoteAddr + " "+request.method+" "+
+Alt.log("Request: "+request.remoteAddr + " "+request.method+" "+
 		request.requestURI);
 
 // Define some paths

@@ -1,2 +1,2 @@
 
-Rhino.require('alt.delight.Delight');
+Alt.require('alt.delight.Delight');

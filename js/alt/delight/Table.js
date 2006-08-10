@@ -1,8 +1,8 @@
 
-Rhino.require('alt.util.ScriptableWrapper');
-Rhino.require('alt.delight.Row');
-Rhino.require('alt.delight.View');
-Rhino.require('alt.delight.Results');
+Alt.require('alt.util.ScriptableWrapper');
+Alt.require('alt.delight.Row');
+Alt.require('alt.delight.View');
+Alt.require('alt.delight.Results');
 
 
 /**

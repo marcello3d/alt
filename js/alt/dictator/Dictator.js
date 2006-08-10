@@ -1,5 +1,5 @@
 
-Rhino.require('alt.dictator.Path');
+Alt.require('alt.dictator.Path');
 
 // This should not change per Servlet instance so we can make it global
 var mainScript = Servlet.config.getInitParameter('dictator.index');
@@ -46,7 +46,7 @@ Dictator.prototype.handle = function(request, response, scope) {
  * 
  * By default, this is set to alt.dictator.ExceptionPage
  * 
- * @param {String}   script  the name of the script as used by Rhino.require()
+ * @param {String}   script  the name of the script as used by Alt.require()
  */
 Dictator.prototype.error = function(script) {
 	this.errorScript = script;
@@ -59,7 +59,7 @@ Dictator.prototype.error = function(script) {
  *  affects all pages recursively, and path('',script) will only act on the 
  *  current path. 
  * 
- * @param {String}   script  the name of the script as used by Rhino.require()
+ * @param {String}   script  the name of the script as used by Alt.require()
  */
 Dictator.prototype.index = function(script, recordPaths) {
 	this.indexScript = script;
@@ -89,7 +89,7 @@ Dictator.prototype.index = function(script, recordPaths) {
  * 
  * 
  * @param {String}   path    the path that loads this script
- * @param {String}   script  the name of the script as used by Rhino.require
+ * @param {String}   script  the name of the script as used by Alt.require
  */
 Dictator.prototype.map = function(scripts) {
 	// Get the next path string
@@ -120,12 +120,12 @@ Dictator.prototype.handleScript = function(script) {
 		this.recordedPaths = null;
 		
 		// Evaluate script
-		Rhino.evaluate(script, this.scope);
+		Alt.evaluate(script, this.scope);
 		
 		// Was anything generated?
 		if (!this.handled && this.recordedPaths != null) {
 			if (this.path.next == '') {
-				Rhino.evaluate(this.indexScript, this.scope);
+				Alt.evaluate(this.indexScript, this.scope);
 				this.setHandled();
 			}
 		} else
@@ -139,12 +139,12 @@ Dictator.prototype.handleScript = function(script) {
  * Filter evaluates a particular script.  Unlike map, this method does not
  *  take a path variable nor does it prevent other filters or maps from being
  *  evaluated.
- * @param {String} script  the name of the script as used by Rhino.require
+ * @param {String} script  the name of the script as used by Alt.require
  */
 Dictator.prototype.filter = function(script) {
 	try {
 		// Evaluate the script (do not set as handled)
-		Rhino.evaluate(script, this.scope);
+		Alt.evaluate(script, this.scope);
 	} catch (ex) {
 		this.handleException(ex);
 	}
@@ -162,12 +162,12 @@ Dictator.prototype.handleException = function(ex) {
 	
 	// Evaluate the error script
 	try {
-		Rhino.evaluate(this.errorScript, exScope);
+		Alt.evaluate(this.errorScript, exScope);
 	} catch (ex2) {
 		// Error in error script, try fail-safe
 		exScope.nestedException = ex2;
 		try {
-			Rhino.evaluate('alt.dictator.ExceptionPageError', exScope);
+			Alt.evaluate('alt.dictator.ExceptionPageError', exScope);
 		} catch (ex3) {
 			throw [ex,ex2,ex3];
 		}

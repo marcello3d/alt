@@ -1,5 +1,5 @@
 
-Rhino.require('alt.util.inspector.Inspector', true);
+Alt.require('alt.util.inspector.Inspector', true);
 
 /**
  * Creates XHTML of entire inspection

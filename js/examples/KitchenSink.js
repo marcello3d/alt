@@ -4,8 +4,8 @@
 
 
 
-Rhino.require('alt.resource.Loader');
-Rhino.require('alt.resource.String');
+Alt.require('alt.resource.Loader');
+Alt.require('alt.resource.String');
 var res = alt.resource.Loader.get("/Main.xml");
 
 	
@@ -16,10 +16,10 @@ response.status = response.SC_OK;
 
 var o = response.writer;
 
-Rhino.require('alt.squeal.SQLSchema');
-Rhino.require('alt.squeal.sql.SQL');
-Rhino.require('alt.squeal.sql.Synchronize');
-Rhino.require('alt.squeal.toHTML');
+Alt.require('alt.squeal.SQLSchema');
+Alt.require('alt.squeal.sql.SQL');
+Alt.require('alt.squeal.sql.Synchronize');
+Alt.require('alt.squeal.toHTML');
 
 
 //var xml = 
@@ -30,7 +30,7 @@ var sql = new alt.squeal.SQLSchema();
 
 sql.add(xml);
 
-Rhino.require('alt.delight.Delight');
+Alt.require('alt.delight.Delight');
 
 java.lang.Class.forName("com.mysql.jdbc.Driver");
 var db = java.sql.DriverManager.getConnection("jdbc:mysql://localhost/", "root", "");

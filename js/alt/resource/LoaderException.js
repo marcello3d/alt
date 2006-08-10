@@ -1,4 +1,4 @@
-Rhino.require("alt.Exception", true);
+Alt.require("alt.Exception", true);
 
 function LoaderException(msg) {
 	alt.Exception.call(this,msg);

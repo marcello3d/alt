@@ -1,5 +1,5 @@
 
-Rhino.require("alt.onion.Exception");
+Alt.require("alt.onion.Exception");
 
 /**
  * Constructs a new Onion ML object.
@@ -38,7 +38,7 @@ Onion.prototype.getXML = function (tagName, contents) {
     this.getTag(tagName).handle(this, contents);
 }
 Onion.prototype.handle = function (tag, contents) {
-    Rhino.log("handle("+tag+","+contents+")");
+    Alt.log("handle("+tag+","+contents+")");
     var kind = tag.nodeKind();
     var ns = tag.namespace();
     switch (kind) {

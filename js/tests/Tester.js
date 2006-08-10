@@ -1,10 +1,10 @@
 
-Rhino.require("tests.TestCore");
+Alt.require("tests.TestCore");
 
 var Tester = {
 	test: function(scope, scripts, logNeutral, logSuccess, logFail) {
 		if (logNeutral==null)
-			logNeutral = Rhino.log;
+			logNeutral = Alt.log;
 		if (logSuccess==null)
 			logSuccess = logNeutral;
 		if (logFail == null)
@@ -13,7 +13,7 @@ var Tester = {
 		var failures = 0;
 		for (var x in scripts) {
 			scope.tc = new TestCore(scripts[x], scope, logNeutral, logSuccess, logFail);
-			Rhino.evaluate(scripts[x], scope);
+			Alt.evaluate(scripts[x], scope);
 			scope.tc.end();
 			tests += scope.tc.tests;
 			failures += scope.tc.failures;

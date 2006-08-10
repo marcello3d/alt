@@ -1,6 +1,6 @@
 
-Rhino.require('tests.moduletest.Func');
-Rhino.require('tests.moduletest.test2.*');
+Alt.require('tests.moduletest.Func');
+Alt.require('tests.moduletest.test2.*');
 
 var local = this;
 function foo(local) {

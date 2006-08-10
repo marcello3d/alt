@@ -1,5 +1,5 @@
 
-Rhino.require("tests.TestCore");
+Alt.require("tests.TestCore");
 
 startTest("ScriptableWrapper");
 
@@ -7,7 +7,7 @@ startTest("ScriptableWrapper");
 
 var Inspector = Packages.cello.alt.servlet.jsdoc.Inspector;
 
-var script = Rhino.require("alt.Exception");
+var script = Alt.require("alt.Exception");
 var i = new Inspector(script);
 
 endTest("ScriptableWrapper");

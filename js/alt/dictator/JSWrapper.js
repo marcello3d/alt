@@ -4,7 +4,7 @@
 
 var url = ""+request.requestURI.substring(1).replace('/','.').replace('.js','');
 try {
-	Rhino.evaluate(url);
+	Alt.evaluate(url);
 	writeln("success?");
 } catch (ex) {
 	writeln("failure?" + ex);

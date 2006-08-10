@@ -1,4 +1,4 @@
-Rhino.require('alt.main.Requires');
+Alt.require('alt.main.Requires');
 
 var Dictator	= alt.dictator.Dictator;
 var SQLSchema	= alt.squeal.SQLSchema;

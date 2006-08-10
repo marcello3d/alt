@@ -151,7 +151,7 @@ Row.prototype.validate = function() {
  * @throws SetException if there was an error setting a value
  */
 Row.prototype.set = function(name, value) {
-	Rhino.log(this+".set("+name+","+value+")");
+	Alt.log(this+".set("+name+","+value+")");
 	if (arguments.length == 1) {
 		var a = arguments[0];
 		if (a instanceof Row) {
@@ -197,7 +197,7 @@ Row.prototype.set = function(name, value) {
  * @throws GetException if the field could not be retrieved
  */
 Row.prototype.get = function(name) {
-	Rhino.log(this+".get("+name+")");
+	Alt.log(this+".get("+name+")");
 	if (!this._[name]) {
 		if (this.delightTable.fields[name]) {
 			// TODO: Retrieve data from the database immediately?

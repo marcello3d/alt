@@ -1,6 +1,6 @@
 
-Rhino.require('alt.resource.Resource', true);
-Rhino.require('alt.resource.String');
+Alt.require('alt.resource.Resource', true);
+Alt.require('alt.resource.String');
 
 /**
  * Constructs a new XMLResource from a given resource object

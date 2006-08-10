@@ -1,5 +1,5 @@
-Rhino.require('alt.util.Inspector');
-Rhino.require('alt.resource.XML');
+Alt.require('alt.util.Inspector');
+Alt.require('alt.resource.XML');
 
 var xml = Loader.load('manage.xml');
 

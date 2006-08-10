@@ -1,5 +1,5 @@
 
-Rhino.require("alt.resource.XML");
+Alt.require("alt.resource.XML");
 
 var xml = Loader.load('OnionML.onion.xml');
 

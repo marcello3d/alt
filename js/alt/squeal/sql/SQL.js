@@ -5,9 +5,9 @@
  * These are required by cello.SQLSchema.sync and Delight.
  */
 
-Rhino.require('alt.squeal.SQLSchema', true);
-Rhino.require('alt.squeal.Table', true);
-Rhino.require('alt.squeal.sql.Exception');
+Alt.require('alt.squeal.SQLSchema', true);
+Alt.require('alt.squeal.Table', true);
+Alt.require('alt.squeal.sql.Exception');
 	
 /**
  * Returns the fully qualified SQL name for this table

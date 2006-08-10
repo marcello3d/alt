@@ -1,5 +1,5 @@
 
-Rhino.require('alt.squeal.Link', true);
+Alt.require('alt.squeal.Link', true);
 
 /**
  * Constructor for ID object.

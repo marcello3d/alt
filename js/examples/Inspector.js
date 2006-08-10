@@ -1,6 +1,6 @@
-Rhino.require('alt.util.inspector.Inspector');
-Rhino.require('alt.util.inspector.InspectorHTML');
-Rhino.require('alt.resource.XML');
+Alt.require('alt.util.inspector.Inspector');
+Alt.require('alt.util.inspector.InspectorHTML');
+Alt.require('alt.resource.XML');
 
 default xml namespace = 'http://www.w3.org/1999/xhtml';
 var xml = Loader.load('Inspector.xml');

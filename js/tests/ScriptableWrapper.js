@@ -1,4 +1,4 @@
-Rhino.require("alt.util.ScriptableWrapper");
+Alt.require("alt.util.ScriptableWrapper");
 
 var output = "";
 

@@ -12,13 +12,13 @@
 
 function Path(request) {
 	/*
-	Rhino.log("request.pathInfo = "+request.pathInfo);
-	Rhino.log("request.pathTranslated = "+request.pathTranslated);
-	Rhino.log("request.contextPath = "+request.contextPath);
-	Rhino.log("request.servletPath = "+request.servletPath);
-	Rhino.log("request.queryString = "+request.queryString);
-	Rhino.log("request.requestURI = "+request.requestURI);
-	Rhino.log("request.requestURL = "+request.requestURL);
+	Alt.log("request.pathInfo = "+request.pathInfo);
+	Alt.log("request.pathTranslated = "+request.pathTranslated);
+	Alt.log("request.contextPath = "+request.contextPath);
+	Alt.log("request.servletPath = "+request.servletPath);
+	Alt.log("request.queryString = "+request.queryString);
+	Alt.log("request.requestURI = "+request.requestURI);
+	Alt.log("request.requestURL = "+request.requestURL);
 	*/
 	this.uri = request.requestURI;
 	this.remaining = request.pathInfo || request.servletPath || this.uri;

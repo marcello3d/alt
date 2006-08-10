@@ -1,6 +1,6 @@
 
 
-Rhino.require('alt.Exception');
+Alt.require('alt.Exception');
 
 /**
  * Constructs a new delight exception

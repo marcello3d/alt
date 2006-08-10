@@ -1,5 +1,5 @@
 
-Rhino.require('alt.resource.Loader', true);
+Alt.require('alt.resource.Loader', true);
 
 function Image(resource) {
 	return Packages.javax.imageio.ImageIO.read(resource.stream);

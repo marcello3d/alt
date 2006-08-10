@@ -1,7 +1,7 @@
 
-Rhino.require('alt.squeal.Field', true);
-Rhino.require('alt.squeal.Exception');
-Rhino.require('alt.squeal.Table');
+Alt.require('alt.squeal.Field', true);
+Alt.require('alt.squeal.Exception');
+Alt.require('alt.squeal.Table');
 
 
 /**

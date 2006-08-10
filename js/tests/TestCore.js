@@ -18,7 +18,7 @@ TestCore.prototype.split = function(message) {
 TestCore.prototype.assert = function(code) {
 	this.tests ++;
 	try {
-		var result = Rhino.eval(code,this.scope);
+		var result = Alt.eval(code,this.scope);
 		if (result) {
 			this.logSuccess("O "+this.name+": Test "+this.tests+" successful : "+code);
 			return true;
@@ -34,7 +34,7 @@ TestCore.prototype.assert = function(code) {
 TestCore.prototype.assertRun = function(code) {
 	this.tests ++;
 	try {
-		var result = Rhino.eval(code,this.scope);
+		var result = Alt.eval(code,this.scope);
 		this.logSuccess("O "+this.name+": Test "+this.tests+" successful : "+code);
 		return true;
 	} catch (ex) {
@@ -46,7 +46,7 @@ TestCore.prototype.assertRun = function(code) {
 TestCore.prototype.assertEqual = function(code, correctResult) {
 	this.tests ++;
 	try {
-		var result = Rhino.eval(code,this.scope);
+		var result = Alt.eval(code,this.scope);
 		if (result==correctResult) {
 			this.logSuccess("O "+this.name+": Test "+this.tests+" successful : "+code+" = "+correctResult);
 			return true;
@@ -62,7 +62,7 @@ TestCore.prototype.assertEqual = function(code, correctResult) {
 TestCore.prototype.assertNotEqual = function(code, incorrectResult) {
 	this.tests ++;
 	try {
-		var result = Rhino.eval(code,this.scope);
+		var result = Alt.eval(code,this.scope);
 		if (result!=incorrectResult) {
 			this.logSuccess("O "+this.name+": Test "+this.tests+" successful : "+code+" = "+result+" (should not be "+incorrectResult+")");
 			return true;

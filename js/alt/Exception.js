@@ -15,7 +15,7 @@ function Exception(msg) {
 	this.name = "alt.Exception";
 	// FIXME: Hack to get a decent stack trace
 	try {
-	    Rhino.throwMessage(msg);
+	    Alt.throwMessage(msg);
 	} catch (ex) {
 	    for (var x in ex)
 	       this[x] = ex[x];

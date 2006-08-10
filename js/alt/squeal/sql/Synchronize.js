@@ -9,14 +9,14 @@
  * updating the database), you do not need this module.
  */
 
-Rhino.require('alt.squeal.SQLSchema', true);
-Rhino.require('alt.squeal.Database', true);
-Rhino.require('alt.squeal.Table', true);
-Rhino.require('alt.squeal.ID', true);
-Rhino.require('alt.squeal.Link', true);
-Rhino.require('alt.squeal.Field', true);
-Rhino.require('alt.squeal.Type', true);
-Rhino.require('alt.squeal.sql.SQL');
+Alt.require('alt.squeal.SQLSchema', true);
+Alt.require('alt.squeal.Database', true);
+Alt.require('alt.squeal.Table', true);
+Alt.require('alt.squeal.ID', true);
+Alt.require('alt.squeal.Link', true);
+Alt.require('alt.squeal.Field', true);
+Alt.require('alt.squeal.Type', true);
+Alt.require('alt.squeal.sql.SQL');
 	
 /**
  * Synchronizes a cello.SQLSchema structure with an actual database.
@@ -146,7 +146,8 @@ alt.squeal.Table.prototype.synchronize = function(conn, log) {
 			
 			// Get definition
 			definition = field.getSQLDefinition();
-			definition += (field.index=='primary'?' PRIMARY KEY':'')+' COMMENT "'+definition+'"';
+			definition += (field.index=='primary'?' PRIMARY KEY':'')+
+			                     ' COMMENT "'+definition+'"';
 			q += "   `" + field.name + '` ' + definition;
 			// Add index
 			if (field.index && field.index!='primary')

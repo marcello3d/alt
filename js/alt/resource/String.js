@@ -1,5 +1,5 @@
 
-Rhino.require('alt.resource.Resource', true);
+Alt.require('alt.resource.Resource', true);
 
 
 function StringResource(resource) {

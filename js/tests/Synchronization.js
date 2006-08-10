@@ -1,7 +1,7 @@
 // Create global variables, if they don't exist
 if (!global.syncTest) global.syncTest = 0;
 
-Rhino.synchronize(global, function() { 
+Alt.synchronize(global, function() { 
 	// Copy current value
 	var value = global.syncTest;
 	tc.assertEqual('global.syncTest',value);

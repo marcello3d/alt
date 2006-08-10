@@ -1,5 +1,5 @@
 
-Rhino.require('alt.resource.LoaderException');
+Alt.require('alt.resource.LoaderException');
 
 
 /**
@@ -10,8 +10,8 @@ var Loader = {};
 Loader.resources = {};
 
 /**
- * Gets a resource using Rhino.getResource and adds a ResourceWrapper cache.
- * @param {String}  resourceName  name of resource as used by Rhino.getResource
+ * Gets a resource using Alt.getResource and adds a ResourceWrapper cache.
+ * @param {String}  resourceName  name of resource as used by Alt.getResource
  * @return {Object}  the constructed internal resource object
  * @private
  */
@@ -19,7 +19,7 @@ Loader.getResource = function(resourceName) {
 	// Check if we've got the resource before
 	if (!Loader.resources[resourceName]) {
 		Loader.resources[resourceName] = {
-			resource: Rhino.getResource(resourceName),
+			resource: Alt.getResource(resourceName),
 			cache: new java.util.HashMap()
 		};
 	}

@@ -1,6 +1,6 @@
 
-Rhino.require('alt.squeal.Node', true);
-Rhino.require('alt.squeal.Database');
+Alt.require('alt.squeal.Node', true);
+Alt.require('alt.squeal.Database');
 
 /**
  * Constructor for Table object.

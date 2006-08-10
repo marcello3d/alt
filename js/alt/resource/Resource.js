@@ -1,5 +1,5 @@
 
-Rhino.require('alt.resource.Loader', true);
+Alt.require('alt.resource.Loader', true);
 
 /**
  * Constructs a new Resource object

@@ -1,5 +1,5 @@
 
-Rhino.require('alt.squeal.Exception', true);
+Alt.require('alt.squeal.Exception', true);
 
 /**
  * Constructs a new SQLException

@@ -3,7 +3,7 @@ var commons = Packages.org.apache.commons;
 var DiskFileItemFactory = commons.fileupload.disk.DiskFileItemFactory;
 var ServletFileUpload = commons.fileupload.servlet.ServletFileUpload;
 
-Rhino.require('alt.resource.XML');
+Alt.require('alt.resource.XML');
 
 var xml = alt.resource.Loader.load('Upload.xml');
 

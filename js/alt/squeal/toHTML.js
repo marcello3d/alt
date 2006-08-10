@@ -8,10 +8,10 @@
  * It is not needed to use SQL Schema.
  */
 
-Rhino.require('alt.squeal.SQLSchema', true);
-Rhino.require('alt.squeal.Node', true);
-Rhino.require('alt.squeal.Database', true);
-Rhino.require('alt.squeal.Table', true);
+Alt.require('alt.squeal.SQLSchema', true);
+Alt.require('alt.squeal.Node', true);
+Alt.require('alt.squeal.Database', true);
+Alt.require('alt.squeal.Table', true);
 
 /**
  * Generates HTML display of the current schema

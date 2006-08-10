@@ -6,15 +6,15 @@
  * various SQueaL modules.
  */
  
-Rhino.require('alt.squeal.Exception');
-Rhino.require('alt.squeal.Node');
-Rhino.require('alt.squeal.Database');
-Rhino.require('alt.squeal.Table');
-Rhino.require('alt.squeal.Type');
-Rhino.require('alt.squeal.View');
-Rhino.require('alt.squeal.Link');
-Rhino.require('alt.squeal.Field');
-Rhino.require('alt.squeal.ID');
+Alt.require('alt.squeal.Exception');
+Alt.require('alt.squeal.Node');
+Alt.require('alt.squeal.Database');
+Alt.require('alt.squeal.Table');
+Alt.require('alt.squeal.Type');
+Alt.require('alt.squeal.View');
+Alt.require('alt.squeal.Link');
+Alt.require('alt.squeal.Field');
+Alt.require('alt.squeal.ID');
 
 /**
  * Creates a new SQueaL object based on a XML source.
@@ -141,7 +141,7 @@ SQLSchema.prototype.add = function(xml) {
 	}
 	
 	/**
-	 * Handles a cello.SimpleXML table tag, adding it and its children to the schema.
+	 * Handles a XML table tag, adding it and its children to the schema.
 	 * @param {Node}	parent	The node this table belongs to.
 	 * @param {XML}		xml		The XML node for the table.
 	 * @throws Exception if there was an error in the table
@@ -186,7 +186,7 @@ SQLSchema.prototype.add = function(xml) {
 		// Tables with the parent attribute allow remote linking 
 		// to other tables. (This is kinda weird.)
 		if (xml.@parent.length > 0) {
-			Rhino.log("xml.@parent = ["+xml.@parent+"]")
+			Alt.log("xml.@parent = ["+xml.@parent+"]")
 			// This may change in the future to calculate the field name
 			// with better respect to namespace.
 			addLink(table,

@@ -1,4 +1,4 @@
 
 
-tc.assert('Rhino.getRequestScope()');
-tc.assertNotEqual('Rhino.getRequestScope()',global);
+tc.assert('Alt.getRequestScope()');
+tc.assertNotEqual('Alt.getRequestScope()',global);

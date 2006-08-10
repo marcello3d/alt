@@ -68,8 +68,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         // Two properties of global: a self pointer
         defineProperty("global", this, AltServlet.PROTECTED);
         //  and a "static" class for managing Rhino
-        RhinoClass rhinoClass = new RhinoClass(server);
-        defineProperty("Rhino", rhinoClass, AltServlet.PROTECTED);
+        AltClass rhinoClass = new AltClass(server);
+        defineProperty("Alt", rhinoClass, AltServlet.PROTECTED);
         
         // Static class for managing servlet
         ServletClass servletClass = new ServletClass(server);
@@ -152,7 +152,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         }
         
     }
-    private static class RhinoClass extends ScriptableObject {
+    private static class AltClass extends ScriptableObject {
         /** For Eclipse warning */
         private static final long serialVersionUID = 4816919208983818311L;
         private AltServlet server;
@@ -161,7 +161,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
          * Constructs a new RhinoClass object
          * @param server
          */
-        private RhinoClass(AltServlet server) {
+        private AltClass(AltServlet server) {
             this.server = server;
             defineFunctionProperties( 
                     new String[] {  "require",
@@ -174,7 +174,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                                     "throwMessage",
                                     //"debug",
                                     "log"},
-                                    RhinoClass.class,
+                                    AltClass.class,
                                     AltServlet.PROTECTED);
                                     
         }

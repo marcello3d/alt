@@ -1,5 +1,5 @@
 
-Rhino.require('alt.squeal.Node', true);
+Alt.require('alt.squeal.Node', true);
 
 /**
  * Constructor for Database object.

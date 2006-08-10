@@ -1,7 +1,7 @@
 
-Rhino.require('alt.squeal.sql.Synchronize');
-Rhino.require('alt.squeal.toHTML');
-Rhino.require('alt.resource.XML');
+Alt.require('alt.squeal.sql.Synchronize');
+Alt.require('alt.squeal.toHTML');
+Alt.require('alt.resource.XML');
 
 XML.ignoreWhitespace = true;
 var xml = alt.resource.Loader.get('sample-squeal.xml');
@@ -14,7 +14,7 @@ var db = java.sql.DriverManager.getConnection("jdbc:hsqldb:file:db/testdb");
 var list = <ul/>;
 
 function log(message) {
-	Rhino.log(message);
+	Alt.log(message);
 	list.appendChild(<li>{message}</li>);
 }
 

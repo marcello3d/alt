@@ -1,5 +1,5 @@
 
-Rhino.require('alt.Exception', true);
+Alt.require('alt.Exception', true);
 
 /**
  * Constructs a new Onion exception

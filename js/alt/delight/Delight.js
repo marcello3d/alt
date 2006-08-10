@@ -4,13 +4,13 @@
  * {@link cello.Delight} can be constructed using a {@link cello.SQLSchema} object.
  */
 
-Rhino.require('alt.squeal.SQLSchema');
-Rhino.require('alt.squeal.sql.SQL');
+Alt.require('alt.squeal.SQLSchema');
+Alt.require('alt.squeal.sql.SQL');
 
-Rhino.require('alt.delight.Exceptions');
+Alt.require('alt.delight.Exceptions');
 
-Rhino.require('alt.delight.Database');
-Rhino.require('alt.delight.Table');
+Alt.require('alt.delight.Database');
+Alt.require('alt.delight.Table');
 	
 /**
  * Creates a new cello.Delight object from an existing cello.SQLSchema object.

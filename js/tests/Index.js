@@ -1,6 +1,6 @@
 
 
-Rhino.require('tests.Tester');
+Alt.require('tests.Tester');
 
 
 response.contentType = "text/html; charset=UTF-8";
@@ -11,7 +11,7 @@ var o = response.writer;
 o.print('<html><body>');
 
 
-Rhino.require('alt.html.StringUtils');
+Alt.require('alt.html.StringUtils');
 
 function writeln(s) {
 	response.writer.println(alt.html.StringUtils.escapeHTML(s)+'<br/>');
