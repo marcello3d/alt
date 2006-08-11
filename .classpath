@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry path="src" kind="src"/>
+	<classpathentry path="js" kind="src"/>
 	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
 	<classpathentry sourcepath="V:/java/jetty-6.0.0rc0/modules/jetty/src/main/java" path="jetty/lib/jetty-6.0.0rc0.jar" kind="lib"/>
 	<classpathentry path="jetty/lib/jetty-util-6.0.0rc0.jar" kind="lib"/>
