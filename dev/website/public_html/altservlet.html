@@ -14,19 +14,16 @@
 <p><a href=""><img name="logo" src="http://images.cellosoft.com/marcello/projects/alt/logo.png" width="481" height="119" border="0" id="logo" alt="cellosoft Alt : the Alternative web framework" /></a> </p>
 <table border="0" align="center" cellpadding="10" cellspacing="0">
   <tr>
-    <td width="440" class="main"><p><em><strong>Note: This page is outdated and kept for legacy purposes. RhinoServlet has been deprecated in this form and renamed to AltServlet. </strong></em></p>
-      <h1>RhinoServlet</h1>
-      <p>RhinoServlet is a Java servlet that uses Mozilla's <a href="http://www.mozilla.org/rhino/">Rhino library</a> to create a platform for developing JavaScript-based web applications.</p>
-      <p>It implements a solid module system that parallel's Java's own package system,
+    <td width="440" class="main"><h1>AltServlet</h1>
+    <p>AltServlet is a Java servlet that uses Mozilla's <a href="http://www.mozilla.org/rhino/">Rhino library</a> to create a platform for developing JavaScript-based web applications.</p>
+      <p>It implements a solid module system that parallels Java's own package system,
         making it easy to write clean modular JavaScript code.</p>
       <p>The primary purpose is a basis for the the Alt Framework, but it is not limited
         to this.</p>
-      <h2>Download</h2>
-      <p>The latest distribution of RhinoServlet can be downloaded in the <a href="download.html">download section</a>. </p>
       <h2>Rationale</h2>
-      <p>My original intention with the Alt Framework was to build on top of <a href="http://www.helma.org/">Helma Object Publisher</a>, a similar JavaScript web framework based on Java and Rhino, but after developing the initial releases of the SQueaL and OnionML modules, I realized it was insufficient.</p>
+      <p>My original intention with the Alt Framework was to build on top of <a href="http://www.helma.org/">Helma Object Publisher</a>, a similar JavaScript web framework based on Java and Rhino, but I soon found it too limiting. </p>
       <p>As a challenge, I decided to see how difficult it would be to write a basic Java Servlet that could serve JavaScript files. After two days of coding, I had functional prototype (released as RhinoServlet v0.01 alpha).</p>
-      <p>I designed and implemented a  module system for JavaScript that I felt was necessary for any serious application development. </p>
+      <p>After fine tuning the module system for JavaScript, I decided to stick with it. </p>
       <h2>RhinoServlet Components</h2>
       <p>The RhinoServlet  package consists of three different components, the  RhinoServlet itself, the jetty-based HTTPServer, and Launcher.</p>
       <h3>cello.alt.servlet.RhinoServlet </h3>
