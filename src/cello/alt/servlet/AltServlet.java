@@ -67,7 +67,7 @@ public class AltServlet extends HttpServlet {
     private GlobalScope globalScope;
     
     /** Version string */
-    public static final String NAME_VERSION = "AltServlet v0.04 alpha";
+    public static final String NAME_VERSION = "AltServlet v0.05 alpha";
     
     private String mainScript = "alt.main.Main";
     
