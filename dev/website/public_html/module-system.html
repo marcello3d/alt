@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/layout.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>Cellosoft Alt Framework : the Alternative web framework</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="style.css" rel="stylesheet" type="text/css" />
+<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+</head>
+<body bgcolor="#ffffff">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><a href=""><img src="http://images.cellosoft.com/marcello/projects/alt/logo.png" width="481" height="119" border="0" id="logo" alt="cellosoft Alt : the Alternative web framework" /></a> </p>
+<table width="780" border="0" align="center" cellpadding="10" cellspacing="0">
+  <tr>
+    <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
+      <h2>AltServlet Module System </h2>
+      <p>The largest problem occured in how JavaScript files are loaded. By nature, JavaScript is not file based. It was originally intended to be loaded linearly in a web page, and little thought was given to how modules interact.</p>
+      <p>JavaScript does not have much in the way of compile-time type checking. It does not care if a function you call actually exists until you try to call it. You can pretty much load things in any order until you are ready to use them. The only place where this gets complicated is when you try to inherit classes from one another. The class you try to inherit from must be loaded first.</p>
+      <p>With those things in mind, I set out to design a module system for JavaScript that was simple to use but made it easy and intuitive to package code. </p>
+      <h3>Module System Proposal : Java Packages </h3>
+      <p>My initial thoughts were to create a system like Java's import/package system. </p>
+      <p>Instead of .java files, you have .js files. Instead of packages, you have modules. Each module has to be in a folder, much like packages. So the 'alt.foo' module would be a path alt/foo/, and any .js files in that folder would be <em>scripts</em> (as opposed to classes) of that module.</p>
+      <p>Each module is loaded in its module scope, so if you define a function Bar in the file alt/foo/Bar.js, it needs to be accessed by calling alt.foo.Bar from other scopes. </p>
+      <p>This makes it painless to define JavaScript classes and package them in modules, you simply define them as top-level classes and put them in a module folder.</p>
+      <h3>Usage </h3>
+      <p>Using the module system is almost identical to Java's import.</p>
+      <p> Instead of modifying Rhino to allow a custom JavaScript syntax, I decided to stick with a compatible method:</p>
+      <pre>Alt.require(&quot;alt.foo.Bar&quot;);</pre>
+      <p>This code states that the script Bar from the alt.foo module must be loaded at this point. This can be read as, the current script depends on alt.foo.Bar. </p>
+      <p> AltServlet will then check if the script has been loaded and up to date. If not, it will load, compile, and execute the script in its module scope. If it fails to load, compile, or execute, an exception will be thrown. </p>
+      <p>If the Bar script defined a class named Bar (this is the recommended convention), then you can access it through its module path (this is where 
+AltServlet diverges from Java):</p>
+      <pre>var bar = new alt.foo.Bar();
+      </pre>
+      <p>Pretty simple? As with any JavaScript, you can easily make class aliases so you do not need to write out the whole module path each time you instantiate a class:</p>
+      <pre>var Bar = alt.foo.Bar;</pre>
+      <h3>Advanced Usage: Wildcard Loading </h3>
+      <p>There are a few extra features of the module system that can be used.</p>
+      <p>In addition to including individual scripts, you can load all of the scripts in a particular module by using the wildcard script name:</p>
+      <pre>
+Alt.require(&quot;alt.foo.*&quot;); </pre>
+      <p>This will attempt to include all scripts in a particular module. Caution should be used when including scripts in this manner, because it does not guarantee a particular script will actually be loaded.</p>
+      <p>Like Java, this will not load scripts from sub-modules. </p>
+      <h3>Advanced Usage: Cascading Dependencies </h3>
+      <p>When extend classes in 
+        JavaScript, the code looks something like this:</p>
+      <pre><span class="comment">// Foo.js </span>
+function Foo() { ... }</pre>
+      <pre><span class="comment">// Bar.js</span>
+Alt.require(&quot;Foo&quot;);
+function Bar() { ... }
+Bar.prototype = new Foo();</pre>
+      <p>As you can see, the Bar.js file constructs a new Foo object to create 
+        its prototype.  If you were then to go and modify Foo to add a function:</p>
+      <pre><span class="comment">// Foo.js </span>
+function Foo() { ... }
+Foo.prototype.sbu = function() { ... }</pre>
+      <p> AltServlet would recognize that Foo was modified and reload it, but Bar would still be pointing at the old Foo, the Foo that is missing the sbu() function.</p>
+      <p>To solve this issue, one would generally need to restart the server, but 
+AltServlet provides &quot;cascading dependencies&quot; to solve the issue. </p>
+      <pre><span class="comment">// Bar.js</span>
+...
+Alt.require(&quot;Foo&quot;, true);
+...</pre>
+      <p>The second (optional) argument of the 
+Alt.require function specifies whether a file should be considered a cascading dependency.</p>
+      <p>This tells 
+AltServlet that Bar needs to also be reloaded whenever Foo is reloaded. (If this feature were enabled by default, then every single script would be reloaded every time one script is modified.) </p>
+    <!-- InstanceEndEditable --></td>
+    <td valign="top"><ul class="menu">
+        <li><a href="/">About</a></li>
+      <li><a href="download.html">Download</a></li>
+      <li><a href="documentation.html">Documentation</a></li>
+      <li><a href="contribute.html">Contribute</a><br />
+        <a href="license.html">License</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul></td>
+  </tr>
+</table>
+<p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
+</body>
+<!-- InstanceEnd --></html>
