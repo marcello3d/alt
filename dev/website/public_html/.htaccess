@@ -1,1 +1,2 @@
 ErrorDocument 404 /projects/alt/sitemap.html
+AddCharset UTF-8 .html
