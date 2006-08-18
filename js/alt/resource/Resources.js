@@ -1,13 +1,13 @@
 
-Alt.require('alt.resource.LoaderException');
+Alt.require('alt.resource.ResourceException');
 
 
 /**
  * Static class
  */
-var Loader = {};
+var Resources = {};
 
-Loader.resources = {};
+Resources.resources = {};
 
 /**
  * Gets a resource using Alt.getResource and adds a ResourceWrapper cache.
@@ -15,29 +15,29 @@ Loader.resources = {};
  * @return {Object}  the constructed internal resource object
  * @private
  */
-Loader.getResource = function(resourceName) {
+Resources.getResource = function(resourceName) {
 	// Check if we've got the resource before
-	if (!Loader.resources[resourceName]) {
-		Loader.resources[resourceName] = {
+	if (!Resources.resources[resourceName]) {
+		Resources.resources[resourceName] = {
 			resource: Alt.getResource(resourceName),
 			cache: new java.util.HashMap()
 		};
 	}
 		
-	return Loader.resources[resourceName];
+	return Resources.resources[resourceName];
 }
 
 
-Loader.types = {};
+Resources.types = {};
 
 /**
  * Defines an extension type -> constructor map
  * @param {Function}  constructor	constructor to call with this type
  * @param {String}    type			extension type name
  */
-Loader.defineType = function(constructor, type) {
+Resources.defineType = function(constructor, type) {
 	for (var i=1; i<arguments.length; i++)
-		Loader.types[arguments[i]] = constructor;
+		Resources.types[arguments[i]] = constructor;
 }
 /**
  * Gets a loader from an extension type name
@@ -45,10 +45,10 @@ Loader.defineType = function(constructor, type) {
  * @return {Function}  the constructor associated with an extension type
  * @private
  */
-Loader.getConstructor = function(type) {
-	var constructor = Loader.types[type];
+Resources.getConstructor = function(type) {
+	var constructor = Resources.types[type];
 	if (constructor==null)
-		throw new LoaderException("Unknown extension type "+type);
+		throw new ResourceException("Unknown extension type "+type);
 	return constructor;
 }
 
@@ -57,7 +57,7 @@ Loader.getConstructor = function(type) {
  * @param {String} resourceName
  * @private
  */
-Loader.getExtension = function(resourceName) {
+Resources.getExtension = function(resourceName) {
 	return /\.([a-z0-9]+)$/i.exec(resourceName)[1];
 }
 
@@ -68,8 +68,8 @@ Loader.getExtension = function(resourceName) {
  * @param {Function} constructor	ResourceWrapper constructor to load resource
  * @return {Object}  the return value from the ResourceWrapper
  */
-Loader.get = function(resourceName, constructor) {
-	return Loader.loadResource(resourceName, constructor, true).get();
+Resources.get = function(resourceName, constructor) {
+	return Resources.loadResource(resourceName, constructor, true).get();
 }
 /**
  * Gets a copy of the resource from the cache
@@ -77,8 +77,8 @@ Loader.get = function(resourceName, constructor) {
  * @param {Function} constructor	ResourceWrapper constructor to load resource
  * @return {Object}  the return value from the ResourceWrapper
  */
-Loader.load = function(resourceName, constructor) {
-	return Loader.loadResource(resourceName, constructor, true).getCopy();
+Resources.load = function(resourceName, constructor) {
+	return Resources.loadResource(resourceName, constructor, true).getCopy();
 }
 
 /**
@@ -89,13 +89,14 @@ Loader.load = function(resourceName, constructor) {
  * @return {Resource}  the loaded resourcewrapper
  * @private
  */
-Loader.loadResource = function(resourceName, constructor, useCache) {
+Resources.loadResource = function(resourceName, constructor, useCache) {
 	// Get default constructor or files of this type, if they exist.
 	if (constructor==null)
-		constructor = Loader.getConstructor(Loader.getExtension(resourceName));
+		constructor = Resources.getConstructor(
+		Resources.getExtension(resourceName));
 	
 	// Get the resource
-	var resource = Loader.getResource(resourceName);
+	var resource = Resources.getResource(resourceName);
 	
 	var newTag = null;
 	if (useCache) {
@@ -110,8 +111,8 @@ Loader.loadResource = function(resourceName, constructor, useCache) {
 			// and version not changed, return it
 			if (newTag.equals(cachedObject.versionTag))
 				return cachedObject.object;
-			// otherwise, check if the cachedObject has an 'updateResource' function
-			// and use it
+			// otherwise, check if the cachedObject has an 'updateResource' 
+			// function and use it
 			if (cachedObject.object.updateResource instanceof Function) {
 				// save new version tag
 				cachedObject.versionTag = newTag;

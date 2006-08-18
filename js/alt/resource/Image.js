@@ -6,4 +6,4 @@ function Image(resource) {
 }
 
 for each (var format in Packages.javax.imageio.ImageIO.readerFormatNames)
-	Loader.defineType(Image, format);
+	Resources.defineType(Image, format);

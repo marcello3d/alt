@@ -1,7 +1,7 @@
 
 Alt.require("alt.resource.XML");
 
-var xml = Loader.load('OnionML.onion.xml');
+var xml = Resources.load('OnionML.onion.xml');
 
 var onion = new Onion(xml);
 

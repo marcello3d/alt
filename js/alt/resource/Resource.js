@@ -1,5 +1,5 @@
 
-Alt.require('alt.resource.Loader', true);
+Alt.require('alt.resource.Resources', true);
 
 /**
  * Constructs a new Resource object

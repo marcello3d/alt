@@ -3,7 +3,7 @@ Alt.require('alt.squeal.toHTML');
 Alt.require('alt.resource.XML');
 
 XML.ignoreWhitespace = false;
-var xml = alt.resource.Loader.get('sample-squeal.xml');
+var xml = Resources.get('sample-squeal.xml');
 
 var sql = new alt.squeal.SQLSchema(xml);
 
@@ -20,7 +20,7 @@ function log(message) {
 
 sql.synchronize(db, log);
 
-var xml = Loader.load("HSQL.xml");
+var xml = Resources.load("HSQL.xml");
 
 xml..p.(@id=="db").appendChild(db);
 xml..p.(@id=="log").appendChild(list);

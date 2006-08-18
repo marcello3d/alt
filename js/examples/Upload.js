@@ -5,7 +5,7 @@ var ServletFileUpload = commons.fileupload.servlet.ServletFileUpload;
 
 Alt.require('alt.resource.XML');
 
-var xml = alt.resource.Loader.load('Upload.xml');
+var xml = Resources.load('Upload.xml');
 
 default xml namespace = 'http://www.w3.org/1999/xhtml';
 

@@ -1,7 +1,7 @@
 Alt.require('alt.resource.XML');
 
 default xml namespace = 'http://www.w3.org/1999/xhtml';
-var xml = Loader.load('Session.xml');
+var xml = Resources.load('Session.xml');
 
 var session = request.session;
 

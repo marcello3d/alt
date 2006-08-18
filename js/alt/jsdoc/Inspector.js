@@ -1,5 +1,5 @@
 
-Alt.require('alt.util.inspector.JSDoc');
+Alt.require('alt.jsdoc.JSDoc');
 
 var JSInspector = Packages.cello.alt.util.Inspector;
 var Decompiler = Packages.org.mozilla.javascript.Decompiler;
@@ -18,7 +18,7 @@ function Inspector(object) {
 /**
  * Inspects the children of this object
  */
-Inspector.prototype.inspectChildren = function() {
+Inspector.prototype.reinspect = function() {
 	this.main.inspectChildren();
 }
 /**
@@ -164,6 +164,8 @@ InspectorObject.prototype.inspectChildren = function(levels, flush) {
  * @return {InspectorNode}  the constructed/cached node object
  */
 InspectorObject.prototype.addChild = function(name, object, hidden) {
+    if (this.children[name])
+        return;
 	var constructor;
 	var node = this.inspector.nodeMap.get(object);
 	if (node != null) {
@@ -287,10 +289,9 @@ InspectorClass.prototype.getSuperClass = function() {
 	if (this.func.prototype) {
 		var c = this.func.prototype.constructor;
 		var p = this.func.prototype.__proto__;
-		for each (var o in this.inspector.nodeMap.values().toArray()) {
-			if (o.prototype==p)
-				return o;
-		}
+		for each (var o in this.inspector.nodeMap.values().toArray()) 
+            if (o instanceof InspectorClass && p===o.func.prototype)    			    
+    			return o;
 		
 		if (c==this.func)
 			return false;

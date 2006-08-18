@@ -1,7 +1,7 @@
 Alt.require('alt.util.Inspector');
 Alt.require('alt.resource.XML');
 
-var xml = Loader.load('manage.xml');
+var xml = Resources.load('manage.xml');
 
 xml..body.h2 += dictator.path.current;
 

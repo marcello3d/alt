@@ -1,32 +1,21 @@
-Alt.require('alt.util.inspector.Inspector');
-Alt.require('alt.util.inspector.InspectorHTML');
+Alt.require('alt.jsdoc.Inspector');
+Alt.require('alt.jsdoc.html.InspectorHTML');
 Alt.require('alt.resource.XML');
 
 default xml namespace = 'http://www.w3.org/1999/xhtml';
-var xml = Loader.load('Inspector.xml');
+var xml = Resources.load('Inspector.xml');
 
 var div = xml.div.(@id=="content");
 
 var Context = Packages.org.mozilla.javascript.Context;
 
-var c = Context.enter();
-
-c.optimizationLevel = -1;
-
 XML.prettyPrinting = false;
 XML.prettyIndent = 1;
 XML.ignoreWhitespace = false;
 XML.ignoreComments = false;
-var inspector = new alt.util.inspector.Inspector(global);
-/*
-for each (var x in ['XML','String','Array','Function','Date',
-		'XMLList','QNode','Namespace',])
-	inspector.main.addChild(x, global[x]);
-*/
+var inspector = new alt.jsdoc.Inspector(global);
 xml..div.(@id=="content").appendChild(inspector.toHTML());
 
+response.contentType = "text/html; charset=UTF-8";
 response.status = response.SC_OK;
-response.contentType = 'text/xml; charset=utf-8'
-response.writer.print(xml.toXMLString());
-
-c.exit();
+response.writer.print(xml);

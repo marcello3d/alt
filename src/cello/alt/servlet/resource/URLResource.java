@@ -54,9 +54,6 @@ public class URLResource implements MutableResource {
         this.loader = loader;
         this.path = path;
         this.url = url;
-        if (url==null) {
-        	System.err.println("path="+path);
-        }
     }
     
     /**

@@ -49,7 +49,6 @@ import cello.alt.servlet.script.DirectoryScriptLoader;
 import cello.alt.servlet.script.JarScriptLoader;
 import cello.alt.servlet.script.JavaScript;
 import cello.alt.servlet.script.MultiScriptLoader;
-import cello.alt.servlet.script.ResourceScriptLoader;
 import cello.alt.servlet.script.ScriptLoader;
 
 /**
@@ -96,16 +95,6 @@ public class AltServlet extends HttpServlet {
     }
     
 
-
-    /*
-     * Initializes the rhino debugger
-     *
-     */
-    /*
-    public void startDebugger() {
-        Main.mainEmbedded(ContextFactory.getGlobal(),this,NAME_VERSION);
-    }*/
-    
     /**
      * Gets an init parameter with a given default.
      * @param name  the name of the parameter
@@ -130,7 +119,7 @@ public class AltServlet extends HttpServlet {
         
         ServletContext context = getServletContext();
 
-        addScriptLoader(new ResourceScriptLoader(loader, "/"));
+        //addScriptLoader(new ResourceScriptLoader(loader, "/"));
         //addScriptLoader(new ContextScriptLoader(loader, context, 
         //		"/WEB-INF/scripts/"));
         
@@ -140,6 +129,7 @@ public class AltServlet extends HttpServlet {
         mainScript = getInitParameter("alt.main", "alt.main.Main");
         optimization = Integer.parseInt(
         		getInitParameter("rhino.optimization","-1"));
+        System.out.println("Rhino optimization: "+optimization);
         timeout = Integer.parseInt(
         		getInitParameter("alt.timeout","10"));
 

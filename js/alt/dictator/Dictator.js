@@ -119,8 +119,8 @@ Dictator.prototype.handleScript = function(script) {
 		// Clear list
 		this.recordedPaths = null;
 		
-		// Evaluate script
-		Alt.evaluate(script, this.scope);
+		// Is file?
+		this.evaluateScript(script);
 		
 		// Was anything generated?
 		if (!this.handled && this.recordedPaths != null) {
@@ -134,6 +134,18 @@ Dictator.prototype.handleScript = function(script) {
 	} catch (ex) {
 		this.handleException(ex);
 	}
+}
+
+Dictator.prototype.evaluateScript = function(script) {
+    if (script.charAt(0)=='/') {
+        // Resource...?
+        var res = Alt.getResource(script);
+        
+	} else { 
+    	// Evaluate script
+    	Alt.evaluate(script, this.scope);
+    }
+    
 }
 /**
  * Filter evaluates a particular script.  Unlike map, this method does not

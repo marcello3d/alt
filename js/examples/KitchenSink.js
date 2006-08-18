@@ -6,7 +6,7 @@
 
 Alt.require('alt.resource.Loader');
 Alt.require('alt.resource.String');
-var res = alt.resource.Loader.get("/Main.xml");
+var res = Resources.get("/Main.xml");
 
 	
 var session = request.session;

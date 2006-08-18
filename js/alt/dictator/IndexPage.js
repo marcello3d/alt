@@ -4,7 +4,7 @@ Alt.require('alt.resource.XML');
 response.contentType = "text/html; charset=UTF-8";
 response.status = response.SC_OK;
 
-var xml = Loader.load("/alt/dictator/IndexPage.xml");
+var xml = Resources.load("/alt/dictator/IndexPage.xml");
 
 var title = "Index for "+dictator.path.current;
 xml..head.title = title;

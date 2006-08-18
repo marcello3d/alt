@@ -172,7 +172,6 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                                     "getRequestScope",
                                     "synchronize",
                                     "throwMessage",
-                                    //"debug",
                                     "log"},
                                     AltClass.class,
                                     AltServlet.PROTECTED);
@@ -184,7 +183,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
          */
         @Override
         public String getClassName() {
-            return "Rhino";
+            return "Alt";
         }
 
         /**
@@ -378,19 +377,11 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 server.addScriptPath(Context.toString(path));
         }
         /**
-         * Starts the Rhino debugger
-         */
-        /*
-        public void debug() {
-            server.startDebugger();
-        }
-        */
-        /**
          * The JavaScript function "log"
          * @param msg
          */
         public void log(Object msg) {
-            System.out.println("Rhino.log: "+Context.toString(msg));
+            System.out.println("Alt.log: "+Context.toString(msg));
         }
         
         /**

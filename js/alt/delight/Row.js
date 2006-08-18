@@ -118,7 +118,9 @@ Row.prototype.update = function() {
  * @type String
  */
 Row.prototype.toString = function() {
-	return "[Row:"+this.delightTable.fullname+"]";
+    if (this.delightTable)
+	   return "[Row:"+this.delightTable.fullname+"]";
+	return "[Row: unlinked]";
 }
 /**
  * Removes the row from the table.

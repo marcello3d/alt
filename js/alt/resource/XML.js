@@ -6,7 +6,7 @@ Alt.require('alt.resource.String');
  * Constructs a new XMLResource from a given resource object
  */
 function XMLResource(resource, resourceName) {
-	var str = Loader.get(resourceName, StringResource);
+	var str = Resources.get(resourceName, StringResource);
 	this.xml = new XML(str);
 }
 XMLResource.prototype = new Resource;
@@ -20,5 +20,5 @@ XMLResource.prototype.getCopy = function() {
 }
 
 
-Loader.defineType(XMLResource, 'xml');
-Loader.defineType(XMLResource, 'xhtml');
+Resources.defineType(XMLResource, 'xml');
+Resources.defineType(XMLResource, 'xhtml');

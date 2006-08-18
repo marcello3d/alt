@@ -23,4 +23,4 @@ StringResource.prototype.getCopy = function() {
 	return this.str;
 }
 
-Loader.defineType(StringResource, 'txt');
+Resources.defineType(StringResource, 'txt');

@@ -1,5 +1,5 @@
 
-Alt.require('alt.util.inspector.Inspector', true);
+Alt.require('alt.jsdoc.Inspector', true);
 
 /**
  * Creates XHTML of entire inspection

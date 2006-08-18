@@ -143,7 +143,6 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      */
     public Object evaluate(Context cx, Scriptable scope) throws IOException {
         //System.out.println("evaluate : "+this);
-        
         // Set current script
         JavaScript previousScript = AltServlet.setCurrentScript(cx,this);
         
@@ -151,10 +150,8 @@ public class JavaScriptResource implements JavaScript,MutableResource {
         resetDependencies();
         
         // Compile file if necessary
-        if (compiledScript==null || isModified()) {
-            //System.out.println("compile : "+this);
-            compiledScript = compile(cx);
-        }
+        if (compiledScript==null || isModified())
+            compile(cx);
         
         // Update modification time.
         evaluationTime = System.currentTimeMillis();
@@ -190,16 +187,14 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     }
     
     /**
-     * Compile and return the current script for use by evaluate().  This method
-     *  can return null if there is no actual Script (only dependencies).
+     * Compile the current script for use by evaluate().
      * @param cx  the javascript Context
-     * @return the compiled script
      * @throws IOException if there was a problem compiling the script
      */
-    protected Script compile(Context cx) throws IOException {
+    protected synchronized void compile(Context cx) throws IOException {
         versionTag = getVersionTag();
-        return cx.compileReader(new InputStreamReader(getStream()), getPath(), 
-                1, null);
+        compiledScript = cx.compileReader(new InputStreamReader(getStream()), 
+        								  getPath(), 1, null);
     }
     
     /**
@@ -220,7 +215,8 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @param dependency  the JavaScript you depend on
      * @param cascadeReload  whether or not to cascade the reload
      */
-    public void addDependency(JavaScript dependency, boolean cascadeReload) {
+    public synchronized void addDependency(JavaScript dependency, 
+    		boolean cascadeReload) {
         if (cascadeReload)
             cascadeDependencies.add(dependency);
         else
@@ -235,7 +231,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @return true if a cascading dependency was loaded
      * @throws IOException  if there was a problem loading something
      */
-    protected boolean checkDependencies(Context cx) 
+    protected synchronized boolean checkDependencies(Context cx) 
             throws IOException {
         // Check the regular dependencies
         for (JavaScript s : dependencies)
@@ -254,7 +250,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     /**
      * Stores the current list of parents for use with synchronizeParents() 
      */
-    protected void resetDependencies() {
+    protected synchronized void resetDependencies() {
         dependencies.clear();
         cascadeDependencies.clear();
     }

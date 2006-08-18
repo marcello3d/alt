@@ -11,7 +11,7 @@ function log(message) {
 	list.appendChild(<li>{message}</li>);
 }
 
-var xml = Loader.load("HSQL.xml");
+var xml = Resources.load("HSQL.xml");
 
 var stmt = db.createStatement();
 try {
