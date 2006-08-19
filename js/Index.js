@@ -7,6 +7,7 @@ dictator.map({
 	manage:     'alt.manage.Index',
 	examples:   'examples.Index',
 	tests:      'tests.Index',
-	api:        'alt.jsdoc.html.Main'
+	api:        'alt.jsdoc.html.Main',
+	debug:     'alt.debug.Main'
 });
 

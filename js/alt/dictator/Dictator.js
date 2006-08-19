@@ -140,7 +140,8 @@ Dictator.prototype.evaluateScript = function(script) {
     if (script.charAt(0)=='/') {
         // Resource...?
         var res = Alt.getResource(script);
-        
+        // TODO:
+        throw new alt.Exception("Incomplete feature.");
 	} else { 
     	// Evaluate script
     	Alt.evaluate(script, this.scope);

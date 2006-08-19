@@ -1,13 +1,15 @@
 <html>
  <head>    
   <meta http-equiv="content-type" 
-  			content="plain/html; charset=utf-8" />
+  			content="text/html; charset=utf-8" />
   <title>Overview Frame</title>
+  <link rel="stylesheet" type="text/css" href="style.css" title="style"/>
  </head>
- <body>
+ <body id="overview" class="frame">
   <h1>JSDoc</h1>
   <p><a href="allclasses-frame.html" target="moduleFrame">All Classes</a></p>
-  <div id="packages">Packages<br/>
+  <div>Modules<br/>
+  <ul id="modules"/>
   </div>
  </body>
 </html>

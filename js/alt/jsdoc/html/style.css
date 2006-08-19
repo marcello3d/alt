@@ -1,0 +1,16 @@
+body,td,th,p,div {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+}
+.frame h1 {
+	font-size: 15pt;
+}
+.frame ul,.frame li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.frame #classes small {
+	font-size: 70%;
+	font-style: italic;
+}

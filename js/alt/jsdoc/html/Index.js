@@ -2,7 +2,7 @@ Alt.log('foooo');
 
 Alt.require('alt.resource.xml')
 
-var index = Resources.load('index.xhtml');
+var index = Resources.load('index.xml');
 
 
 response.contentType = "text/html; charset=UTF-8";

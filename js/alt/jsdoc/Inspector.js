@@ -13,14 +13,18 @@ var Decompiler = Packages.org.mozilla.javascript.Decompiler;
  */
 function Inspector(object) {
 	this.nodeMap = new java.util.HashMap();
+	this.nodes = [];
+	this.modules = {};
 	this.main = new InspectorObject(this, object);
+	
+	for each (var node in this.nodes)
+	    if (node instanceof InspectorClass) {
+	        if (!this.modules[node.getModule()])
+	            this.modules[node.getModule()] = {};
+	        this.modules[node.getModule()][node.name] = node;
+	    }
 }
-/**
- * Inspects the children of this object
- */
-Inspector.prototype.reinspect = function() {
-	this.main.inspectChildren();
-}
+
 /**
  * Gets a mapping of full names to InspectorNodes
  * @return {Object}  map of InspectorNode objects
@@ -28,6 +32,7 @@ Inspector.prototype.reinspect = function() {
 Inspector.prototype.getFlatMap = function() {
 	return this.main.getFlatMap();
 }
+
 /**
  * Returns a string representation of this object
  * @return {String} representation of this object
@@ -47,23 +52,18 @@ Inspector.prototype.toString = function() {
 function InspectorNode(inspector, object) {
 	this.inspector = inspector;
 	this.object = object;
-	this.parents = [];
-}
-/**
- * Adds a parent to this node.
- * 
- * @param {InspectorNode}	parent	parent node
- * @param {String}			name	the name of this node under the parent
- */
-InspectorNode.prototype.addParent = function(parent, name) {
-	this.parents.push({parent: parent, name: name});
+	//this.parents = [];
+	this.parent = null;
+	this.module = '';
+	this.fullName = '';
+	this.name = '';
 }
 /**
  * Returns a string representation of this object
  * @return {String} representation of this object
  */
 InspectorNode.prototype.toString = function() {
-	return "["+this.constructor.name+" "+this.getName()+"]";
+	return "["+this.constructor.name+" "+this.getFullName()+"/"+this.getModule()+"/"+this.name+"]";
 }
 
 
@@ -77,7 +77,27 @@ InspectorNode.prototype.getType = function(type) {
 	return null;
 }
 
-
+/**
+ * Sets parent node
+ * @param {InspectorNode}	parent	parent node
+ */
+InspectorNode.prototype.setParent = function(parent,name) {
+    // Don't overwrite parent with reference
+	this.parent = parent;
+	this.name = name;
+}
+InspectorNode.prototype.getModule = function() {
+    if (this.parent)
+	    return this.parent.getFullName();
+	return false;
+}
+InspectorNode.prototype.getFullName = function() {
+    var module = this.getModule();
+    if (module)
+        return module + '.' + this.name;
+    return this.name;
+}
+/*
 InspectorNode.prototype.getName = function() {
 	if (!this.parents)
 		return '';
@@ -108,6 +128,16 @@ InspectorNode.prototype.getFullName = function() {
 	}
 	return '['+list+'].'+this.getName();
 }
+	*/
+/*
+ * Adds a parent to this node.
+ * 
+ * @param {InspectorNode}	parent	parent node
+ * @param {String}			name	the name of this node under the parent
+ */
+/*InspectorNode.prototype.addParent = function(parent, name) {
+	this.parents.push({parent: parent, name: name});
+}*/
 /**
  * Constructs a new inspector object.
  * @class
@@ -192,11 +222,12 @@ InspectorObject.prototype.addChild = function(name, object, hidden) {
 		}
 		node = new constructor(this.inspector, object);
 		this.inspector.nodeMap.put(object, node);
+		this.inspector.nodes.push(node);
 	}
 	if (!hidden || constructor)
 		this.children[name] = node;
-	if (!hidden && node.addParent)
-		node.addParent(this, name);
+    if (!hidden)
+        node.setParent(this, name);
 	return node;
 	
 	/**
@@ -223,7 +254,11 @@ InspectorObject.prototype.addChild = function(name, object, hidden) {
 		if (o instanceof Function)
 			for (var x in o.prototype)
 				return true;
-		return o instanceof Object && name.match(/^[A-Z]/);
+		if (o instanceof Object && name.match(/^[A-Z]/))
+		    for each (var x in o)
+		        if (x instanceof Function)
+		            return true;
+		return false;
 	}
 	function isReference(name,o) {
 		return isClass(name,o) && 
@@ -263,6 +298,7 @@ function InspectorFunction(inspector, func) {
 	this.doc = new JSDoc(func);
 }
 InspectorFunction.prototype = new InspectorObject;
+InspectorFunction.prototype.constructor = InspectorFunction;
 
 /**
  * Constructs a new InspectorClass object from a given function.
@@ -279,6 +315,7 @@ function InspectorClass(inspector,func) {
 		this.proto = new InspectorObject(inspector, func.prototype);
 }
 InspectorClass.prototype = new InspectorFunction;
+InspectorClass.prototype.constructor = InspectorClass;
 /**
  * Gets the super-class of a particular InspectorClass.  This method does not
  *  work quite correctly at the moment.
@@ -287,17 +324,21 @@ InspectorClass.prototype = new InspectorFunction;
  */
 InspectorClass.prototype.getSuperClass = function() {
 	if (this.func.prototype) {
-		var c = this.func.prototype.constructor;
-		var p = this.func.prototype.__proto__;
-		for each (var o in this.inspector.nodeMap.values().toArray()) 
-            if (o instanceof InspectorClass && p===o.func.prototype)    			    
-    			return o;
-		
-		if (c==this.func)
-			return false;
-		var node = this.inspector.nodeMap.get(c);
-		if (node!=null)
-			return node;
+	    if (!this.superClass) {
+	        this.superClass = null;
+    		var c = this.func.prototype.constructor;
+    		var p = this.func.prototype.__proto__;
+    		for each (var o in this.inspector.nodeMap.values().toArray()) 
+                if (o instanceof InspectorClass && p===o.func.prototype)    			    
+        			return this.superClass = o;
+    		
+    		if (c==this.func)
+    			return false;
+    			
+    		var node = this.inspector.nodeMap.get(c);
+    		if (node!=null)
+    			return this.superClass = node;
+	    }
 	}
 	return false;
 }
@@ -314,6 +355,7 @@ function InspectorReference(inspector,object) {
 	InspectorNode.call(this,inspector,object);
 }
 InspectorReference.prototype = new InspectorNode;
+InspectorReference.prototype.constructor = InspectorReference;
 InspectorReference.prototype.getReference = function() {
 	return this.inspector.nodeMap.get(this.object);
 }
@@ -327,4 +369,5 @@ function InspectorProperty(inspector,object) {
 	InspectorNode.call(this,inspector,object);
 }
 InspectorProperty.prototype = new InspectorNode;
+InspectorProperty.prototype.constructor = InspectorProperty;
 

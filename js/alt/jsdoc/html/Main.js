@@ -1,10 +1,14 @@
 
 Alt.require('alt.jsdoc.Inspector');
 
-if (!inspector)
+/*
+if (!alt.jsdoc.html.inspector || request.getParameter('reload'))
     alt.jsdoc.html.inspector = new alt.jsdoc.Inspector(global);
 else
-    inspector.reinspect();
+    alt.jsdoc.html.inspector.reinspect();
+    */
+
+var inspector = new alt.jsdoc.Inspector(global);
 
 dictator.map({
    '':                      'alt.jsdoc.html.Index',
@@ -12,4 +16,23 @@ dictator.map({
    'overview-frame.html':   'alt.jsdoc.html.OverviewFrame',
    'overview-summary.html': 'alt.jsdoc.html.OverviewSummary',
    'allclasses-frame.html': 'alt.jsdoc.html.AllClassesFrame',
+   'style.css':             'alt.jsdoc.html.Style'
 });
+
+if (inspector.modules[dictator.path.next]) {
+    
+    var currentModule = dictator.path.next;
+    dictator.path.pop();
+    
+    dictator.map({
+        '': 'alt.jsdoc.html.ModuleFrame',
+        'module-frame.html': 'alt.jsdoc.html.ModuleFrame'
+    });
+   
+    if (inspector.modules[currentModule][dictator.path.next]) {
+        var currentClass = dictator.path.next;
+        dictator.path.pop();
+        
+    }
+}
+

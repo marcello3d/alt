@@ -93,7 +93,7 @@ Resources.loadResource = function(resourceName, constructor, useCache) {
 	// Get default constructor or files of this type, if they exist.
 	if (constructor==null)
 		constructor = Resources.getConstructor(
-		Resources.getExtension(resourceName));
+		                              Resources.getExtension(resourceName));
 	
 	// Get the resource
 	var resource = Resources.getResource(resourceName);

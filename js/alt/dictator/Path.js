@@ -20,10 +20,11 @@ function Path(request) {
 	Alt.log("request.requestURI = "+request.requestURI);
 	Alt.log("request.requestURL = "+request.requestURL);
 	*/
-	this.uri = request.requestURI;
-	this.remaining = request.pathInfo || request.servletPath || this.uri;
+	this.uri = (request.requestURI || '/')+'';
+	this.remaining = (request.pathInfo || request.servletPath || this.uri)+'';
 	this.full = this.remaining;
 	this.current = '';
+	this.currenturi = this.uri.substring(0,this.uri.length - this.full.length);
 	this.last = '';
 	this.next = '';
 	
@@ -42,6 +43,7 @@ function Path(request) {
  */
 Path.prototype.pop = function() {
 	this.current += this.next + '/';
+	this.currenturi += this.next + '/';
 	this.last = this.next;
 	
 	if (this.remaining == null) {
