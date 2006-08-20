@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/layout.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>Cellosoft Alt Framework : the Alternative web framework</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="style.css" rel="stylesheet" type="text/css" />
+<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+</head>
+<body bgcolor="#ffffff">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><a href="./"><img src="http://images.cellosoft.com/marcello/projects/alt/logo.png" width="481" height="119" border="0" id="logo" alt="cellosoft Alt : the Alternative web framework" /></a> </p>
+<table width="780" border="0" align="center" cellpadding="10" cellspacing="0">
+  <tr>
+    <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
+      <h1>To Do List</h1>
+      <p> Just a hashing of what needs to be done on Alt Framework. </p>
+      <h2>Alt Framework Core (JavaScript)</h2>
+      <ul>
+        <li>SQueaL
+          <ul>
+            <li>SQL Schema
+              <ul>
+                <li>Finalize XML format </li>
+                <li>SQueaL types                </li>
+              </ul>
+            </li>
+            <li>Delight</li>
+            <ul>
+              <li>Generalizing database connection (HSQL/Derby support?)</li>
+              <li>SQueaL types</li>
+              <li>Data validation functions</li>
+            </ul>
+          </ul>
+        </li>
+        <li>Onion ML
+          <ul>
+            <li>Finalize XML format</li>
+            <li>Finish API </li>
+            <li>Define core html, layout managers  </li>
+            <li>Form control (along with SQueaL types/Dictator) </li>
+          </ul>
+        </li>
+        <li>Dictator
+          <ul>
+            <li>GET/POST/HEAD/etc. handling</li>
+            <li>Form control (along with SQueaL types/Onion ML) </li>
+            <li>Cache control</li>
+            <li>Static file sending/custom file pushers</li>
+            <li>Refinements  to API </li>
+          </ul>
+        </li>
+        <li>JSDoc
+          <ul>
+            <li>Further improvements to display</li>
+            <li>Parse .js files and display actual function definitions with comments
+              <ul>
+                <li>Find jsdoc comments for file/module overview?</li>
+                <li>Find jsdoc comments for member properties? </li>
+              </ul>
+            </li>
+            <li>Switch to using Onion ML  </li>
+            <li>Caching</li>
+            <li>File generation for web site </li>
+            <li>Control over display (function codes</li>
+          </ul>
+        </li>
+      </ul>
+      <h2>AltServlet (Java)</h2>
+      <p>Some of these were pulled from a chat conversation, hence the more casual writing style. :-) </p>
+      <ul>
+        <li>Timeout /Thread killing code
+          <ul>
+            <li>Currently using Future/ThreadPool to run the scripts on a delayed timeout, which doesn't work.
+              <ul>
+                <li>It kills the script to the browser, but the javascript still runs in the background.</li>
+                <li>It is also restrictive since I have to set the timeout in the config file.</li>
+              </ul>
+            </li>
+            <li>Control timeout from javascript:
+              <ul>
+                <li>E.g., &quot;request 5 more seconds of time&quot; if you know you're going to do a slow operation</li>
+                <li>Ability to catch timeout inside Javascript (to display a custom error, for example). <br />
+                    </li>
+              </ul>
+            </li>
+            <li>            Rhino has a method for counting byte codes. It only works in interpreted mode, but you could pretend these errors only happen in development environment.</li>
+          </ul>
+        </li>
+        <li>Detecting user abort</li>
+        <li>Fixing Rhino optimizer?  </li>
+        <li>Ability to enable/disable runtime file modification time checking 
+          <ul>
+            <li>Ability to optimize this runtime checking to speed it up?</li>
+            <li>Ability to flush cache? Detect updates?  </li>
+          </ul>
+        </li>
+        <li>Refine script/class loaders</li>
+        <li>Finalize Java Servlet folder structure
+          <ul>
+            <li>Where do scripts go?</li>
+            <li>How to JavaScript modules work?</li>
+          </ul>
+        </li>
+        <li>Security manager/isolation/jailing code
+          <ul>
+              <li>Lock down the AltServlet to prevent certain actions such as System.exit</li>
+            <li>Potentially lock down socket/file access</li>
+            <li>Allow privilege elimination from JavaScript for running &quot;insecure&quot; code </li>
+            <li>Look at Rhino/JavaScript security manager features as well?</li>
+          </ul>
+        </li>
+        <li>Continuations
+          <ul>
+              <li>Support for Jetty's continuations features, with some kind of means to pause scripts during runtime while waiting for some event. </li>
+            <li>This would be useful for long running scripts with lots of wait/blocking time.</li>
+          </ul>
+        </li>
+        <li>Debugger
+          <ul>
+            <li>Rhino has a graphical debugger thing, but it is kinda crufty and does not work well with the whole servlet mechanism.</li>
+            <li>It would  be nice to integrate some kind of debugger, but I am not sure what the best approach here is.
+              <ul>
+                <li>AltGUI could be revamped to integrate some form of debugger.</li>
+                <li> One cool idea is to somehow inject into the standard java/eclipse debugger. So that you can debug both java and javascript in the same standard interface.</li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <h2>Other/Misc.</h2>
+      <ul>
+        <li>Ant build script to generate releases </li>
+        <li>Improved AltGUI</li>
+        <li>Rhino rewrite to use javax.xml instead of XMLBeans </li>
+        <li>Benchmarking/profiling/optimization
+          <ul>
+            <li>Compare interpreted/optimized modes</li>
+            <li>Profile to see where the bottlenecks actually are  </li>
+          </ul>
+        </li>
+      </ul>
+      <!-- InstanceEndEditable --></td>
+    <td rowspan="2" valign="top"><ul class="menu">
+        <li><a href="./">About</a></li>
+      <li><a href="download.html">Download</a></li>
+      <li><a href="documentation.html">Documentation</a></li>
+      <li><a href="contribute.html">Contribute</a><br />
+        <a href="license.html">License</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td align="right" valign="top" class="small">page last updated: 
+    <!-- #BeginDate format:fcAm1 -->Sunday, August 20, 2006<!-- #EndDate --></td>
+  </tr>
+</table>
+<p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
+</body>
+<!-- InstanceEnd --></html>
