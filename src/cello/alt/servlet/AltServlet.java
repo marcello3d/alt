@@ -23,11 +23,6 @@ package cello.alt.servlet;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
@@ -71,7 +66,6 @@ public class AltServlet extends HttpServlet {
     private String mainScript = "alt.main.Main";
     
     private int optimization = -1;
-    private int timeout = 5000;
     
     /** 
      * Protected access from ScriptableObject (Don't enum, read-only, and
@@ -85,8 +79,6 @@ public class AltServlet extends HttpServlet {
      */
     public static final int VISIBLE = ScriptableObject.PERMANENT |
                                         ScriptableObject.READONLY;
-    private ExecutorService pool;
-    
     /**
      * Constructs a new AltServlet
      */
@@ -113,7 +105,6 @@ public class AltServlet extends HttpServlet {
      */
     @Override
     public void init() {
-        pool = Executors.newCachedThreadPool();
         globalScope = new GlobalScope(this);
         loader.setModuleProvider(globalScope);
         
@@ -130,9 +121,6 @@ public class AltServlet extends HttpServlet {
         optimization = Integer.parseInt(
         		getInitParameter("rhino.optimization","-1"));
         System.out.println("Rhino optimization: "+optimization);
-        timeout = Integer.parseInt(
-        		getInitParameter("alt.timeout","10"));
-
         if (!ContextFactory.hasExplicitGlobal())
             ContextFactory.initGlobal(new DynamicFactory());
         
@@ -284,64 +272,6 @@ public class AltServlet extends HttpServlet {
         return child;
     }
     
-
-    private class Service implements Callable<Void> {
-        private HttpServletRequest request;
-        private HttpServletResponse response;
-        /**
-         * Constructs a new service object
-         * @param request
-         * @param response
-         */
-        Service(HttpServletRequest request, HttpServletResponse response) {
-            this.request = request;
-            this.response = response;
-        }
-        /**
-         * Handles the service
-         * @return null
-         */
-        public Void call() {
-            long startTime = System.nanoTime();
-            Context cx = Context.enter();
-            cx.setOptimizationLevel(optimization);
-            cx.putThreadLocal("altServlet",AltServlet.this);
-            try {
-
-                // retrieve JavaScript...
-                JavaScript s = loader.loadScript(mainScript);
-                
-                // Isolate the request from the module namespace
-                ScriptableObject requestScope = makeChildScope("RequestScope-" +
-                        (requestCount++),s.getModule());
-                
-                cx.putThreadLocal("globalScope", globalScope);
-                cx.putThreadLocal("requestScope", requestScope);
-                // Define thread-local variables
-                requestScope.defineProperty("request", 
-                        new NativeJavaInterface(requestScope, request, 
-                                HttpServletRequest.class), VISIBLE);
-                
-                requestScope.defineProperty("response", 
-                        new NativeJavaInterface(requestScope, response, 
-                                HttpServletResponse.class), VISIBLE);
-                
-                
-                // Evaluate the script in this scope
-                s.evaluate(cx, requestScope);
-            } catch (Throwable ex) {
-                handleError(response,ex);
-            } finally {
-                Context.exit();
-            }
-            long time = System.nanoTime() - startTime;
-            System.out.println("handled in "+(time*1e-9)+"sec");
-            
-            return null;
-        }
- 
-    }
-
     private int requestCount = 1;
     /**
      * The main Servlet method. 
@@ -351,19 +281,39 @@ public class AltServlet extends HttpServlet {
     @Override
     public void service(HttpServletRequest request, 
             HttpServletResponse response) {
-        
-    	Service service = new Service(request, response);
-    	if (timeout<0)
-    		service.call();
-    	else {
-	        Future<Void> future = pool.submit(service);
-	        try {
-	            future.get(timeout, TimeUnit.SECONDS);
-	        } catch (Throwable t) {
-	            handleError(response,t);
-	        }
-    	}
+        long startTime = System.nanoTime();
+        Context cx = Context.enter();
+        cx.setOptimizationLevel(optimization);
+        cx.putThreadLocal("altServlet",AltServlet.this);
+        try {
+
+            // retrieve JavaScript...
+            JavaScript s = loader.loadScript(mainScript);
+            
+            // Isolate the request from the module namespace
+            ScriptableObject requestScope = makeChildScope("RequestScope-" +
+                    (requestCount++),s.getModule());
+            
+            cx.putThreadLocal("globalScope", globalScope);
+            cx.putThreadLocal("requestScope", requestScope);
+            // Define thread-local variables
+            requestScope.defineProperty("request", 
+                    new NativeJavaInterface(requestScope, request, 
+                            HttpServletRequest.class), VISIBLE);
+            
+            requestScope.defineProperty("response", 
+                    new NativeJavaInterface(requestScope, response, 
+                            HttpServletResponse.class), VISIBLE);
+            
+            
+            // Evaluate the script in this scope
+            s.evaluate(cx, requestScope);
+        } catch (Throwable ex) {
+            handleError(response,ex);
+        } finally {
+            Context.exit();
+        }
+        long time = System.nanoTime() - startTime;
+        System.out.println("handled in "+(time*1e-9)+"sec");
     }
-
-
 }
