@@ -175,7 +175,7 @@ InspectorFunction.prototype.toHTML = function(name) {
     	if (this.doc.lines) {
     	    lines = <>
     	       <dt><b>Lines:</b></dt>
-    	       <dd><code>{java.util.Arrays.toString(this.doc.lines)}</code></dd>
+    	       <dd><code>{this.doc.lines}</code></dd>
     	    </>;
     	    
     	}
@@ -258,9 +258,9 @@ InspectorClass.prototype.toHTML = function(name) {
 	
 	var id = InspectorFunction.nextSpanId++;
 	
-	var name = this.getName();
+	var name = this.name;
 	
-	var div = <div id={'span'+id} style="display:none">
+	var div = <div id={'span'+id}>
 	<code>{extendsClass}</code>
 	<p>{classDesc}</p>
 	<dl>
@@ -312,7 +312,8 @@ InspectorClass.prototype.toHTML = function(name) {
 						table.tr.td.code.appendChild(<b><a href={'#'+
 													fullname+'.'+x}>{x}</a></b>);
 					}
-				div.appendChild(table);
+			    if (!first)
+				    div.appendChild(<p>{table}</p>);
 			}
 			
 		}

@@ -22,12 +22,17 @@ function JSDoc(func) {
 			this.returnType = 'void';
 			
 		// Try to guess member variables
-		var members = /this\.([a-z_][a-z0-9_]*)\s*=/gm.exec(f);
+		var members = /this\.([a-z_$][a-z0-9_$]*)\s*=/gm.exec(f);
 			
 		// See if a jsdoc is defined for this function
 		var doc = func.__jsdoc__;
 	    this.source = func.__source__;
-	    this.lines = func.__lines__;
+	    this.lines = [];
+	    if (func.__lines__) {
+	        for each (var i in func.__lines__)
+	           this.lines.push(i);
+	        this.lines.sort();
+	    }
 		if (doc) {
 			
 			// Build parameter map

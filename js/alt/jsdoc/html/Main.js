@@ -25,14 +25,18 @@ if (inspector.modules[dictator.path.next]) {
     dictator.path.pop();
     
     dictator.map({
-        '': 'alt.jsdoc.html.ModuleFrame',
-        'module-frame.html': 'alt.jsdoc.html.ModuleFrame'
+        'module-frame.html':    'alt.jsdoc.html.ModuleFrame',
+        'module-summary.html':  'alt.jsdoc.html.ModuleSummary'
     });
-   
-    if (inspector.modules[currentModule][dictator.path.next]) {
-        var currentClass = dictator.path.next;
+    var currentClass = dictator.path.next;
+    currentClass = currentClass.substring(0,currentClass.lastIndexOf('.'));
+    Alt.log('currentclass = '+currentClass);
+    
+    if (currentClass && inspector.modules[currentModule][currentClass]) {
         dictator.path.pop();
-        
+        dictator.map({
+            '': 'alt.jsdoc.html.Class'
+        });
     }
 }
 

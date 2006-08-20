@@ -27,6 +27,7 @@ function writeColorln(color) {
 tests.Tester.test(this,
 	['tests.ScriptableWrapper',
 	 'tests.Synchronization',
+	 'tests.Enclosure',
 	 'tests.Modules',
 	 'tests.RequestScope',
 	 'tests.HashTest',

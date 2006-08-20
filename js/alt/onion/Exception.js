@@ -7,6 +7,6 @@ Alt.require('alt.Exception', true);
  */
 function Exception(msg) {
     alt.Exception.call(this,msg);
-	this.name = "alt.Exception";
+	this.name = "alt.onion.Exception";
 }
 Exception.prototype = new alt.Exception;

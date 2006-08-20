@@ -18,7 +18,7 @@ function Exception(msg) {
 	    Alt.throwMessage(msg);
 	} catch (ex) {
 	    for (var x in ex)
-	       this[x] = ex[x];
+	        this[x] = ex[x];
 	}
 }
 Exception.prototype = new Error;

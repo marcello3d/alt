@@ -63,7 +63,7 @@ function InspectorNode(inspector, object) {
  * @return {String} representation of this object
  */
 InspectorNode.prototype.toString = function() {
-	return "["+this.constructor.name+" "+this.getFullName()+"/"+this.getModule()+"/"+this.name+"]";
+	return "["+this.constructor.name+" "+this.getFullName()+"]";
 }
 
 
@@ -324,21 +324,21 @@ InspectorClass.prototype.constructor = InspectorClass;
  */
 InspectorClass.prototype.getSuperClass = function() {
 	if (this.func.prototype) {
-	    if (!this.superClass) {
-	        this.superClass = null;
-    		var c = this.func.prototype.constructor;
-    		var p = this.func.prototype.__proto__;
-    		for each (var o in this.inspector.nodeMap.values().toArray()) 
-                if (o instanceof InspectorClass && p===o.func.prototype)    			    
-        			return this.superClass = o;
-    		
-    		if (c==this.func)
-    			return false;
-    			
-    		var node = this.inspector.nodeMap.get(c);
-    		if (node!=null)
-    			return this.superClass = node;
-	    }
+	    if (this.superClass)
+	        return this.superClass;
+
+		var c = this.func.prototype.constructor;
+		var p = this.func.prototype.__proto__;
+		for each (var o in this.inspector.nodeMap.values().toArray()) 
+            if (o instanceof InspectorClass && p===o.func.prototype)    			    
+    			return this.superClass = o;
+		
+		if (c==this.func)
+			return false;
+			
+		var node = this.inspector.nodeMap.get(c);
+		if (node!=null)
+			return this.superClass = node;
 	}
 	return false;
 }

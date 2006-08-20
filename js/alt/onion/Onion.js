@@ -24,6 +24,23 @@ Onion.O_NAMESPACE = new Namespace("http://alt.cellosoft.com/xml/onion/core");
  * @param {XML} xml  the xml object
  */
 Onion.prototype.add = function(xml) {
+    /*
+    for each (var f in [
+        //'children','descendants','elements',
+        'parent','attributes',
+        'inScopeNamespaces',
+        'name',
+        'namespace',
+        'namespaceDeclarations',
+        'comments',
+        'hasComplexContent','hasSimpleContent',
+        'nodeKind','processingInstructions','text',
+        'normalize','toString','toXMLString',
+        'valueOf','length'
+    ])
+        Alt.log('xml.'+f+'()='+xml[f]());
+        */
+        
 	for each (var o in xml.*) {
 		if (o.namespace() == Onion.TAG_NAMESPACE)
 			this.defineTag(o.localName().toString(),o);
@@ -38,7 +55,7 @@ Onion.prototype.getXML = function (tagName, contents) {
     this.getTag(tagName).handle(this, contents);
 }
 Onion.prototype.handle = function (tag, contents) {
-    Alt.log("handle("+tag+","+contents+")");
+   // Alt.log("handle("+tag+","+contents+")");
     var kind = tag.nodeKind();
     var ns = tag.namespace();
     switch (kind) {

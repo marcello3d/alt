@@ -1,6 +1,6 @@
 Alt.require('alt.resource.XML');
 
-var xml = Resources.load("module-frame.xml");
+var xml = Resources.load("module-summary.xml");
 
 var sorted = [];
 for each (var n in inspector.modules[currentModule])
@@ -15,12 +15,21 @@ sorted.sort(function(a,b) {
     return compare(a.name,b.name);
 });
 
-xml..p.(@id=="module")[0] += <a href="module-summary.html" 
-                                target="classFrame">{currentModule}</a>;
-var classlist = xml..ul.(@id=="classes");
+xml..h1.(@id=="name")[0] += currentModule;
+
+
+var classlist = xml..table.(@id=="classes");
 for each (var n in sorted) {
+	var desc = '';
+	if (n.doc && n.doc.classDesc)
+		desc = n.doc.classDesc;
+			
     var path = n.name+'.html';
-    classlist.appendChild(<li><a href={path} target="classFrame">{n.name}</a></li>);
+    classlist.appendChild(
+    <tr>
+     <td><a href={path}>{n.name}</a></td>
+     <td>{desc}</td>
+    </tr>);
 }
 
 response.contentType = "text/html; charset=UTF-8";

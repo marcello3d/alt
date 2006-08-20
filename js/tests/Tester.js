@@ -11,10 +11,13 @@ var Tester = {
 			logFail = logNeutral;
 		var tests = 0;
 		var failures = 0;
+		var metascope = { scope: scope };
+		var metatc = new TestCore("All Tests", metascope, function(){}, 
+		                              function(){}, logFail);
 		for (var x in scripts) {
-			scope.tc = new TestCore(scripts[x], scope, logNeutral, logSuccess, logFail);
-			Alt.evaluate(scripts[x], scope);
-			scope.tc.end();
+		    scope.tc = new TestCore(scripts[x], scope, logNeutral, logSuccess, logFail);
+    	    metatc.assertRun('Alt.evaluate("'+scripts[x]+'", scope);');
+    	    scope.tc.end();
 			tests += scope.tc.tests;
 			failures += scope.tc.failures;
 		}

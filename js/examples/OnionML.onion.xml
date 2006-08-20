@@ -1,20 +1,21 @@
 <onion version="1.0" xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" 
-					 xmlns:o="http://alt.cellosoft.com/xml/onion/core">
+					 xmlns:o="http://alt.cellosoft.com/xml/onion/core"
+					 xmlns:html="alt.onion.tags.html">
 
  <tag:head renderer="xhtml">
-  <head>
-   <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-   <title>Inspector</title>
-   <style type="text/css">
+  <html:head>
+   <html:meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
+   <html:title>Inspector</html:title>
+   <html:style type="text/css">
     pre {
         font-size: 0.8em;
     }
     p {
         margin-top: 0;
     }
-   </style>
+   </html:style>
    <o:tag-contents/>
-  </head>
+  </html:head>
  </tag:head>
 
 

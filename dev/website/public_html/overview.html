@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/layout.dwt" codeOutsideHTMLIsLocked="false" -->
 <head>
 <!-- InstanceBeginEditable name="doctitle" -->
-<title>Cellosoft Alt Framework : Onion ML</title>
+<title>Cellosoft Alt Framework : Overview</title>
 <!-- InstanceEndEditable -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link href="style.css" rel="stylesheet" type="text/css" />
@@ -16,15 +16,21 @@
 <table width="780" border="0" align="center" cellpadding="10" cellspacing="0">
   <tr>
     <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
-      <p>[This section is under construction!] </p>
-      <h1>Onion ML</h1>
-      <p>Onion ML is an XML-based template system designed with a bias toward modularity and simplicity. </p>
-      <p>A rough comparison can be made to XSLT and JSF (Java Server Faces), Onion ML provides a means of defining custom XML tags in an attempt to abstract modular content design.</p>
-      <p>These custom tags can both be designed directly in Onion ML  xml files, or they can be defined as a functional code which generates data on the fly.</p>
-      <p>In addition to static content, Onion ML provides simple yet powerful control flow methods necessary for dynamic content. Methods for iterating over data sets and conditionally displaying tags are core to Onion ML's functionality. </p>
-      <h2>Quick Tutorial</h2>
-      <p><em>To come...  </em></p>
-      <!-- InstanceEndEditable --></td>
+      <h1>Alt Framework Overview</h1>
+      <p>The Alt Framework Core is made up of three components: SQueaL, Onion ML, and Dictator. Under the hood lies the AltServlet engine. </p>
+      <p align="center" class="center"><img src="http://images.cellosoft.com/marcello/projects/alt/overview.png" alt="overview" width="450" height="216" border="0" usemap="#Map" />
+<map name="Map" id="Map"><area shape="rect" coords="8,3,150,46" href="squeal.html" alt="SQueaL" />
+<area shape="rect" coords="151,3,297,46" href="onion.html" alt="Onion ML" />
+<area shape="rect" coords="298,3,443,46" href="dictator.html" alt="Dictator" />
+<area shape="rect" coords="8,47,443,89" href="altservlet.html" alt="AltServlet" />
+</map></p>
+      <h2>Core</h2>
+      <p><a href="squeal.html">SQueaL </a>is in charge of defining and handling content. It provides a means of defining, managing, and interfacing with databases.</p>
+      <p><a href="onion.html">Onion ML</a> is in charge of defining and handling design. It provides a means of defining, organizing, and generating pages from xml files. </p>
+      <p><a href="dictator.html">Dictator</a> is in charge of defining and handling requests. It provides a means of defining, and organizing site structure. </p>
+      <h2>Under the Hood </h2>
+      <p><a href="altservlet.html">AltServlet</a> is a Java Servlet in charge of connecting Java to JavaScript and providing the foundation for the Alt Framework Core modules to be developed. Alt Servlet can run on any Java Application Server, such as Jetty. </p>
+    <!-- InstanceEndEditable --></td>
     <td rowspan="2" valign="top"><ul class="menu">
         <li><a href="./">About</a></li>
       <li><a href="download.html">Download</a></li>

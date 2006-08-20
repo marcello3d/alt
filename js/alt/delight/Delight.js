@@ -1,7 +1,8 @@
 /**
  * @fileoverview
  * This file specifies holds all the code cello.Delight, the main class
- * {@link cello.Delight} can be constructed using a {@link cello.SQLSchema} object.
+ * {@link alt.delight.Delight} can be constructed using a 
+ * {@link alt.squeal.SQLSchema} object.
  */
 
 Alt.require('alt.squeal.SQLSchema');
@@ -13,14 +14,15 @@ Alt.require('alt.delight.Database');
 Alt.require('alt.delight.Table');
 	
 /**
- * Creates a new cello.Delight object from an existing cello.SQLSchema object.
+ * Creates a new Delight object from an existing cello.SQLSchema object.
  * @class
- * The main cello.Delight class.  Use a valid {@link cello.SQLSchema} object to construct
- * cello.Delight objects, which will then contain a list of members for all top level 
- * databases ({@link Database}) and tables ({@link Table}) from the SQL Schema.
+ * The main Delight class.  Use a valid {@link alt.squeal.SQLSchema} 
+ * object to construct Delight objects, which will then contain a list of 
+ * members for all top level databases ({@link Database}) and tables 
+ * ({@link Table}) from the SQL Schema.
  * @constructor
- * @param {cello.SQLSchema} 	schema		The cello.SQLSchema object this api is based on.
- * @param {java.sql.Connection}	conn		A database connection
+ * @param {alt.squeal.SQLSchema} 	schema	The SQLSchema object this api is based on.
+ * @param {java.sql.Connection}	    conn	A database connection
  */
 function Delight(schema,conn) {
 	for (var database in schema.databases)
@@ -35,12 +37,5 @@ function Delight(schema,conn) {
  * @type String
  */
 Delight.prototype.toString = function() {
-	return "[cello.Delight]";
+	return "[alt.delight.Delight]";
 }
-
-
-
-
-
-
-
