@@ -17,7 +17,7 @@
   <tr>
     <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
       <h2>AltServlet Module System </h2>
-      <p>The largest problem occured in how JavaScript files are loaded. By nature, JavaScript is not file based. It was originally intended to be loaded linearly in a web page, and little thought was given to how modules interact.</p>
+      <p>The largest problem occurred in how JavaScript files are loaded. By nature, JavaScript is not file based. It was originally intended to be loaded linearly in a web page, and little thought was given to how modules interact.</p>
       <p>JavaScript does not have much in the way of compile-time type checking. It does not care if a function you call actually exists until you try to call it. You can pretty much load things in any order until you are ready to use them. The only place where this gets complicated is when you try to inherit classes from one another. The class you try to inherit from must be loaded first.</p>
       <p>With those things in mind, I set out to design a module system for JavaScript that was simple to use but made it easy and intuitive to package code. </p>
       <h3>Module System Proposal : Java Packages </h3>
@@ -78,6 +78,11 @@ AltServlet that Bar needs to also be reloaded whenever Foo is reloaded. (If this
         <a href="license.html">License</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul></td>
+  </tr>
+  <tr>
+    <td align="right" valign="top" class="small">page last updated: 
+    <!-- #BeginDate format:fcAm1 -->Saturday, August 19, 2006<!-- #EndDate --></td>
+    <td valign="top">&nbsp;</td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>

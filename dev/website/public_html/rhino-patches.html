@@ -22,12 +22,12 @@
       <p>The source changes are included in a patch file (<code>dev/rhinocvs.patch</code> on SVN) with the distribution, and a binary version is included for convenience.</p>
       <h2>JSDoc Patches </h2>
       <p>To provide dynamic source-documenting in JavaScript, a series of patches provide a hidden __jsdoc__ property on all JavaScript Function objects that are defined after a /** javadoc */-style comment. </p>
-      <p>This feature is only available in interpretted mode and can be used by the Alt Framework documentation system to generate documentation for the core Alt Framework classes as well as your own code.</p>
+      <p>This feature is only available in interpreted mode and can be used by the Alt Framework documentation system to generate documentation for the core Alt Framework classes as well as your own code.</p>
       <h2>toSource Compression Patch</h2>
       <p>Inspired by <a href="http://dojotoolkit.org/docs/compressor_system.html">Dojo's compressor</a>, the toSource compression patch extends the definition of the Function.toSource method to take an additional flags argument. </p>
       <p>Two flags (in the Java object org.mozilla.javascript.Decompiler) are defined by this patch: COMPRESS_FLAG and COMPRESS_NEWLINES_FLAG.</p>
-      <p>COMPRESS_FLAG tells toSource to generate a method where all the local variables are obfuscated, all comments are removed, and unnecessary whitespace is removed.</p>
-      <p>COMPRESS_NEWLINES_FLAG goes one step further to remove all newlines from the resulting code. (You may want to keep newlines if you want better client-side debugging.) </p>
+      <p>COMPRESS_FLAG tells toSource to generate a method where all the local variables are obfuscated, all comments are removed, and unnecessary white space is removed.</p>
+      <p>COMPRESS_NEWLINES_FLAG goes one step further to remove all new lines from the resulting code. (You may want to keep new lines if you want better client-side debugging.) </p>
       <p>This feature will eventually be used by the client-side JavaScript module deployment system. </p>
     <!-- InstanceEndEditable --></td>
     <td valign="top"><ul class="menu">
@@ -38,6 +38,11 @@
         <a href="license.html">License</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul></td>
+  </tr>
+  <tr>
+    <td align="right" valign="top" class="small">page last updated: 
+    <!-- #BeginDate format:fcAm1 -->Saturday, August 19, 2006<!-- #EndDate --></td>
+    <td valign="top">&nbsp;</td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
