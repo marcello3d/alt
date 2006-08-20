@@ -10,6 +10,7 @@ dictator.map({
 	Delight: 	'examples.Delight',
 	SQueaL: 	'examples.SQueaL',
 	OnionML:    'examples.OnionML',
-	HSQL:		'examples.HSQL'
+	HSQL:		'examples.HSQL',
+	Timeout:    'examples.Timeout'
 	
 });
