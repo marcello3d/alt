@@ -20,9 +20,9 @@ if (session) {
     if (newString != null)
     	sessiondata.string = newString;
 }
-xml..span.(@id=="sessionid").parent().span = session.id;
-xml..span.(@id=="sessionhits").parent().span = sessiondata.hits;
-xml..span.(@id=="string").parent().span = sessiondata.string;
+xml..span.(@id=="sessionid")[0] = session.id;
+xml..span.(@id=="sessionhits")[0] = sessiondata.hits;
+xml..span.(@id=="string")[0] = sessiondata.string;
 xml..input.(@name=="string").@value = sessiondata.string;
 
 response.status = response.SC_OK;
