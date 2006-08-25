@@ -1,3 +1,5 @@
+Alt Framework License 1.0
+
 Copyright (C) 2005-2006 Marcello Bastéa-Forte and Cellosoft
 
 This software is provided 'as-is', without any express or implied warranty.
