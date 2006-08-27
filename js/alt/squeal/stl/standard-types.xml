@@ -1,0 +1,48 @@
+<squeal>
+ <type:SQL>
+   <define-method name="getSQLType"/>
+   <define-constraint name="regexp" type="client" />
+ </type:SQL>
+ 
+ <type:String base="SQL">
+   <define-constraint name="length" type="client" />
+ </type:String>
+ 
+ <type:Binary base="String">
+   <define-constraint name="length" type="client" />
+ </type:Binary>
+ 
+ <type:Integer base="SQL">
+   <define-constraint name="range" type="client" />
+   <define-constraint name="minimum" type="client" />
+   <define-constraint name="maximum" type="client" />
+   <define-constraint name="positive" type="client" />
+   <define-constraint name="negative" type="client" />
+ </type:Integer>
+
+ <type:Real base="Integer">
+ </type:Real>
+ 
+ <type:Date base="SQL">
+   <define-constraint name="range" type="client" />
+   <define-constraint name="past" type="client" />
+   <define-constraint name="future" type="client" />
+ </type:Date>
+ 
+ <type:Time base="Date">
+  <constrain name="regexp" match="^[0-9]{1,2}:[0-9]{2}$" />
+ </type:Time>
+ 
+ <type:Timestamp base="Date">
+  <constrain name="regexp" match="^[0-9]{1,2}:[0-9]{2}$" />
+ </type:Timestamp>
+ 
+ <type:Enum base="SQL">
+ </type:Enum>
+ 
+ <type:Set base="SQL">
+  <define-constraint name="range" type="client" />
+  <define-constraint name="minimum" type="client" />
+  <define-constraint name="maximum" type="client" />
+ </type:Set>
+</squeal>

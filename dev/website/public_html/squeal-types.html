@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0014)about:internet -->
+<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/Templates/layout.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>Cellosoft Alt Framework : the Alternative web framework</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="style.css" rel="stylesheet" type="text/css" />
+<!-- InstanceBeginEditable name="head" --><!-- InstanceEndEditable -->
+</head>
+<body bgcolor="#ffffff">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p><a href="./"><img src="http://images.cellosoft.com/marcello/projects/alt/logo.png" width="481" height="119" border="0" id="logo" alt="cellosoft Alt : the Alternative web framework" /></a> </p>
+<table width="780" border="0" align="center" cellpadding="10" cellspacing="0">
+  <tr>
+    <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
+      <h1>SQL Schema Type System</h1>
+      <p>The SQL Schema type system is the subset of SQL Schema that allows you to define data types. </p>
+      <p>A type in SQL Schema has the following: </p>
+      <ul>
+        <li>Some form of data storage</li>
+        <li>Constraints to determine validate data input </li>
+        <li>Methods for working with the type (editing, displaying, analyzing) </li>
+        <li>Values that can be assigned to the type (constants or SQL functions)</li>
+        <li>A base type to inherit all of the above from</li>
+      </ul>
+      <p>The type system provides an XML structure to define all of the above, while leaving the actual implementation of methods, sql types, and sql functions to the program. </p>
+      <h2>Syntax</h2>
+      <p>Types are defined in XML and look like the following:</p>
+      <pre>&lt;type name=&quot;Username&quot; base=&quot;String&quot; size=&quot;15&quot;&gt;<br />  &lt;constrain type=&quot;length&quot; min=&quot;3&quot; /&gt;<br />  &lt;constrain type=&quot;ereg&quot; value=&quot;^[a-zA-Z0-9]+$&quot;/&gt;<br />&lt;/type&gt;<br />&lt;type name=&quot;Password&quot; base=&quot;String&quot; size=&quot;15&quot;&gt;<br />  &lt;constrain type=&quot;length&quot; min=&quot;6&quot; /&gt;<br />  &lt;constrain type=&quot;ereg&quot; value=&quot;^[a-zA-Z0-9]+$&quot;/&gt;<br />&lt;/type&gt;<br />&lt;type name=&quot;Email&quot; base=&quot;String&quot; size=&quot;255&quot;&gt;<br />  &lt;constrain type=&quot;length&quot; min=&quot;5&quot;/&gt;<br />  &lt;constrain type=&quot;ereg&quot; value=&quot;^.+@.+$&quot;/&gt;<br />&lt;/type&gt;<br /> <br />&lt;type name=&quot;Title&quot; base=&quot;String&quot;&gt;
+ &lt;default value=&quot;No title&quot;/&gt;
+&lt;/type&gt;<br />&lt;type name=&quot;Message&quot; base=&quot;String&quot; size=&quot;^2&quot; /&gt;<br />&lt;type name=&quot;Date&quot; base=&quot;Timestamp&quot;&gt;<br />  &lt;value name=&quot;default&quot;/&gt;<br />  &lt;value name=&quot;yesterday&quot;/&gt;<br />&lt;/type&gt; 
+
+&lt;type name=&quot;Status&quot; base=&quot;Enum&quot;&gt;
+  &lt;option value=&quot;unread&quot;/&gt;
+  &lt;option value=&quot;read&quot;/&gt;
+&lt;/type&gt;</pre>
+      <p>&nbsp;</p>
+      <p>&nbsp; </p>
+    <!-- InstanceEndEditable --></td>
+    <td rowspan="2" valign="top"><ul class="menu">
+        <li><a href="./">About</a></li>
+      <li><a href="download.html">Download</a></li>
+      <li><a href="documentation.html">Documentation</a></li>
+      <li><a href="contribute.html">Contribute</a><br />
+        <a href="license.html">License</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul></td>
+  </tr>
+  <tr>
+    <td align="right" valign="top" class="small">page last updated: 
+    <!-- #BeginDate format:fcAm1 -->Saturday, August 26, 2006<!-- #EndDate --></td>
+  </tr>
+</table>
+<p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
+</body>
+<!-- InstanceEnd --></html>
