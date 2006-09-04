@@ -1,18 +1,18 @@
 // Create global variables, if they don't exist
-if (!global.syncTest) global.syncTest = 0;
+if (!alt.tests.syncTest) alt.tests.syncTest = 0;
 
-Alt.synchronize(global, function() { 
+Alt.synchronize(alt.tests, function() { 
 	// Copy current value
-	var value = global.syncTest;
-	tc.assertEqual('global.syncTest',value);
+	var value = alt.tests.syncTest;
+	tc.assertEqual('alt.tests.syncTest',value);
 	// Update value
-	global.syncTest += 50;
+	alt.tests.syncTest += 50;
 	value += 50;
-	tc.assertEqual('global.syncTest',value);
+	tc.assertEqual('alt.tests.syncTest',value);
 	
 	// Sleep
 	//java.lang.Thread.sleep(4000);
 	
 	// Check if value has changed
-	tc.assertEqual('global.syncTest',value);
+	tc.assertEqual('alt.tests.syncTest',value);
 });

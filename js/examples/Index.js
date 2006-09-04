@@ -2,7 +2,7 @@
 
 dictator.map({
 	java2d: 	'examples.Java2D',
-	tests: 		'tests.Index',
+	tests: 		dictator.Redirect('/tests/'),
 	inspector: 	'examples.Inspector',
 	upload: 	'examples.Upload',
 	session: 	'examples.Session',

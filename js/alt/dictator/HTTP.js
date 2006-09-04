@@ -9,6 +9,9 @@ HTTP.codeToString = function(code) {
     return 'unknown';
 }
 
+for each (var method in ['GET','POST','HEAD','OPTIONS','PUT','DELETE','TRACE'])
+    HTTP[method] = method;
+
 for (var x in Packages.javax.servlet.http.HttpServletResponse) {
     if (x.match(/^SC_/))
         HTTP[x.substring(3)] = 

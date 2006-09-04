@@ -1,6 +1,7 @@
 
 Alt.require('alt.dictator.Path');
 Alt.require('alt.dictator.HTTP');
+Alt.require('alt.dictator.Response');
 
 // These should not change per Servlet instance so we can make them global
 var mainScript = Servlet.config.getInitParameter('dictator.index') || 'Index';
@@ -16,13 +17,19 @@ var mainFilter = Servlet.config.getInitParameter('dictator.filter') ||
 function Dictator() {
 	this.path = null;
 	this.handled = false;
-	this.allowed = {
-	   'GET':      true,
-	   'HEAD':     true,
-	   'OPTIONS':  true
-	};
+	this.started = false;
+	this.allowed = {};
+	this.allow(HTTP.GET, HTTP.HEAD, HTTP.OPTIONS);
 	this.index('alt.dictator.IndexPage', true);
+	this.defaultErrorScript = 'alt.dictator.ExceptionPage';
 	this.error('alt.dictator.ExceptionPage');
+}
+
+Dictator.prototype.Redirect = function(path) {
+    var thisObj = this;
+    return function() {
+        thisObj.redirect(path);
+    }
 }
 
 /**
@@ -40,8 +47,8 @@ Dictator.prototype.handle = function(scope) {
 	// Make path object
 	this.path = new Path(this.request);
 	
-	// We'll replace this later with our own type
-	//delete scope.response;
+	// Replace response object with our own
+	scope.response = new Response(this); 
 	
 	// Handle the script
 	this.handleScript(mainScript);
@@ -87,7 +94,23 @@ Dictator.prototype.index = function(script, recordPaths) {
  * @param {String}  method  the name of the method (should be all-caps)
  */
 Dictator.prototype.allow = function(method) {
-    this.allowed[method] = true;
+    for (var x=0; x<arguments.length; x++)
+        this.allowed[arguments[x]] = true;
+}
+
+Dictator.prototype.sendError = function(status, message) {
+    if (!this.response.committed) {
+        this.response.status = status;
+        this.response.contentType = 'text/plain; charset=UTF-8';
+    }
+    this.response.writer.println(status+" "+HTTP.codeToString(status));
+    this.response.writer.println(message);
+    this.finish();
+}
+
+Dictator.prototype.redirect = function(location) {
+    this.response.sendRedirect(location);
+    this.finish();
 }
 
 /**
@@ -98,17 +121,35 @@ Dictator.prototype.allow = function(method) {
  * @see alt.dictator.HTTP 
  */
 Dictator.prototype.start = function(contentType, statusCode) {
+    if (!this.allowed[this.request.method]) {
+        this.sendError(this.request.protocol.match(/1.1$/) ? 
+                                 HTTP.METHOD_NOT_ALLOWED :
+                                 HTTP.BAD_REQUEST,
+                       this.request.method+' not allowed.');
+    }
     this.response.contentType = contentType || 'text/html; charset=UTF-8';
     this.response.status      = statusCode  || HTTP.OK;
+    this.started = true;
     
     switch (this.request.method) {
-        case "HEAD":
-        	//var response = new NoBodyResponse(resp);
-        	//response.
-        	
+        case HTTP.HEAD:
+            this.scope.response.echo = false;
+            break;
+        case HTTP.OPTIONS:
+            var allow = "";
+            for each (var method in this.allowed)
+                allow = (allow ? allow+', ' : '')+method;
+	        this.response.setHeader("Allow", allow);
+            break;
+        case HTTP.GET:
+        case HTTP.POST:
             break;
     }
 	
+}
+Dictator.prototype.finish = function() {
+    this.scope.response.finish();
+    this.setHandled();
 }
 
 /**
@@ -182,7 +223,9 @@ Dictator.prototype.handleScript = function(script) {
 }
 
 Dictator.prototype.evaluateScript = function(script) {
-    if (script.charAt(0)=='/') {
+    if (script instanceof Function) {
+        script();
+    } else if (script.charAt(0)=='/') {
         // Resource...?
         var res = Alt.getResource(script);
         // TODO:
@@ -222,13 +265,14 @@ Dictator.prototype.handleException = function(ex) {
 	try {
 		Alt.evaluate(this.errorScript, exScope);
 	} catch (ex2) {
-		// Error in error script, try fail-safe
-		exScope.nestedException = ex2;
-		try {
-			Alt.evaluate('alt.dictator.ExceptionPageError', exScope);
-		} catch (ex3) {
-			throw [ex,ex2,ex3];
-		}
+	    if (this.errorScript != this.defaultErrorScript) {
+	        try {
+	           Alt.evaluate(this.defaultErrorScript, exScope);
+	        } catch (ex3) {
+	            throw [ex,ex2,ex3];
+	        }
+	    } else
+	       throw ex+","+ex.rhinoException;
 	}
 }
 /**

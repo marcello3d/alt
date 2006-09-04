@@ -48,7 +48,6 @@ if (ServletFileUpload.isMultipartContent(request)) {
 } else {
 }
 
-response.status = response.SC_OK;
-response.contentType = 'application/xhtml+xml; charset=utf-8'
+dictator.start();
 
-response.writer.print(xml.toXMLString());
+response.write(xml.toXMLString());

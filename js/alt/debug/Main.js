@@ -1,3 +1,5 @@
+
+Alt.require('alt.resource.XML');
 /**
  * Use an anonymous function to hide all these variables from scopes we are 
  * inspecting.
@@ -97,14 +99,13 @@ function buildTable(table, names) {
     }
 }
 
-response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_OK;
+dictator.start();
+
 response.writer.print(xml);
 
 dictator.setHandled();
 
 })({
     'global_scope': global,
-    'module_scope': module,
     'request_scope': this 
 });

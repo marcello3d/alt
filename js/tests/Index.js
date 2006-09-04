@@ -3,8 +3,7 @@
 Alt.require('tests.Tester');
 
 
-response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_OK;
+dictator.start();
 
 var o = response.writer;
 
@@ -26,6 +25,7 @@ function writeColorln(color) {
 // Do tests
 tests.Tester.test(this,
 	['tests.ScriptableWrapper',
+	 'tests.ScriptableBean',
 	 'tests.Synchronization',
 	 'tests.Enclosure',
 	 'tests.Modules',

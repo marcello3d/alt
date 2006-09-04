@@ -1,12 +1,12 @@
 
 
 
-if (response.committed) {
+if (dictator.started) {
     var out = response.writer;
     exception.printStackTrace(out);
 } else {
-	response.contentType = "text/html; charset=UTF-8";
-	response.status = response.SC_INTERNAL_SERVER_ERROR;
+    dictator.start("text/html; charset=UTF-8", HTTP.INTERNAL_SERVER_ERROR);
+    
 	var out = response.writer;
 	out.println("<html>");
 	out.println(" <head><title>Execution Error: 500</title></head>");
@@ -41,4 +41,4 @@ if (response.committed) {
 	out.println("</html>");
 }
 
-dictator.setHandled();
+dictator.finish();

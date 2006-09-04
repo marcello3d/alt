@@ -186,10 +186,10 @@ InspectorFunction.prototype.toHTML = function(name) {
 	var compressedSource = this.func.toSource(0,Decompiler.COMPRESS_FLAG|
 	                 Decompiler.COMPRESS_NEWLINES_FLAG);
 
-    var packedSource = null;
+    //var packedSource = null;
     //try {
-    Alt.require('lgpl.packer.Pack');
-    var packedSource = lgpl.packer.pack(compressedSource, "UTF-8", false, false); 	                 
+    //Alt.require('lgpl.packer.Pack');
+    //var packedSource = lgpl.packer.pack(compressedSource, "UTF-8", false, false); 	                 
     //} catch (ex) {}
     compressedSource = compressedSource.replace(/(.{80})/g,'$1\n');
     
