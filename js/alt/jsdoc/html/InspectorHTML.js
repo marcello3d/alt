@@ -183,6 +183,16 @@ InspectorFunction.prototype.toHTML = function(name) {
 	var func = <code><b><a href="#" onclick={toggleCode('span'+id)}>{name}</a></b>({args})</code>;
 	if (markedPrivate)
 	   func = <i>(Private) {func}</i>;
+	var compressedSource = this.func.toSource(0,Decompiler.COMPRESS_FLAG|
+	                 Decompiler.COMPRESS_NEWLINES_FLAG);
+
+    var packedSource = null;
+    //try {
+    Alt.require('lgpl.packer.Pack');
+    var packedSource = lgpl.packer.pack(compressedSource, "UTF-8", false, false); 	                 
+    //} catch (ex) {}
+    compressedSource = compressedSource.replace(/(.{80})/g,'$1\n');
+    
 	return <dl style="margin:0">
 	         <dt>
 	           {func}
@@ -199,7 +209,7 @@ InspectorFunction.prototype.toHTML = function(name) {
 	           <dt><b>Source:</b></dt>
 	           <dd><pre>{this.func}</pre></dd>
 	           <dt><b>Compressed Source:</b></dt>
-	           <dd><pre>{this.func.toSource(0,Decompiler.COMPRESS_FLAG)}</pre></dd>
+	           <dd><pre>{compressedSource}</pre></dd>
 	           </dl>
 	         </span>
 	         </dd>
@@ -224,6 +234,7 @@ InspectorNode.prototype.getTypeLink = function(type) {
 		return <a href={'#'+node.getFullName()}>{type}</a>;
 	return type;
 }
+
 
 /**
  * Creates XHTML of this InspectorClass

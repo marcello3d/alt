@@ -20,8 +20,8 @@ function Path(request) {
 	Alt.log("request.requestURI = "+request.requestURI);
 	Alt.log("request.requestURL = "+request.requestURL);
 	*/
-	this.uri = (request.requestURI || '/')+'';
-	this.remaining = (request.pathInfo || request.servletPath || this.uri)+'';
+	this.uri = request.requestURI || '/';
+	this.remaining = request.pathInfo || request.servletPath || this.uri;
 	this.full = this.remaining;
 	this.current = '';
 	this.currenturi = this.uri.substring(0,this.uri.length - this.full.length);

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextAction;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
@@ -78,7 +79,12 @@ public class AltServlet extends HttpServlet {
      * Visible protected access from ScriptableObject (read-only and permanent) 
      */
     public static final int VISIBLE = ScriptableObject.PERMANENT |
-                                        ScriptableObject.READONLY;
+                                       ScriptableObject.READONLY;
+    /**
+     * Visible unprotected access (default)
+     */
+    public static final int AVAILABLE = ScriptableObject.EMPTY;
+    
     /**
      * Constructs a new AltServlet
      */
@@ -279,40 +285,44 @@ public class AltServlet extends HttpServlet {
      * @param response  the HTTP response object
      */
     @Override
-    public void service(HttpServletRequest request, 
-            HttpServletResponse response) {
+    public void service(final HttpServletRequest request, 
+            			final HttpServletResponse response) {
         long startTime = System.nanoTime();
-        Context cx = Context.enter();
-        cx.setOptimizationLevel(optimization);
-        cx.putThreadLocal("altServlet",AltServlet.this);
-        try {
-
-            // retrieve JavaScript...
-            JavaScript s = loader.loadScript(mainScript);
-            
-            // Isolate the request from the module namespace
-            ScriptableObject requestScope = makeChildScope("RequestScope-" +
-                    (requestCount++),s.getModule());
-            
-            cx.putThreadLocal("globalScope", globalScope);
-            cx.putThreadLocal("requestScope", requestScope);
-            // Define thread-local variables
-            requestScope.defineProperty("request", 
-                    new NativeJavaInterface(requestScope, request, 
-                            HttpServletRequest.class), VISIBLE);
-            
-            requestScope.defineProperty("response", 
-                    new NativeJavaInterface(requestScope, response, 
-                            HttpServletResponse.class), VISIBLE);
-            
-            
-            // Evaluate the script in this scope
-            s.evaluate(cx, requestScope);
-        } catch (Throwable ex) {
-            handleError(response,ex);
-        } finally {
-            Context.exit();
-        }
+        Context.call(new ContextAction() {
+        	public Object run(Context cx ) {
+		        cx.setOptimizationLevel(optimization);
+		        cx.putThreadLocal("altServlet",AltServlet.this);
+		        // Convert Java objects to JavaScript objects...
+		        cx.getWrapFactory().setJavaPrimitiveWrap(false);
+		        try {
+		            // retrieve JavaScript...
+		            JavaScript s = loader.loadScript(mainScript);
+		            
+		            // Isolate the request from the module namespace
+		            ScriptableObject requestScope = makeChildScope("RequestScope-" +
+		                    (requestCount++), globalScope);
+		            
+		            cx.putThreadLocal("globalScope", globalScope);
+		            cx.putThreadLocal("requestScope", requestScope);
+		            // Define thread-local variables
+		            requestScope.defineProperty("request", 
+		                    new NativeJavaInterface(requestScope, request, 
+		                            HttpServletRequest.class), AVAILABLE);
+		            
+		            requestScope.defineProperty("response", 
+		                    new NativeJavaInterface(requestScope, response, 
+		                            HttpServletResponse.class), AVAILABLE);
+		            
+		            
+		            // Evaluate the script in this scope
+		            s.evaluate(cx, requestScope);
+		        } catch (Throwable ex) {
+		            handleError(response,ex);
+		        }
+		        
+		        return null;
+        	}
+        });
         long time = System.nanoTime() - startTime;
         System.out.println("handled in "+(time*1e-9)+"sec");
     }

@@ -1,8 +1,6 @@
 Alt.require('alt.resource.XML');
 
-
-response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_NOT_FOUND;
+dictator.start("text/html; charset=UTF-8", HTTP.NOT_FOUND);
 
 var xml = Resources.load("/alt/dictator/IndexPage.xml");
 

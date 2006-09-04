@@ -1,3 +1,6 @@
+
+Alt.require('alt.resource.String');
+	        
 /**
  * Constructs a new JSDoc object
  * @class
@@ -27,6 +30,12 @@ function JSDoc(func) {
 		// See if a jsdoc is defined for this function
 		var doc = func.__jsdoc__;
 	    this.source = func.__source__;
+	    /*
+	    if (func.__source__) {
+	        this.fileSource = Resources.get(this.source, alt.resource.String)
+	                                   .split('\n');
+	        //this.functionSource = 
+	    }*/
 	    this.lines = [];
 	    if (func.__lines__) {
 	        for each (var i in func.__lines__)

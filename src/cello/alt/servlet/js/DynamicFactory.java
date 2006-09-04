@@ -51,4 +51,14 @@ public class DynamicFactory extends ContextFactory {
             return true;
         return super.hasFeature(cx, feature);
     }
+
+	/**
+	 * @see ContextFactory#observeInstructionCount(Context, int)
+	 */
+    /*
+	@Override
+	protected void observeInstructionCount(Context cx, int instructionCount) {
+		//
+	}*/
+    
 }

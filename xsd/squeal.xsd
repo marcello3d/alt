@@ -1,0 +1,168 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+			SQL Schema definition for creating and managing databases.
+			by Marcello Bastea-Forte (marcello@cellosoft.com) 
+			Version 0.1
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:element name="schema">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				The top-level element is a schema tag with 0 or more
+				types, database, or table tags.
+			</xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:sequence>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="database" type="Database" />
+					<xs:element name="types" type="Types" />
+					<xs:element name="table" type="Table" />
+				</xs:choice>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="Database">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="type" type="Type" />
+				<xs:element name="table" type="Table" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="name" type="Name" use="optional" />
+	</xs:complexType>
+
+	<xs:complexType name="Types">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="type" type="Type" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="name" type="Name" use="optional" />
+	</xs:complexType>
+	<xs:complexType name="Type">
+		<xs:sequence>
+			<xs:choice maxOccurs="unbounded" minOccurs="0">
+				<xs:element name="option" type="Option" />
+				<xs:element name="define-constraint"
+					type="DefineConstraint" />
+				<xs:element name="constrain" type="Constrain" />
+				<xs:element name="define-method" type="DefineMethod" />
+			</xs:choice>
+		</xs:sequence>
+		<xs:attribute name="name" type="TypeName" use="required" />
+		<xs:attribute name="base" type="TypeName" use="optional" />
+		<xs:attribute name="size">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\d+[kmg]?"></xs:pattern>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:simpleType name="Name">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-zA-Z_][a-zA-Z0-9_]+" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="TableName">
+		<xs:restriction base="xs:string">
+			<xs:pattern
+				value="[a-zA-Z_][a-zA-Z0-9_]*(.[a-zA-Z_][a-zA-Z0-9_]*)*" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="TypeName">
+		<xs:restriction base="xs:string">
+			<xs:pattern value=".+" />
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="Table">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="field">
+					<xs:complexType>
+						<xs:attribute name="name" type="Name"
+							use="required" />
+						<xs:attribute name="type" type="TypeName"
+							use="required" />
+						<xs:attribute name="index" type="IndexType"
+							use="optional" default="false" />
+						<xs:attribute name="required" type="xs:boolean"
+							use="optional" default="false" />
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="link">
+					<xs:complexType>
+						<xs:attribute name="name" type="Name"
+							use="required" />
+						<xs:attribute name="table" type="TableName"
+							use="required" />
+						<xs:attribute name="index" type="xs:boolean"
+							use="optional" default="false" />
+						<xs:attribute name="required" type="xs:boolean"
+							use="optional" default="false" />
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="type" type="Type" />
+				<xs:element name="table" type="Table" />
+			</xs:choice>
+		</xs:sequence>
+
+		<xs:attribute name="name" type="Name" use="required" />
+		<xs:attribute name="parent" type="TableName" use="optional" />
+		<xs:attribute name="unique" type="xs:boolean" use="optional"
+			default="false" />
+		<xs:attribute name="required" type="xs:boolean" use="optional"
+			default="false" />	</xs:complexType>
+
+
+	<xs:complexType name="Constrain">
+		<xs:attribute name="name" type="xs:string" />
+		<xs:anyAttribute processContents="skip"></xs:anyAttribute>
+	</xs:complexType>
+
+	<xs:complexType name="Option">
+		<xs:attribute name="value" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="DefineConstraint">
+		<xs:attribute name="name" type="xs:string" />
+		<xs:attribute name="type">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="client" />
+					<xs:enumeration value="server" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+
+	<xs:complexType name="DefineMethod">
+		<xs:attribute name="name" type="MethodName" />
+	</xs:complexType>
+
+	<xs:simpleType name="MethodName">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-zA-Z_][a-zA-Z0-9_]*" />
+		</xs:restriction>
+	</xs:simpleType>
+
+
+	<xs:simpleType name="IndexType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="true"></xs:enumeration>
+			<xs:enumeration value="false"></xs:enumeration>
+			<xs:enumeration value="unique"></xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

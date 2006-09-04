@@ -22,6 +22,23 @@
       <p>A rough comparison can be made to XSLT and JSF (Java Server Faces), Onion ML provides a means of defining custom XML tags in an attempt to abstract modular content design.</p>
       <p>These custom tags can both be designed directly in Onion ML  xml files, or they can be defined as a functional code which generates data on the fly.</p>
       <p>In addition to static content, Onion ML provides simple yet powerful control flow methods necessary for dynamic content. Methods for iterating over data sets and conditionally displaying tags are core to Onion ML's functionality. </p>
+      <h2>Introduction to Onion ML</h2>
+      <p>Onion ML can be thought of as a tag scripting language, you can define a simple tag:</p>
+      <pre>&lt;onion version=&quot;1.0&quot; xmlns:tag=&quot;http://alt.cellosoft.com/xml/onion/tag&quot; 
+ xmlns:o=&quot;http://alt.cellosoft.com/xml/onion/core&quot;
+ xmlns:html=&quot;alt.onion.tags.html&quot;&gt;<br /><br /> &lt;tag:head renderer=&quot;xhtml&quot; use=&quot;html&quot;&gt;
+  &lt;html:head&gt;
+   &lt;meta http-equiv=&quot;content-type&quot; content=&quot;application/xhtml+xml; charset=utf-8&quot; /&gt;
+   &lt;title&gt;Inspector&lt;/title&gt;
+   &lt;style type=&quot;text/css&quot;&gt;
+   pre { font-size: 0.8em; }
+   p { margin-top: 0; }
+   &lt;/style&gt;
+   &lt;o:tag-contents/&gt;
+  &lt;/html:head&gt;
+ &lt;/tag:head&gt;
+&lt;/onion&gt;</pre>
+      <p>&nbsp; </p>
       <h2>Quick Tutorial</h2>
       <p><em>To come...  </em></p>
       <!-- InstanceEndEditable --></td>
@@ -36,7 +53,7 @@
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Saturday, August 19, 2006<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Thursday, August 31, 2006<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>

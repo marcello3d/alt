@@ -109,7 +109,7 @@ Resources.loadResource = function(resourceName, constructor, useCache) {
 		// If there is a cache, 
 		if (cachedObject != null) {
 			// and version not changed, return it
-			if (newTag.equals(cachedObject.versionTag))
+			if (newTag === cachedObject.versionTag)
 				return cachedObject.object;
 			// otherwise, check if the cachedObject has an 'updateResource' 
 			// function and use it

@@ -1,10 +1,11 @@
 
 Alt.require('alt.dictator.Path');
+Alt.require('alt.dictator.HTTP');
 
-// This should not change per Servlet instance so we can make it global
-var mainScript = Servlet.config.getInitParameter('dictator.index');
-if (mainScript == null)
-	mainScript = 'Index';
+// These should not change per Servlet instance so we can make them global
+var mainScript = Servlet.config.getInitParameter('dictator.index') || 'Index';
+var mainFilter = Servlet.config.getInitParameter('dictator.filter') || 
+    'alt.dictator.DefaultFilter';
 
 /**
  * Constructs a new Dictator object.  In general it is a better idea to simply
@@ -15,6 +16,11 @@ if (mainScript == null)
 function Dictator() {
 	this.path = null;
 	this.handled = false;
+	this.allowed = {
+	   'GET':      true,
+	   'HEAD':     true,
+	   'OPTIONS':  true
+	};
 	this.index('alt.dictator.IndexPage', true);
 	this.error('alt.dictator.ExceptionPage');
 }
@@ -23,14 +29,19 @@ function Dictator() {
  * Main entry point/launcher for Dictator module.  There is no need to call this
  *  method directly, it is used by the {@link alt.dictator.Main} script.
  * 
- * @param {javax.servlet.http.HttpServletRequest}  request    the http request
- * @param {javax.servlet.http.HttpServletResponse} response   the http response
- * @param                                          scope      the scope to use
+ * @private
+ * @param  {Object}   scope      the scope to use
  */
-Dictator.prototype.handle = function(request, response, scope) {
-	// Make path object
-	this.path = new Path(request);
+Dictator.prototype.handle = function(scope) {
+	this.request = scope.request;
+	this.response = scope.response;
 	this.scope = scope;
+	
+	// Make path object
+	this.path = new Path(this.request);
+	
+	// We'll replace this later with our own type
+	//delete scope.response;
 	
 	// Handle the script
 	this.handleScript(mainScript);
@@ -64,6 +75,40 @@ Dictator.prototype.error = function(script) {
 Dictator.prototype.index = function(script, recordPaths) {
 	this.indexScript = script;
 	this.recordPaths = recordPaths;
+}
+
+/**
+ * This function tells Dictator to allow certain HTTP methods by your script.
+ *  By default the methods GET, HEAD, and OPTIONS are allowed.  If you want to 
+ *  allow form input, you need to allow POST.  If you want to support other 
+ *  methods (PUT, DELETE, TRACE), call this method.
+ * You can check the 
+ * 
+ * @param {String}  method  the name of the method (should be all-caps)
+ */
+Dictator.prototype.allow = function(method) {
+    this.allowed[method] = true;
+}
+
+/**
+ * This function initiates the response through Dictator.  
+ * 
+ * @param {String}  contentType the content type for the response (default text/html; charset=UTF-8)
+ * @param {int}     statusCode  the status code for the response (default HTTP.OK)
+ * @see alt.dictator.HTTP 
+ */
+Dictator.prototype.start = function(contentType, statusCode) {
+    this.response.contentType = contentType || 'text/html; charset=UTF-8';
+    this.response.status      = statusCode  || HTTP.OK;
+    
+    switch (this.request.method) {
+        case "HEAD":
+        	//var response = new NoBodyResponse(resp);
+        	//response.
+        	
+            break;
+    }
+	
 }
 
 /**

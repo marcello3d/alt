@@ -28,6 +28,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextAction;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.NativeJavaObject;
@@ -61,9 +62,22 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
      * @param server  the server
      */
     public GlobalScope(AltServlet server) {
-        Context cx = Context.enter();
-        cx.initStandardObjects(this);
-        Context.exit();
+        Context.call(new ContextAction() {
+			public Object run(Context cx) {
+		        cx.initStandardObjects(GlobalScope.this);
+				return null;
+			}
+        });
+        
+        /*
+        ScriptableObject objectProto = (ScriptableObject)
+        							ScriptableObject.getObjectPrototype(this);
+        objectProto.defineFunctionProperties(
+    		new String[]{"__defineGetter__",
+    					 "__defineSetter__"}, 
+    		getClass(), 
+    		AltServlet.PROTECTED
+        );*/
 
         // Two properties of global: a self pointer
         defineProperty("global", this, AltServlet.PROTECTED);
@@ -81,6 +95,30 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
 
         rootModule = new RootModule(this);
     }
+    
+    /**
+     * @param cx
+     * @param thisObj
+     * @param args
+     * @param funObj
+     * @return null
+     */
+    /*
+    public static Object __defineGetter__(Context cx, Scriptable thisObj, 
+    		Object[] args, Function funObj) {
+    	if (thisObj instanceof ScriptableObject) {
+    		String field = Context.toString(args[0]);
+    		ScriptableObject so = (ScriptableObject)thisObj;
+    		so.defineProperty("__defineGetter__"+field, args[1], AltServlet.)
+    		so.defineProperty(field, null, 
+    				GlobalScope.class.getMethod("reflectGetter", 
+    											ScriptableObject.class), 
+    				null, 
+    				ScriptableObject.EMPTY);
+    	}
+    	return null;
+    }*/
+    
     /**
      * Converts wrapped Java objects to their native object. 
      * @param o 
@@ -310,7 +348,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 throw new RuntimeException("Current script is undefined!");
             
             
-            return cx.evaluateString(scope,source,currentScript.getName()+"(eval)",1,null);
+            return cx.evaluateString(scope,source,
+            						currentScript.getName()+"(eval)",1,null);
         }
 
         /**
@@ -398,13 +437,14 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             Function func = (Function)args[1];
             
             synchronized (lock) {
-                func.call(cx, func.getParentScope(), thisObj, new Object[]{cx,lock,func,funObj,thisObj});
+                func.call(cx, func.getParentScope(), thisObj, 
+                		new Object[]{lock, thisObj});
             }
             
             return lock;
         }
         /**
-         * The JavaScript function "log" 
+         * The JavaScript function "throwMessage" 
          * @param message 
          */
         public void throwMessage(String message) {
