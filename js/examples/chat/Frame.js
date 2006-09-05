@@ -1,5 +1,11 @@
 
-var sessiondata = request.session.getAttribute('chatData');
+
+
+
+var sessiondata = {};
+
+examples.chat.roomData[request.sessionId] = sessiondata;
+request.session.setAttribute('chatData', sessiondata);
 
 response.write("<html>");
 response.write("<body>");
@@ -16,6 +22,8 @@ while (true) {
     response.write(message);
     response.flush();
 }
+
+delete roomData[request.sessionId];
 
 response.write(<><hr/><p>Done.</p></>)
 response.write("</body>");

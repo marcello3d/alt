@@ -1,15 +1,11 @@
 
 if (!examples.chat.roomData)
-    examples.chat.roomData = new java.util.HashMap();
+    examples.chat.roomData = {};
 
-var sessiondata = request.session.getAttribute('chatData');
-
-if (sessiondata == null) {
-    sessiondata = {};
-    request.session.setAttribute('chatData', sessiondata);
+function sendAll(message) {
+    for each (var sessiondata in examples.chat.roomData)
+        sessiondata.queue.offer(message);
 }
-
-examples.chat.roomData.put(request.session, sessiondata);
 
 dictator.map({
     'frame':    'examples.chat.Frame',
