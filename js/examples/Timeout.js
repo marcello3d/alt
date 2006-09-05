@@ -1,11 +1,10 @@
 
-var o = response.writer;
+
+response.start('text/plain');
 var i = 0;
-response.contentType = 'text/plain';
-response.status = response.SC_OK;
 while (true) {
-    o.println("foo "+(i++));
-    o.flush();
+    response.writeln("foo "+(i++));
+    response.flush();
     java.lang.Thread.sleep(100);
 }
     

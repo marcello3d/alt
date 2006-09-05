@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>Chat demo</title>
+<style type="text/css">
+body, p, td, th, li {
+	font-family: Verdana, sans-serif;
+}
+a {
+	color: #cc3333;
+}
+iframe {
+	border: solid 2px silver;
+	width: 100%;
+	height: 400px;
+} 
+input {
+	border: solid 2px silver;	 
+}
+</style>
+<script type="text/javascript">
+<![CDATA[
+function xmlreq() {
+	var request = null;
+    if (window.XMLHttpRequest)
+        request = new XMLHttpRequest();
+    else if (window.ActiveXObject)
+        request = new ActiveXObject("Microsoft.XMLHTTP");
+    return request;
+}
+function $(n) {
+	return document.getElementById(n);
+}
+function submitForm() {
+	var i = $('input');
+	var message = i.value;
+	i.value = '';
+	var req = xmlreq();
+	req.open("POST","req",true);
+	req.send("input="+encodeURI(message));
+}
+]]>
+</script>
+</head>
+<body>
+<h1>Chat demo</h1>
+<iframe src="frame" border="0">x</iframe>
+<form action="." onsubmit="submitForm(); return false;">
+<table cellspacing="0" cellpadding="0" border="0" width="100%" style="width:100%;padding-top:2px">
+<tr>
+	<td width="100%">
+		<input id="input" style="width:100%"/></td>
+	<td>d</td>
+	<td align="right"><input type="submit" value="Join"/></td>
+</tr>
+</table>
+</form>
+<p>Back to <a href="..">examples list</a></p>
+</body>
+</html>

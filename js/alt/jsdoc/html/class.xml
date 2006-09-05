@@ -6,7 +6,7 @@
   <meta http-equiv="content-type" 
   		content="application/xhtml+xml; charset=utf-8" />
   <title>Overview Summary</title>
-  <link rel="stylesheet" type="text/css" href="style.css" title="style"/>
+  <link rel="stylesheet" type="text/css" href="../style.css" title="style"/>
  </head>
  <body id="class" class="summary">
   <div id="contents"/>

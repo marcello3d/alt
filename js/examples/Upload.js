@@ -48,6 +48,4 @@ if (ServletFileUpload.isMultipartContent(request)) {
 } else {
 }
 
-dictator.start();
-
 response.write(xml.toXMLString());

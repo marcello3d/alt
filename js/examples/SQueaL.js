@@ -26,6 +26,4 @@ xml..p.(@id=="db").appendChild(db);
 xml..p.(@id=="log").appendChild(list);
 xml..p.(@id=="squeal").appendChild(sql.toHTML());
 
-response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_OK;
-response.writer.print(xml);
+response.write(xml);

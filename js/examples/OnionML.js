@@ -7,8 +7,5 @@ var onion = new Onion(xml);
 
 var site = onion.getXML('site');
 
-response.status = response.SC_OK;
-response.contentType = "text/html";
-
-response.writer.print(site);
+response.write(site);
 

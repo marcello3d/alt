@@ -23,7 +23,5 @@ for each (var n in sorted) {
             <small>{n.getModule()}</small></li>);
 }
 
-response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_OK;
-response.writer.print(xml);
+response.write(xml);
  

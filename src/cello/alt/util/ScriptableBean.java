@@ -73,7 +73,6 @@ public class ScriptableBean extends ScriptableObject {
                 ctorMember = m;
                 break;
             }
-        System.out.println("ScriptableBean.init("+scope+")");
         FunctionObject ctor = new FunctionObject("ScriptableBean", ctorMember, 
         		scope);
         ctor.addAsConstructor(scope, proto);

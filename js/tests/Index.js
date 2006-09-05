@@ -1,24 +1,13 @@
-
-
 Alt.require('tests.Tester');
 
-
-dictator.start();
-
-var o = response.writer;
-
-o.print('<html><body>');
-
-
-Alt.require('alt.html.StringUtils');
+response.write('<html><body>');
 
 function writeln(s) {
-	response.writer.println(alt.html.StringUtils.escapeHTML(s)+'<br/>');
+	response.writeln(<>{s}<br/></>);
 }
 function writeColorln(color) {
 	return function(msg) {
-		response.writer.println('<span style="color:'+color+'">'+
-				alt.html.StringUtils.escapeHTML(msg)+'</span><br/>');
+		response.writeln(<><span style={'color:'+color}>{msg}</span><br/></>);
 	}
 }
 
@@ -37,4 +26,4 @@ tests.Tester.test(this,
 	writeln, writeColorln('green'), writeColorln('red')
 	);
 
-o.print('</body></html>');
+response.write('</body></html>');

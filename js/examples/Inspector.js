@@ -16,6 +16,4 @@ XML.ignoreComments = false;
 var inspector = new alt.jsdoc.Inspector(global);
 xml..div.(@id=="content").appendChild(inspector.toHTML());
 
-dictator.start();
-
-response.writer.print(xml);
+response.write(xml);

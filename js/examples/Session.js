@@ -25,8 +25,6 @@ xml..span.(@id=="sessionhits")[0] = sessiondata.hits;
 xml..span.(@id=="string")[0] = sessiondata.string;
 xml..input.(@name=="string").@value = sessiondata.string;
 
-dictator.allow(HTTP.POST);
-
-dictator.start('application/xhtml+xml; charset=utf-8');
-
-response.writer.print(xml.toXMLString());
+//response.allow(HTTP.POST);
+response.start('application/xhtml+xml; charset=utf-8');
+response.write(xml);

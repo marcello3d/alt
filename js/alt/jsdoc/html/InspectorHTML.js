@@ -191,7 +191,7 @@ InspectorFunction.prototype.toHTML = function(name) {
     //Alt.require('lgpl.packer.Pack');
     //var packedSource = lgpl.packer.pack(compressedSource, "UTF-8", false, false); 	                 
     //} catch (ex) {}
-    compressedSource = compressedSource.replace(/(.{80})/g,'$1\n');
+    compressedSource = compressedSource.replace(/(.{79})/g,'$1\\\n');
     
 	return <dl style="margin:0">
 	         <dt>

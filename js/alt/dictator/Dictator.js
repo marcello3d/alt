@@ -3,10 +3,8 @@ Alt.require('alt.dictator.Path');
 Alt.require('alt.dictator.HTTP');
 Alt.require('alt.dictator.Response');
 
-// These should not change per Servlet instance so we can make them global
+// This should not change per Servlet instance so we can make it global
 var mainScript = Servlet.config.getInitParameter('dictator.index') || 'Index';
-var mainFilter = Servlet.config.getInitParameter('dictator.filter') || 
-    'alt.dictator.DefaultFilter';
 
 /**
  * Constructs a new Dictator object.  In general it is a better idea to simply
@@ -17,9 +15,6 @@ var mainFilter = Servlet.config.getInitParameter('dictator.filter') ||
 function Dictator() {
 	this.path = null;
 	this.handled = false;
-	this.started = false;
-	this.allowed = {};
-	this.allow(HTTP.GET, HTTP.HEAD, HTTP.OPTIONS);
 	this.index('alt.dictator.IndexPage', true);
 	this.defaultErrorScript = 'alt.dictator.ExceptionPage';
 	this.error('alt.dictator.ExceptionPage');
@@ -48,13 +43,16 @@ Dictator.prototype.handle = function(scope) {
 	this.path = new Path(this.request);
 	
 	// Replace response object with our own
-	scope.response = new Response(this); 
+	this.scope.response = new Response(this); 
 	
 	// Handle the script
 	this.handleScript(mainScript);
 	
 	// Otherwise, a catch-all filter acts like a 404 page
 	this.filter('alt.dictator.NotFoundPage');
+	
+	// Finish everything
+	this.scope.response.finish();
 }
 
 /**
@@ -84,72 +82,9 @@ Dictator.prototype.index = function(script, recordPaths) {
 	this.recordPaths = recordPaths;
 }
 
-/**
- * This function tells Dictator to allow certain HTTP methods by your script.
- *  By default the methods GET, HEAD, and OPTIONS are allowed.  If you want to 
- *  allow form input, you need to allow POST.  If you want to support other 
- *  methods (PUT, DELETE, TRACE), call this method.
- * You can check the 
- * 
- * @param {String}  method  the name of the method (should be all-caps)
- */
-Dictator.prototype.allow = function(method) {
-    for (var x=0; x<arguments.length; x++)
-        this.allowed[arguments[x]] = true;
-}
-
-Dictator.prototype.sendError = function(status, message) {
-    if (!this.response.committed) {
-        this.response.status = status;
-        this.response.contentType = 'text/plain; charset=UTF-8';
-    }
-    this.response.writer.println(status+" "+HTTP.codeToString(status));
-    this.response.writer.println(message);
-    this.finish();
-}
 
 Dictator.prototype.redirect = function(location) {
-    this.response.sendRedirect(location);
-    this.finish();
-}
-
-/**
- * This function initiates the response through Dictator.  
- * 
- * @param {String}  contentType the content type for the response (default text/html; charset=UTF-8)
- * @param {int}     statusCode  the status code for the response (default HTTP.OK)
- * @see alt.dictator.HTTP 
- */
-Dictator.prototype.start = function(contentType, statusCode) {
-    if (!this.allowed[this.request.method]) {
-        this.sendError(this.request.protocol.match(/1.1$/) ? 
-                                 HTTP.METHOD_NOT_ALLOWED :
-                                 HTTP.BAD_REQUEST,
-                       this.request.method+' not allowed.');
-    }
-    this.response.contentType = contentType || 'text/html; charset=UTF-8';
-    this.response.status      = statusCode  || HTTP.OK;
-    this.started = true;
-    
-    switch (this.request.method) {
-        case HTTP.HEAD:
-            this.scope.response.echo = false;
-            break;
-        case HTTP.OPTIONS:
-            var allow = "";
-            for each (var method in this.allowed)
-                allow = (allow ? allow+', ' : '')+method;
-	        this.response.setHeader("Allow", allow);
-            break;
-        case HTTP.GET:
-        case HTTP.POST:
-            break;
-    }
-	
-}
-Dictator.prototype.finish = function() {
-    this.scope.response.finish();
-    this.setHandled();
+    this.scope.response.redirect(location);
 }
 
 /**

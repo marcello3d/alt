@@ -1,5 +1,8 @@
 
 // Some helpful aliases
+//
+// It would be nice to wrap these up in some JavaScript library for Alt
+//  
 var BufferedImage = java.awt.image.BufferedImage;
 var Color = java.awt.Color;
 var Line = java.awt.geom.Line2D.Double;
@@ -47,7 +50,7 @@ g.drawString("homg ip! "+request.remoteAddr, 50, 20);
 g.drawString("homg host? "+request.remoteHost, 50, 30);
 
 // Set response information
-dictator.start('image/png');
+response.start('image/png');
 
 // Write image out to user
 ImageIO.write(img, "png", response.outputStream);

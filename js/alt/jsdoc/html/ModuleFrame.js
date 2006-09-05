@@ -23,7 +23,5 @@ for each (var n in sorted) {
     classlist.appendChild(<li><a href={path} target="classFrame">{n.name}</a></li>);
 }
 
-response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_OK;
-response.writer.print(xml);
+response.write(xml);
  

@@ -8,7 +8,5 @@ var node = inspector.modules[currentModule][currentClass];
 
 xml..div.(@id=="contents")[0] += node.toHTML();
 
-response.contentType = "text/html; charset=UTF-8";
-response.status = response.SC_OK;
-response.writer.print(xml);
+response.write(xml);
  

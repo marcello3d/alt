@@ -11,6 +11,6 @@ dictator.map({
 	SQueaL: 	'examples.SQueaL',
 	OnionML:    'examples.OnionML',
 	HSQL:		'examples.HSQL',
-	Timeout:    'examples.Timeout'
-	
+	Timeout:    'examples.Timeout',
+	chat:       'examples.chat.Main'
 });

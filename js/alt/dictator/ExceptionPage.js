@@ -1,13 +1,16 @@
 
-
-
-if (dictator.started) {
+/*
+ * This code accesses the response information and prints raw html, in case 
+ *  things are really messed up.
+ */
+if (dictator.response.committed) {
     var out = response.writer;
     exception.printStackTrace(out);
 } else {
-    dictator.start("text/html; charset=UTF-8", HTTP.INTERNAL_SERVER_ERROR);
+    dictator.response.status = 500;
+    dictator.response.contentType = "text/html; charset=UTF-8";
     
-	var out = response.writer;
+	var out = dictator.response.writer;
 	out.println("<html>");
 	out.println(" <head><title>Execution Error: 500</title></head>");
 	out.println(" <body>");
@@ -28,7 +31,8 @@ if (dictator.started) {
 		out.println(exception.toString ? exception.toString() : exception);
 		var match;
 		var index = 0;
-		while (match = /at (?:(script[^)]*)|org\.mozilla\.javascript\.gen\.[^)]*)\(([^:]+.js:[^)]+)\)/g.exec(stack,index)) {
+		while (match = /at (?:(script[^)]*)|org\.mozilla\.javascript\.gen\.[^)]\
+		               *)\(([^:]+.js:[^)]+)\)/g.exec(stack,index)) {
 			index = match.index;
 			out.println('    '+(match[1]||'')+" "+match[2]);
 		}
@@ -40,5 +44,3 @@ if (dictator.started) {
 	out.println(" </body>");
 	out.println("</html>");
 }
-
-dictator.finish();

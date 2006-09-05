@@ -47,10 +47,17 @@ Onion.prototype.add = function(xml) {
 	}
 }
 Onion.prototype.getTag = function (tagName) {
-    if (!this.tags[tagName])
-        throw new Exception("Tag not defined: "+tagName);
+    if (!this.tags[tagName]) {
+        default xml namespace = Onion.O_NAMESPACE;
+        this.tags[tagName] = new OnionTag(tagName,
+                                            <tag-contents />,
+                                            null);
+        //throw new Exception("Tag not defined: "+tagName);
+    }
     return this.tags[tagName];
 }
+
+
 Onion.prototype.getXML = function (tagName, contents) {
     this.getTag(tagName).handle(this, contents);
 }

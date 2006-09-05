@@ -99,11 +99,7 @@ function buildTable(table, names) {
     }
 }
 
-dictator.start();
-
-response.writer.print(xml);
-
-dictator.setHandled();
+response.write(xml);
 
 })({
     'global_scope': global,
