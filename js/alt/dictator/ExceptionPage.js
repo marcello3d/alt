@@ -28,6 +28,8 @@ if (dictator.response.committed) {
 		var stack = sw.toString();
 		out.println("  <p>JavaScript stack trace:</p>");
 		out.print("  <blockquote><pre>");
+		//out.print(exception.rhinoException.scriptStackTrace);
+		
 		out.println(exception.toString ? exception.toString() : exception);
 		var match;
 		var index = 0;

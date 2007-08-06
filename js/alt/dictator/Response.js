@@ -50,7 +50,9 @@ Response.prototype.getCache = function() {
     	};
     return this.cache;
 }
-
+Response.prototype.redirect = function(u) {
+	this.response.sendRedirect(u);
+}
 
 
 

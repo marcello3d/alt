@@ -111,7 +111,7 @@ SQLSchema.prototype.add = function(xml) {
 	}
 
 	/**
-	 * Handles a cello.SimpleXML "type" node
+	 * Handles a XML "type" node
 	 * @param {Node}	parent	The node this type belongs to.
 	 * @param {XML}		xml		The XML node for the type.
 	 * @throws Exception if there was an error in the type

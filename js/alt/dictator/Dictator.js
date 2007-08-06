@@ -38,16 +38,17 @@ Dictator.prototype.handle = function(scope) {
 	this.request = scope.request;
 	this.response = scope.response;
 	this.scope = scope;
-	
 	// Make path object
 	this.path = new Path(this.request);
 	
 	// Replace response object with our own
 	this.scope.response = new Response(this); 
 	
+	split("dictator3");
 	// Handle the script
 	this.handleScript(mainScript);
 	
+	split("dictator4");
 	// Otherwise, a catch-all filter acts like a 404 page
 	this.filter('alt.dictator.NotFoundPage');
 	
@@ -142,12 +143,15 @@ Dictator.prototype.handleScript = function(script) {
 		
 		// Is file?
 		this.evaluateScript(script);
+		split("script}"+script);
 		
 		// Was anything generated?
 		if (!this.handled && this.recordedPaths != null) {
 			if (this.path.next == '') {
+				split("handle index");
 				Alt.evaluate(this.indexScript, this.scope);
 				this.setHandled();
+				split("/handle index");
 			}
 		} else
 			// Set it as handled
@@ -209,6 +213,7 @@ Dictator.prototype.handleException = function(ex) {
 	    } else
 	       throw ex+","+ex.rhinoException;
 	}
+	this.setHandled();
 }
 /**
  * @private

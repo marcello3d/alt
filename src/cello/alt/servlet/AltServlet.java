@@ -33,6 +33,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextAction;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -279,6 +280,35 @@ public class AltServlet extends HttpServlet {
     }
     
     private int requestCount = 1;
+    
+    private static long startTime = 0;
+    private static long totalScriptTime = 0;
+    private static long totalOverheadTime = 0;
+    private static boolean measuringOverhead = false;//String lastMessage = "";
+    public static boolean measure(boolean m) {
+    	if (measuringOverhead == m) return m;
+    	measuringOverhead = m;
+    	long nt = System.nanoTime();
+		long time = nt - startTime;
+    	if (measuringOverhead) {
+    		totalScriptTime += time;
+    	} else {
+    		totalOverheadTime += time;
+    	}
+		startTime = nt;
+		return !m;
+    }/*
+    public static void record() {
+    	//long time = System.nanoTime() - startTime;
+        //System.out.println("<<< ("+lastMessage+") in "+(time*1e-9)+"sec");
+        startTime = System.nanoTime();
+    }
+    public static void stopRecord(String str) {
+    	long time = System.nanoTime() - startTime;
+    	totalTime += time;
+        //System.out.println(">>> ("+str+") in "+(time*1e-9)+"sec");
+        startTime = System.nanoTime();
+    }*/
     /**
      * The main Servlet method. 
      * @param request  the HTTP request object
@@ -287,7 +317,11 @@ public class AltServlet extends HttpServlet {
     @Override
     public void service(final HttpServletRequest request, 
             			final HttpServletResponse response) {
-        long startTime = System.nanoTime();
+    	System.out.println(">>> got "+request.getRequestURL());
+        final long startTime = this.startTime = System.nanoTime();
+        totalScriptTime = 0;
+        totalOverheadTime = 0;
+        measure(true);
         Context.call(new ContextAction() {
         	public Object run(Context cx ) {
 		        cx.setOptimizationLevel(optimization);
@@ -313,9 +347,10 @@ public class AltServlet extends HttpServlet {
 		                    new NativeJavaInterface(requestScope, response, 
 		                            HttpServletResponse.class), AVAILABLE);
 		            
-		            
+		            measure(false);
 		            // Evaluate the script in this scope
 		            s.evaluate(cx, requestScope);
+		            measure(true);
 		        } catch (Throwable ex) {
 		            handleError(response,ex);
 		        }
@@ -324,6 +359,9 @@ public class AltServlet extends HttpServlet {
         	}
         });
         long time = System.nanoTime() - startTime;
-        System.out.println("handled in "+(time*1e-9)+"sec");
+        measure(false);
+        System.out.println("--- total overhead = "+(totalOverheadTime*1e-6)+"ms");
+        System.out.println("--- total script = "+(totalScriptTime*1e-6)+"ms");
+        System.out.println("<<< handled in "+(time*1e-6)+"ms");
     }
 }

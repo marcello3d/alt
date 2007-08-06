@@ -243,6 +243,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         public static Object require(Context cx, Scriptable thisObj, 
                 Object[] args, Function funObj) throws ScriptNotFoundException,
                 IOException {
+            boolean oldMeasure = AltServlet.measure(true);
 
             // Read arguments
             String scriptName = Context.toString(args[0]);
@@ -268,7 +269,10 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             // Add the dependency
             currentScript.addDependency(s, cascade);
             // Update the dependency
-            s.update(cx);
+            AltServlet.measure(false);
+        	s.update(cx);
+            AltServlet.measure(oldMeasure);
+        
 
             return s;
         }
@@ -291,6 +295,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         public static Object evaluate(Context cx, Scriptable thisObj, 
                 Object[] args, Function funObj) throws ScriptNotFoundException,
                 IOException {
+            boolean oldMeasure = AltServlet.measure(true);
 
             // Read arguments
             if (args.length==0) return false;
@@ -298,21 +303,26 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
 
             // Get the current script (the one that called evaluate())
             JavaScript currentScript = AltServlet.getCurrentScript(cx);
-            
+
             // This should never be null
             if (currentScript == null)
                 throw new RuntimeException("Current script is undefined!");
-            
+
             // Load and evaluate the script in the current scope
             ScriptLoader loader = currentScript.getScriptLoader();
             JavaScript s = loader.loadScript(scriptName);
-            
+
             // Get scope
             Scriptable scope = s.getModule();
             if (args.length>=2 && args[1] instanceof Scriptable)
                 scope = (Scriptable)args[1];
-            
-            return s.evaluate(cx, scope);
+
+            try {
+                AltServlet.measure(false);
+            	return s.evaluate(cx, scope);
+            } finally {
+                AltServlet.measure(oldMeasure);
+            }
         }
         /**
          * JavaScript function "evaluate".  In order to access the current 
@@ -330,6 +340,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
          */
         public static Object eval(Context cx, Scriptable thisObj, 
                 Object[] args, Function funObj) {
+            boolean oldMeasure = AltServlet.measure(true);
 
             // Read arguments
             if (args.length==0) return false;
@@ -347,9 +358,13 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             if (currentScript == null)
                 throw new RuntimeException("Current script is undefined!");
             
-            
-            return cx.evaluateString(scope,source,
-            						currentScript.getName()+"(eval)",1,null);
+            try {
+                AltServlet.measure(false);
+	            return cx.evaluateString(scope,source,
+	            						currentScript.getName()+"(eval)",1,null);
+            } finally {
+                AltServlet.measure(oldMeasure);
+            }
         }
 
         /**
