@@ -19,6 +19,8 @@ sessiondata.queue = queue;
 
 while (true) {
     var message = queue.take();
+    if (message=='quit')
+	    break;
     response.write(message);
     response.flush();
 }

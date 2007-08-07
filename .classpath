@@ -6,6 +6,6 @@
 	<classpathentry kind="lib" path="jetty/lib/jetty-6.1.5.jar"/>
 	<classpathentry kind="lib" path="jetty/lib/jetty-util-6.1.5.jar"/>
 	<classpathentry kind="lib" path="jetty/lib/servlet-api-2.5-6.1.5.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/rhinocvs"/>
+	<classpathentry kind="lib" path="js/WEB-INF/lib/rhino.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

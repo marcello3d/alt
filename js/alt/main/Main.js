@@ -1,3 +1,4 @@
+
 var startTime = java.lang.System.nanoTime();
 global.split= function(msg) {
 	Alt.log("split "+msg+": "+(java.lang.System.nanoTime() - startTime)*1e-6);

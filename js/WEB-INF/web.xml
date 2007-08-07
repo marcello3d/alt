@@ -22,7 +22,7 @@
     </init-param>
     <init-param>
       <param-name>rhino.optimization</param-name>
-      <param-value>2</param-value> 
+      <param-value>-1</param-value> 
     </init-param>
     <init-param>
       <param-name>alt.timeout</param-name>

@@ -21,7 +21,6 @@ input {
 }
 </style>
 <script type="text/javascript">
-<![CDATA[
 function xmlreq() {
 	var request = null;
     if (window.XMLHttpRequest)
@@ -45,7 +44,6 @@ function submitForm() {
     req.setRequestHeader("Connection", "close");
 	req.send(postdata);
 }
-]]>
 </script>
 </head>
 <body>
