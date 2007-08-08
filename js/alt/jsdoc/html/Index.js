@@ -1,4 +1,4 @@
-Alt.require('alt.resource.xml')
+Alt.require('alt.resource.XML')
 
 var index = Resources.load('index.xml');
 
