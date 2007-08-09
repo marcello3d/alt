@@ -8,7 +8,10 @@ else
     alt.jsdoc.html.inspector.reinspect();
     */
 
-var inspector = new alt.jsdoc.Inspector(global);
+if (request.getParameter('rewrite') || !global.alt.jsdoc.inspected)
+	global.alt.jsdoc.inspected = new alt.jsdoc.Inspector(global);
+	
+inspector = global.alt.jsdoc.inspected;
 
 dictator.map({
    '':                      'alt.jsdoc.html.Index',
