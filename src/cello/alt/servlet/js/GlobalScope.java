@@ -82,15 +82,15 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         // Two properties of global: a self pointer
         defineProperty("global", this, AltServlet.PROTECTED);
         //  and a "static" class for managing Rhino
-        AltClass rhinoClass = new AltClass(server);
-        defineProperty("Alt", rhinoClass, AltServlet.PROTECTED);
+        AltClass altClass = new AltClass(server);
+        defineProperty("Alt", altClass, AltServlet.PROTECTED);
         
         // Static class for managing servlet
         ServletClass servletClass = new ServletClass(server);
         defineProperty("Servlet", servletClass, AltServlet.PROTECTED);
         
         // Add require as a global method
-        defineProperty("require", rhinoClass.get("require",rhinoClass),
+        defineProperty("require", altClass.get("require",altClass),
                 AltServlet.PROTECTED);
 
         rootModule = new RootModule(this);

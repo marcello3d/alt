@@ -138,7 +138,7 @@ public class JarScriptLoader extends ScriptLoader {
         Set<String> set = new HashSet<String>();
         
         // Enumeration...meh
-        Enumeration e = zipFile.entries();
+        Enumeration<?> e = zipFile.entries();
         while (e.hasMoreElements()) {
             // Get filename
             String file = ((ZipFile)e.nextElement()).getName();

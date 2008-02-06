@@ -38,7 +38,7 @@ import cello.alt.servlet.resource.URLResource;
 public class ResourceScriptLoader extends ScriptLoader {
 
     private String basePath;
-    private Class clazz;
+    private Class<?> clazz;
     
     /**
      * Constructs a new ResourceScriptLoader object based on a particular file-

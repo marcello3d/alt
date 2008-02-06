@@ -51,7 +51,7 @@ public class Launcher {
             Thread.currentThread().setContextClassLoader(loader);
             
             // Initialize HTTP server
-            Class c = loader.loadClass("cello.alt.server.HTTPServer");
+            Class<?> c = loader.loadClass("cello.alt.server.HTTPServer");
             Method main = c.getMethod("main", String[].class);
             
             // Go!

@@ -57,7 +57,7 @@ public class HTTPServer {
 
     	XmlConfiguration xml = new XmlConfiguration(new FileInputStream("jetty/etc/jetty.xml"));
     	xml.configure();
-    	Map map = xml.getIdMap();
+    	Map<?,?> map = xml.getIdMap();
     	Object o = map.get("connector");
     	if (o != null && o instanceof Connector) {
 	    	Connector connector = (Connector)o;
@@ -130,7 +130,7 @@ public class HTTPServer {
             ex.printStackTrace(System.err);
         }
     }
-    private static String getVersion(Class c) {
+    private static String getVersion(Class<?> c) {
         Package p = c.getPackage();
         return p.getImplementationTitle()+" "+p.getImplementationVersion();
     }

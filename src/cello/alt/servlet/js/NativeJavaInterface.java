@@ -47,7 +47,7 @@ public class NativeJavaInterface extends NativeJavaObject {
      * @param staticType
      */
     public NativeJavaInterface(Scriptable scope, Object javaObject,
-            Class staticType) {
+            Class<?> staticType) {
         super(scope, javaObject, staticType);
     }
 

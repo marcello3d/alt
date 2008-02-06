@@ -33,7 +33,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextAction;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.JavaScriptException;
-import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -285,6 +284,11 @@ public class AltServlet extends HttpServlet {
     private static long totalScriptTime = 0;
     private static long totalOverheadTime = 0;
     private static boolean measuringOverhead = false;//String lastMessage = "";
+    /**
+     * Not used?
+     * @param m
+     * @return last measure flag
+     */
     public static boolean measure(boolean m) {
     	if (measuringOverhead == m) return m;
     	measuringOverhead = m;
@@ -318,7 +322,7 @@ public class AltServlet extends HttpServlet {
     public void service(final HttpServletRequest request, 
             			final HttpServletResponse response) {
     	System.out.println(">>> got "+request.getRequestURL());
-        final long startTime = this.startTime = System.nanoTime();
+        final long startTime = AltServlet.startTime = System.nanoTime();
         totalScriptTime = 0;
         totalOverheadTime = 0;
         measure(true);

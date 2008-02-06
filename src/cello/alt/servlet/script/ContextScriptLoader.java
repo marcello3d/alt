@@ -102,7 +102,7 @@ public class ContextScriptLoader extends ScriptLoader {
         if (path.startsWith("/"))
             path = path.substring(1);
         
-        Set paths = context.getResourcePaths(basePath+path);
+        Set<?> paths = context.getResourcePaths(basePath+path);
         if (paths==null)
             return null;
         
