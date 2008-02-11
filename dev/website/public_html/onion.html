@@ -16,31 +16,165 @@
 <table width="780" border="0" align="center" cellpadding="10" cellspacing="0">
   <tr>
     <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
-      <p>[This section is under construction!] </p>
       <h1>Onion ML</h1>
-      <p>Onion ML is an XML-based template system designed with a bias toward modularity and simplicity. </p>
-      <p>A rough comparison can be made to XSLT and JSF (Java Server Faces), Onion ML provides a means of defining custom XML tags in an attempt to abstract modular content design.</p>
-      <p>These custom tags can both be designed directly in Onion ML  xml files, or they can be defined as a functional code which generates data on the fly.</p>
-      <p>In addition to static content, Onion ML provides simple yet powerful control flow methods necessary for dynamic content. Methods for iterating over data sets and conditionally displaying tags are core to Onion ML's functionality. </p>
+      <p>Onion ML is an XML template system designed with a bias toward modularity.</p>
+      <p>Onion ML lets you easily custom XML tags to make modular content design simple and easy to mix with HTML. It is somewhat comparable to XSLT and JSF, but intended to be easier to understand.</p>
+      <p>You define custom tags either in Onion ML  XML files, or they can be defined as custom JavaScript functions which generate output.</p>
+      <p>Onion ML also provides several control flow methods necessary for dynamic content. Methods for iterating over data sets and conditionally displaying tags are core to Onion ML's functionality.</p>
       <h2>Introduction to Onion ML</h2>
-      <p>Onion ML can be thought of as a tag scripting language, you can define a simple tag:</p>
-      <pre>&lt;onion version=&quot;1.0&quot; xmlns:tag=&quot;http://alt.cellosoft.com/xml/onion/tag&quot; 
- xmlns:o=&quot;http://alt.cellosoft.com/xml/onion/core&quot;
- xmlns:html=&quot;alt.onion.tags.html&quot;&gt;<br /><br /> &lt;tag:head renderer=&quot;xhtml&quot; use=&quot;html&quot;&gt;
-  &lt;html:head&gt;
-   &lt;meta http-equiv=&quot;content-type&quot; content=&quot;application/xhtml+xml; charset=utf-8&quot; /&gt;
-   &lt;title&gt;Inspector&lt;/title&gt;
-   &lt;style type=&quot;text/css&quot;&gt;
-   pre { font-size: 0.8em; }
-   p { margin-top: 0; }
-   &lt;/style&gt;
-   &lt;o:tag-contents/&gt;
-  &lt;/html:head&gt;
- &lt;/tag:head&gt;
-&lt;/onion&gt;</pre>
-      <p>&nbsp; </p>
-      <h2>Quick Tutorial</h2>
-      <p><em>To come...  </em></p>
+      <p>Onion ML is a meta syntax language for XML/HTML. At its core it allows you to define XML tags, and as a result, define layouts, templates, widgets, and so on.</p>
+      <p>For example, to define a tag, you would write:</p>
+      <pre>&lt;tag:mytag&gt;This is my tag.&lt;/tag:mytag&gt;</pre>
+      <p>Then if you were to use this tag somewhere, for example:</p>
+      <pre>&lt;p&gt;Check out my tag: &lt;mytag/&gt;&lt;/p&gt;</pre>
+      <p>It would be rendered as:</p>
+      <pre>&lt;p&gt;Check out my tag: This is my tag.&lt;/p&gt;
+</pre>
+      <p>Because you can use tags with-in tags, the power increase. For example, if you wanted to make a web-site layout, you might write the tag:</p>
+      <pre>&lt;tag:mylayout&gt;
+&lt;html&gt;
+ &lt;head&gt;
+  &lt;title&gt;&lt;arg:title/&gt;&lt;/title&gt;
+  &lt;style&gt; ... &lt;/style&gt;
+ &lt;/head&gt;
+ &lt;body&gt;<br />  &lt;h1&gt;&lt;arg:title/&gt;&lt;/h1&gt;
+  &lt;div id=&quot;contents&quot;&gt;&lt;arg:body/&gt;&lt;/div&gt;
+  &lt;div id=&quot;footer&quot;&gt;&lt;footer&gt;&lt;arg:year/&gt;&lt;/footer&gt;&lt;/div&gt;
+ &lt;/body&gt;
+&lt;/html&gt;
+&lt;/tag:mylayout&gt;
+
+&lt;tag:footer&gt;Copyright &lt;arg:all/&gt; All rights reserved&lt;/tag:footer&gt;</pre>
+      <p>Now, to use this tag, you might have a page that looks like:</p>
+      <pre>&lt;mylayout&gt;
+ &lt;title&gt;Hello world!&lt;/title&gt;
+ &lt;body&gt;This is my world, too.&lt;/body&gt;
+ &lt;year&gt;2008&lt;/year&gt;
+&lt;/mylayout&gt;</pre>
+      <p>This would be rendered as:</p>
+      <pre>&lt;html&gt;
+ &lt;head&gt;
+  &lt;title&gt;Hello world!&lt;/title&gt;
+  &lt;style&gt; ... &lt;/style&gt;
+ &lt;/head&gt;
+ &lt;body&gt;<br />  &lt;h1&gt;Hello world!&lt;/h1&gt;
+  &lt;div id=&quot;contents&quot;&gt;This is my world, too.&lt;/div&gt;
+  &lt;div id=&quot;footer&quot;&gt;Copyright 2008 All rights reserved&lt;/div&gt;
+ &lt;/body&gt;
+&lt;/html&gt;</pre>
+      <p>Congratulations! You have now successfully separated your content from your layout! Let us try to understand what's happening.</p>
+      <p><code>&lt;tag:mylayout&gt;...&lt;/tag:mylayout&gt;</code> defines a tag  that can be used anywhere. It contains both HTML and special OnionML tags. The <code>&lt;arg:title/&gt;</code> tag inside the mylayout tag allows you to use arguments to your tag (notice how the title is placed in both the html <code>&lt;title&gt;</code> and <code>&lt;h1&gt;</code> tags). </p>
+      <p>By separating <code>&lt;tag:footer&gt;</code> as a separate tag, it can now be used in other tags. The special <code>&lt;arg:all/&gt;</code> argument matches the entire contents passed to the tag.<br>
+      </p>
+      <h2>Tags</h2>
+      <p>Tags are simply defined as <code>&lt;tag:name&gt; ... &lt;/tag:name&gt;</code>. This specifies a tag with the name &quot;name.&quot;</p>
+      <p>Within tags you can reference any other tag. If it does not exist, it will be used as-is. </p>
+      <h2>Attributes</h2>
+      <p>You can reference arguments in attributes with the @ sign. For example:</p>
+      <pre>&lt;tag:link&gt;
+ &lt;a href=&quot;@url&quot;&gt;&lt;tag:name/&gt;&lt;/a&gt;
+&lt;/tag:link&gt;
+</pre>
+      <p>This could then be used like so:<br>
+      </p>
+      <pre>&lt;link&gt;
+ &lt;url&gt;http://alt.cellosoft.com/&lt;/url&gt;
+ &lt;name&gt;Alt website&lt;/name&gt;
+&lt;/link&gt;</pre>
+      <p>      Arguments can be passed as tags or attributes, for example, the following is equivalent short-hand for the four lines above:</p>
+      <pre>&lt;link url=&quot;http://alt.cellosoft.com/&quot; name=&quot;Alt website&quot;/&gt;</pre>
+      <h2>Processing Data</h2>
+      <p>Data is an important part of a template engine. While the XML format does not allow for logic, several special tags are defined to conditionally display content. For example, to display a list of users, you may do something like:</p>
+      <pre>&lt;if data=&quot;users&quot;&gt;
+ &lt;table&gt;
+
+  &lt;for item=&quot;user&quot; data=&quot;users&quot;&gt;
+   &lt;tr&gt;
+    &lt;td&gt;&lt;arg&gt;user.name&lt;/arg&gt;&lt;/td&gt; 
+    &lt;td&gt;&lt;arg&gt;user.email&lt;/arg&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;date&gt;&lt;arg&gt;user.registerDate&lt;/arg&gt;&lt;/date&gt;&lt;/td&gt;
+   &lt;/tr&gt;
+
+  &lt;/for&gt;
+ &lt;/table&gt;
+
+ &lt;else&gt;No users found.&lt;/else&gt;
+
+&lt;/if&gt;
+</pre>
+      <p>This demonstrates all three special tags: for, if, and else. </p>
+      <p>Alternative shorthand syntax:</p>
+      <pre>&lt;table o:if=&quot;users&quot;&gt;
+ &lt;tr o:for=&quot;user&quot; o:data=&quot;users&quot;&gt;
+  &lt;td&gt;&lt;arg&gt;user.name&lt;/arg&gt;&lt;/td&gt; 
+  &lt;td&gt;&lt;arg&gt;user.email&lt;/arg&gt;&lt;/td&gt;
+  &lt;td&gt;&lt;date&gt;&lt;arg&gt;user.registerDate&lt;/arg&gt;&lt;/date&gt;&lt;/td&gt;
+ &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;if data=&quot;!users&quot;&gt;No users found.&lt;/if&gt;</pre>
+<h2>Onion ML in the Alt Framework</h2>
+      <p>To use Onion ML in JavaScript you first make an OnionML object with  XML:</p>
+      <pre>var onion = new OnionML(
+ &lt;onion&gt; 
+  &lt;tag:mytag&gt;woot, &lt;tag:contents/&gt;!&lt;/tag:mytag&gt; 
+ &lt;/onion&gt;
+);
+
+onion.add(
+ &lt;tag:anothertag&gt;play the &lt;mytag&gt;tuba&lt;/mytag&gt;&lt;/tag:anothertag&gt;
+);      </pre>
+      <p>Then you can use that object to evaluate tags:</p>
+      <pre>var output = onion.evaluate(&lt;mytag&gt;ice cream&lt;/mytag&gt;);
+</pre>
+      <p>The output is XML, so if you want to print it to the screen, write:</p>
+      <pre>response.write(onion.evaluate(&lt;mytag&gt;&lt;b&gt;ice cream&lt;/b&gt;&lt;/mytag&gt;).toXMLString());</pre>
+      <p>You  pass variables as an optional second argument:</p>
+      <pre>onion.evaluate(&lt;mytag/&gt;, { name: &quot;Onion Man&quot; });</pre>
+<h2>Functional Tags </h2>
+      <p>You can specify tags as functions:</p>
+      <pre>var onion = new OnionML();
+
+
+onion.add(&quot;date&quot;, function() {
+  return new Date().toString()
+
+});
+
+onion.add({
+ multiply: function(onion,contents) { return contents.x * contents.y; },
+ repeat: function(onion,contents) {
+  var result = &lt;&gt;&lt;/&gt;;
+  for (var i=0; i&lt;contents.count; i++)
+   result += onion.evaluate(contents.body);
+  return result;
+ }
+
+});
+</pre>
+      <p>These functions take an optional XML object with the entire contents of the tag (or nothing) and should return a new XML object. <strong>Important Note:</strong> the contents are not automatically evaluated, if you need it evaluated, you can simply evaluate it with the provided Onion ML object.</p>
+      <h2>Engine Background</h2>
+      <p>Onion ML was designed so that it has very few moving parts. In fact, all tags are  simply predefined functional tags with special parameters.</p>
+      <p>Generic  tags are  defined as (&quot;tag&quot; is tag):</p>
+      <pre>tag = &quot;foo&quot;
+
+function(onion, contents, data) {
+ return &lt;{tag}&gt;{onion.evaluate(contents, data)}&lt;/{tag}&gt;;
+}</pre>
+      <p>Where tag is the tag.</p>
+      <p>OnionML.evaluate is defined as:</p>
+      <pre>function(xml, data) {
+ return this.getTag(xml.name())(this,xml.children(),data);
+}</pre>
+      <p>XML-defined tags are defined as (args is an array of args used):</p>
+      <pre>args = [];
+
+function (onion, contents, data) {
+ for each (var arg in args)  
+ for each (var child in contents.children()) {
+  for
+ }
+}</pre>
       <!-- InstanceEndEditable --></td>
     <td rowspan="2" valign="top"><ul class="menu">
         <li><a href="./">About</a></li>
@@ -53,7 +187,7 @@
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Thursday, August 31, 2006<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Saturday, February 9, 2008<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>

@@ -12,5 +12,6 @@ dictator.map({
 	OnionML:    'examples.OnionML',
 	HSQL:		'examples.HSQL',
 	Timeout:    'examples.Timeout',
-	chat:       'examples.chat.Main'
+	chat:       'examples.chat.Main',
+	svn:       'examples.SVN'
 });
