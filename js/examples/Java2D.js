@@ -50,7 +50,7 @@ g.drawString("homg ip! "+request.remoteAddr, 50, 20);
 g.drawString("homg host? "+request.remoteHost, 50, 30);
 
 // Set response information
-response.start('image/png');
+response.contentType = 'image/png';
 
 // Write image out to user
 ImageIO.write(img, "png", response.outputStream);
