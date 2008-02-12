@@ -20,7 +20,7 @@ var g = img.graphics;
 
 // Enable antialiasing
 g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-					RenderingHints.VALUE_ANTIALIAS_ON);
+				   RenderingHints.VALUE_ANTIALIAS_ON);
 
 // Draw background
 g.color = new Color(0xE0E0FF);

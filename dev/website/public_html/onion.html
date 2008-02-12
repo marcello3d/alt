@@ -16,6 +16,7 @@
 <table width="780" border="0" align="center" cellpadding="10" cellspacing="0">
   <tr>
     <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
+      <p>[This is under construction...]</p>
       <h1>Onion ML</h1>
       <p>Onion ML is an XML template system designed with a bias toward modularity.</p>
       <p>Onion ML lets you easily custom XML tags to make modular content design simple and easy to mix with HTML. It is somewhat comparable to XSLT and JSF, but intended to be easier to understand.</p>
@@ -72,7 +73,7 @@
       <h2>Attributes</h2>
       <p>You can reference arguments in attributes with the @ sign. For example:</p>
       <pre>&lt;tag:link&gt;
- &lt;a href=&quot;@url&quot;&gt;&lt;tag:name/&gt;&lt;/a&gt;
+ &lt;a href=&quot;@url&quot;&gt;&lt;arg:name/&gt;&lt;/a&gt;
 &lt;/tag:link&gt;
 </pre>
       <p>This could then be used like so:<br>
@@ -159,21 +160,39 @@ onion.add({
       <pre>tag = &quot;foo&quot;
 
 function(onion, contents, data) {
- return &lt;{tag}&gt;{onion.evaluate(contents, data)}&lt;/{tag}&gt;;
+ var result = &lt;{tag}&gt;{onion.evaluate(contents, data)}&lt;/{tag}&gt;;
+ for (var attr in contents.@)
+  result.@[attr] = contents.@[attr];
+ return result;
 }</pre>
       <p>Where tag is the tag.</p>
       <p>OnionML.evaluate is defined as:</p>
       <pre>function(xml, data) {
- return this.getTag(xml.name())(this,xml.children(),data);
+ return (this.getTag(xml.name()))(this,xml.children(),data);
 }</pre>
-      <p>XML-defined tags are defined as (args is an array of args used):</p>
-      <pre>args = [];
+      <p>XML-defined tags are defined as (args is an array of args used, tagxml is the XML of the tag):</p>
+      <pre>args : Array
+tagxml : XML
 
-function (onion, contents, data) {
- for each (var arg in args)  
- for each (var child in contents.children()) {
-  for
+function (onion, tag, data) {
+<span class="comment"> // copy the tag template XML</span>
+ var result = tagxml.clone();
+ 
+ <span class="comment">// loop through each arg</span>
+ for each (var arg in args) {
+  <span class="comment">// find arguments from call to this tag function 
+  // first check if attribute exists, otherwise use the child tag</span>
+  var tagValue = tag.@[arg] || tag.[arg];
+
+  <span class="comment">// replace all instances in template with new value</span>
+  for each (var argInOutput in result..[arg])
+    argInOutput.replaceWith(tagValue);
  }
+ <span class="comment">// recursively call evaluate on children.</span>
+ for each (var child in result.children()) 
+   child.replaceWith(onion.evaluate(child,data));
+
+ return result;
 }</pre>
       <!-- InstanceEndEditable --></td>
     <td rowspan="2" valign="top"><ul class="menu">
@@ -187,7 +206,7 @@ function (onion, contents, data) {
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Saturday, February 9, 2008<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Monday, February 11, 2008<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
