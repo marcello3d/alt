@@ -78,10 +78,11 @@ InspectorObject.prototype.toHTML = function(name,type) {
 			children.classes[name] = child;
 		else if (child instanceof InspectorFunction)
 			children.functions[name] = child;
-		else if (child instanceof InspectorObject)
-			children.objects[name] = child;
-		else
-			children.properties[name] = child;
+		else if (child instanceof InspectorObject) {
+			if (name!="prototype")
+				children.objects[name] = child;
+		} else 
+			children.properties[name] = child ;
 	}
 	for each (var name in ['Classes','Functions','Objects','Properties']) {
 		var table = Inspector.makeTable(

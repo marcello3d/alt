@@ -38,18 +38,18 @@
   &lt;title&gt;&lt;arg:title/&gt;&lt;/title&gt;
   &lt;style&gt; ... &lt;/style&gt;
  &lt;/head&gt;
- &lt;body&gt;<br />  &lt;h1&gt;&lt;arg:title/&gt;&lt;/h1&gt;
-  &lt;div id=&quot;contents&quot;&gt;&lt;arg:body/&gt;&lt;/div&gt;
-  &lt;div id=&quot;footer&quot;&gt;&lt;footer&gt;&lt;arg:year/&gt;&lt;/footer&gt;&lt;/div&gt;
+ &lt;body&gt;<br />  &lt;h1&gt;&lt;tag:title/&gt;&lt;/h1&gt;
+  &lt;div id=&quot;contents&quot;&gt;&lt;tag:body/&gt;&lt;/div&gt;
+  &lt;div id=&quot;footer&quot;&gt;&lt;footer&gt;&lt;tag:year/&gt;&lt;/footer&gt;&lt;/div&gt;
  &lt;/body&gt;
 &lt;/html&gt;
 &lt;/tag:mylayout&gt;
 
-&lt;tag:footer&gt;Copyright &lt;arg:all/&gt; All rights reserved&lt;/tag:footer&gt;</pre>
+&lt;tag:footer&gt;Copyright &lt;tag:all/&gt; All rights reserved&lt;/tag:footer&gt;</pre>
       <p>Now, to use this tag, you might have a page that looks like:</p>
       <pre>&lt;mylayout&gt;
  &lt;title&gt;Hello world!&lt;/title&gt;
- &lt;body&gt;This is my world, too.&lt;/body&gt;
+ &lt;body&gt;This is my &lt;b&gt;world&lt;/b&gt;, too.&lt;/body&gt;
  &lt;year&gt;2008&lt;/year&gt;
 &lt;/mylayout&gt;</pre>
       <p>This would be rendered as:</p>
@@ -59,7 +59,7 @@
   &lt;style&gt; ... &lt;/style&gt;
  &lt;/head&gt;
  &lt;body&gt;<br />  &lt;h1&gt;Hello world!&lt;/h1&gt;
-  &lt;div id=&quot;contents&quot;&gt;This is my world, too.&lt;/div&gt;
+  &lt;div id=&quot;contents&quot;&gt;This is my &lt;b&gt;world&lt;/b&gt;, too.&lt;/div&gt;
   &lt;div id=&quot;footer&quot;&gt;Copyright 2008 All rights reserved&lt;/div&gt;
  &lt;/body&gt;
 &lt;/html&gt;</pre>
@@ -70,7 +70,7 @@
       <h2>Tags</h2>
       <p>Tags are simply defined as <code>&lt;tag:name&gt; ... &lt;/tag:name&gt;</code>. This specifies a tag with the name &quot;name.&quot;</p>
       <p>Within tags you can reference any other tag. If it does not exist, it will be used as-is. </p>
-      <h2>Attributes</h2>
+      <h2>Attributes [not supported yet]</h2>
       <p>You can reference arguments in attributes with the @ sign. For example:</p>
       <pre>&lt;tag:link&gt;
  &lt;a href=&quot;@url&quot;&gt;&lt;arg:name/&gt;&lt;/a&gt;
@@ -84,7 +84,7 @@
 &lt;/link&gt;</pre>
       <p>      Arguments can be passed as tags or attributes, for example, the following is equivalent short-hand for the four lines above:</p>
       <pre>&lt;link url=&quot;http://alt.cellosoft.com/&quot; name=&quot;Alt website&quot;/&gt;</pre>
-      <h2>Processing Data</h2>
+      <h2>Processing Data [not supported yet]</h2>
       <p>Data is an important part of a template engine. While the XML format does not allow for logic, several special tags are defined to conditionally display content. For example, to display a list of users, you may do something like:</p>
       <pre>&lt;if data=&quot;users&quot;&gt;
  &lt;table&gt;
@@ -147,7 +147,7 @@ onion.add({
  repeat: function(onion,xml) {
   var result = &lt;&gt;&lt;/&gt;;
   for (var i=0; i&lt;xml.count; i++)
-   result.appendChild(onion.evaluateChildren(xml.body));
+   result += onion.evaluateChildren(xml.body);
   return result;
  }
 
@@ -155,9 +155,9 @@ onion.add({
 </pre>
       <p>These functions take an optional XML object with the entire XML tag and contents and should return a new XML object. <strong>Important Note:</strong> the contents are not automatically evaluated, if you need it evaluated, you can simply evaluate it with the provided Onion ML object.</p>
       <h2>Engine Background</h2>
-      <p>Onion ML was designed so that it has very few moving parts. In fact, all tags are  simply predefined functional tags with special parameters.</p>
-      <p>Generic  tags are  defined as a functional tag that calls Onion.evaluateChildren:</p>
-      <pre>Onion.prototype.getTag = function(tag) {
+      <p>Onion ML was designed so that it has very few moving parts. In fact, all tags are  simply standard functional tags.</p>
+      <p>Generic  tags are  defined as a functional tag that call Onion.evaluateChildren:</p>
+      <pre>Onion.prototype.getTagFunction = function(tag) {
   <span class="comment">// return tag if it is defined</span>
   if (this.tags[tag])
     return this.tags[tag];
@@ -168,47 +168,16 @@ onion.add({
   }
 }</pre>
       <p>Onion.evaluateChildren:</p>
-      <pre>Onion.prototype.evaluateChildren = function (xml, data) {<span class="comment">
-  // recursively call evaluate on child elements.</span> 
-  for each (var child in result.*)
-    if (child.nodeKind() == 'element')
-      child.replaceWith(this.evaluate(child,data));
-}</pre>
+      <pre>Onion.prototype.evaluateChildren = function (xml, data) {<br />	if (xml instanceof XML)<br />		// recursively call evaluate on child elements. <br />		for each (var child in xml.*)<br />			if (child.nodeKind)<br />				if (child.nodeKind() == 'element') <br />					Onion.replaceWith(child, this.evaluate(child, data));<br />	return xml;<br />}</pre>
 <p>Onion.evaluate is defined as:</p>
       <pre>Onion.prototype.evaluate = function(xml, data) {
  <span class="comment">// get the associated tag function and call it</span>
- return (this.getTag(xml.name()))(this,xml,data);
-
+ return (this.getTag(xml.localName()))(this,xml,data);
 }</pre>
       <p>XML-defined tags are defined as (args is an array of args used, tagxml is the XML of the tag):</p>
-      <pre>args : Array
-tagxml : XML
-
-function(onion, xml, data) {
-<span class="comment"> // copy the tag template XML</span>
- var result = tagxml.clone();
- 
- <span class="comment">// loop through each arg</span>
- for each (var arg in args) {
-  <span class="comment">// find arguments from call to this tag function 
-  // first check if attribute exists, otherwise use the child tag</span>
-  var tagValue = xml.@[arg] || xml.[arg];
-
-  <span class="comment">// replace all instances in template with new value</span>
-  for each (var argInOutput in result..[arg])
-    Onion.replaceWith(argInOutput,tagValue);
- }<span class="comment">
- // recursively call evaluate on children.</span> 
- return onion.evaluateChildren(result, data);
-}
-</pre>
-      <p>E4X does not support &quot;replaceWith&quot; so we wrote our own hackish version:</p>
-      <pre>Onion.replaceWith = function(oldnode,newnode) {
-  oldnode.parent().*[oldnode.childIndex()] = newnode;
-}
-</pre>
-      <p>Last of all, Onion's add method:</p>
-      <p>Onion.</p>
+      <pre>function(onion, xml, data) {<br />	// copy the tag template XML<br />	var result = tagxml.copy();<br />	<br />	// Replace all &lt;tag:*/&gt; with the passed arguments<br />	var TAG = Onion.TAG;<br />	for each (var node in result..TAG::*) {<br />		var arg = node.localName();<br />		// &lt;tag:all/&gt; returns everything, otherwise look for an attribute <br />		// or child node<br />		var tagValue = arg==&quot;all&quot; <br />						? xml.children() <br />						: (xml.@[arg].toString() || xml[arg].children());<br />		Onion.replaceWith(node, tagValue);<br />	}<br />	// Evaluate all children then knock off the top-level<br />	return onion.evaluateChildren(result, data).children();<br />}</pre>
+      <p>E4X does not support &quot;replaceWith&quot; so we wrote this helper function:</p>
+      <pre>Onion.replaceWith = function(node,newnode) {<br />	node.parent().replace(node.childIndex(), newnode);<br />}</pre>
     <!-- InstanceEndEditable --></td>
     <td rowspan="2" valign="top"><ul class="menu">
         <li><a href="./">About</a></li>
@@ -221,7 +190,7 @@ function(onion, xml, data) {
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Tuesday, February 12, 2008<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Wednesday, February 13, 2008<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>

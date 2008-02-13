@@ -1,6 +1,3 @@
-
-Alt.require("alt.onion.Exception");
-
 /**
  * Constructs a new Onion ML object.
  * @class
@@ -23,6 +20,23 @@ function Onion(xml) {
 Onion.TAG = new Namespace("tag", "http://alt.cellosoft.com/xml/onion/tag");
 Onion.O = new Namespace("o", "http://alt.cellosoft.com/xml/onion/core");
 
+/**
+ * Adds an XML object to this Onion ML object.
+ * @param {XML} xml  the xml object
+ */
+Onion.prototype.add = function(xml) {
+	var TAG = Onion.TAG;
+	if (xml.namespace() == TAG) {
+		this.tags[xml.localName()] = Onion.makeTag(xml);
+	} else 
+		for each (var child in xml.TAG::*)
+			this.add(child);	
+}
+
+/**
+ * Gets the function associated with a give tag
+ * @param {String} tag
+ */
 Onion.prototype.getTagFunction = function(tag) {
 	// return tag if it is defined
 	if (this.tags[tag])
@@ -30,32 +44,14 @@ Onion.prototype.getTagFunction = function(tag) {
 	
 	// otherwise return generic function
 	return function(onion, xml, data) {
-		return onion.evaluateChildren(xml,data);
+		return onion.evaluateChildren(xml, data);
 	}
 }
 
 /**
- * Evaluates 
- * @param {Object} xml
- * @param {Object} data
- */
-Onion.prototype.evaluateChildren = function (xml, data) {
-	if (xml instanceof XML) {
-		// recursively call evaluate on child elements. 
-		for each (var child in xml.*)
-			if (child.nodeKind) {
-				if (child.nodeKind() == 'element') 
-					child.parent().replace(child.childIndex(), this.evaluate(child, data));
-					//Onion.replaceWith(child, this.evaluate(child, data));
-				else if (child.nodeKind() == 'text')
-					Alt.log("Text=["+child.toXMLString()+"]")
-			}
-	}
-	return xml;
-}
-/**
- * 
- * @param {Object} xml
+ * Evaluate an XML tree with this Onion object.  Main entry point 
+ * for using onion templates.
+ * @param {XML} xml
  * @param {Object} data
  */
 Onion.prototype.evaluate = function(xml, data) {
@@ -64,135 +60,63 @@ Onion.prototype.evaluate = function(xml, data) {
 }
 
 /**
- * XML-defined tags are defined as (args is an array of args used, tagxml is the XML of the tag):
- *
- * @param {Object} onion
- * @param {Object} xml
+ * Evaluate child nodes in an XML tree with this Onion object.
+ * This is used by functional tags.
+ * @param {XML} xml
  * @param {Object} data
  */
-
+Onion.prototype.evaluateChildren = function (xml, data) {
+	if (xml instanceof XML)
+		// recursively call evaluate on child elements. 
+		for each (var child in xml.*)
+			if (child.nodeKind)
+				if (child.nodeKind() == 'element') 
+					Onion.replaceWith(child, this.evaluate(child, data));
+	return xml;
+}
 
 /**
  * E4X does not support "replaceWith" so we wrote our own hackish version. 
  * Replaces an XML node with another
  * @param {Object} oldnode
  * @param {Object} newnode
+ * @private
  */
-
 Onion.replaceWith = function(node,newnode) {
 	node.parent().replace(node.childIndex(), newnode);
-	
-		
-	/*
-	// This is a gross hack because replace doesn't work with XMLLists (I think?)
-	var p = node.parent();
-	if (newnode instanceof XML && newnode.length() > 1)
-		for (var i = newnode.length()-1; i > 0; --i)
-			p.insertChildAfter(node,newnode[i]);
-	p.replace(node.childIndex(), newnode);
-	*/
-	//oldnode.parent().*[oldnode.childIndex()] = newnode;
-	//oldnode.replaceWith(newnode);
-	//oldnode.parent().children()[oldnode.childIndex()] = <>{newnode}</>;
-	//oldnode.parent().insertChildAfter(oldnode,newnode);//.*[oldnode.childIndex()] = newnode;
-	//delete oldnode.parent().children[oldnode.childIndex()];
-	//oldnode.name() = newnode.name();
 }
 
+/**
+ * Generates a function for a tag defined in XML 
+ * @param {Object} tagxml
+ * @private
+ */
 Onion.makeTag = function (tagxml) {
+	
+	/**
+	 * XML-defined tags are defined as (args is an array of args used, tagxml 
+	 * is the XML of the tag):
+	 *
+	 * @param {Object} onion
+	 * @param {Object} xml
+	 * @param {Object} data
+	 */
 	return function(onion, xml, data) {
 		// copy the tag template XML
 		var result = tagxml.copy();
 		
+		// Replace all <tag:*/> with the passed arguments
 		var TAG = Onion.TAG;
 		for each (var node in result..TAG::*) {
 			var arg = node.localName();
-			var tagValue = (arg=="all") ? xml.children() : xml.@[arg].toString() || xml[arg].children();
-			node.parent().replace(node.childIndex(), tagValue);
-			//Onion.replaceWith(node,tagValue);
+			// <tag:all/> returns everything, otherwise look for an attribute 
+			// or child node
+			var tagValue = arg=="all" 
+							? xml.children() 
+							: (xml.@[arg].toString() || xml[arg].children());
+			Onion.replaceWith(node, tagValue);
 		}
+		// Evaluate all children then knock off the top-level
 		return onion.evaluateChildren(result, data).children();
 	}
 }
-
-/**
- * Adds an XML object to this Onion ML object.
- * @param {XML} xml  the xml object
- */
-Onion.prototype.add = function(xml) {
-	var TAG = Onion.TAG;
-	if (xml.namespace() == TAG) {
-		//Alt.log("found tag: "+xml.localName());
-		this.tags[xml.localName()] = Onion.makeTag(xml);
-	} else for each (var child in xml.TAG::*) {
-		this.add(child);
-	}
-}
-	/*
-Onion.prototype.add = function(xml) {
-	for each (var o in xml.*) {
-		if (o.namespace() == Onion.TAG_NAMESPACE)
-			this.defineTag(o.localName().toString(),o);
-	}
-}
-
-Onion.prototype.getTag = function (tagName) {
-    if (!this.tags[tagName]) {
-        default xml namespace = Onion.O_NAMESPACE;
-        this.tags[tagName] = new OnionTag(tagName,
-                                            <tag-contents />,
-                                            null);
-        //throw new Exception("Tag not defined: "+tagName);
-    }
-    return this.tags[tagName];
-}
-
-
-Onion.prototype.getXML = function (tagName, contents) {
-    this.getTag(tagName).handle(this, contents);
-}
-Onion.prototype.handle = function (tag, contents) {
-   // Alt.log("handle("+tag+","+contents+")");
-    var kind = tag.nodeKind();
-    var ns = tag.namespace();
-    switch (kind) {
-        case 'text':
-            return tag.toString();
-        case 'element':
-            var name = tag.localName().toString();
-            switch (ns) {
-                case Onion.O_NAMESPACE:
-                    if (name=="tag-contents")
-                        return tag;
-                    break;
-                case Onion.TAG_NAMESPACE:
-                    throw new Exception("Inner tags not supported yet.");
-                default:
-                    var onionTag = this.getTag(name);
-                    return onionTag.handle(this, tag);
-            }
-            throw new Exception("Unknown tag: "+tag.name());
-    }
-}
-
-
-/**
- * Defines a particular tag in this Onion ML object.
- * @param {String} name the name of the tag
- * @param {XML} xml the xml body of this tag
- */
-/*
-Onion.prototype.defineTag = function(name, xml) {
-	this.tags[name] = new OnionTag(name, xml, this.tags[name]);
-}
-
-function OnionTag(name, xml, parent) {
-    this.name = name;
-    this.xml = xml;
-    this.parent = parent;
-}
-OnionTag.prototype.handle = function (onion, contents) {
-    for each (var tag in this.xml.children())
-        onion.handle(tag, contents);
-}
-*/
