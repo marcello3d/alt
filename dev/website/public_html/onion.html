@@ -116,7 +116,7 @@
 &lt;if data=&quot;!users&quot;&gt;No users found.&lt;/if&gt;</pre>
 <h2>Onion ML in the Alt Framework</h2>
       <p>To use Onion ML in JavaScript you first make an OnionML object with  XML:</p>
-      <pre>var onion = new OnionML(
+      <pre>var onion = new Onion(
  &lt;onion&gt; 
   &lt;tag:mytag&gt;woot, &lt;tag:contents/&gt;!&lt;/tag:mytag&gt; 
  &lt;/onion&gt;
@@ -134,7 +134,7 @@ onion.add(
       <pre>onion.evaluate(&lt;mytag/&gt;, { name: &quot;Onion Man&quot; });</pre>
 <h2>Functional Tags </h2>
       <p>You can specify tags as functions:</p>
-      <pre>var onion = new OnionML();
+      <pre>var onion = new Onion;
 
 
 onion.add(&quot;date&quot;, function() {
@@ -143,38 +143,48 @@ onion.add(&quot;date&quot;, function() {
 });
 
 onion.add({
- multiply: function(onion,contents) { return contents.x * contents.y; },
- repeat: function(onion,contents) {
+ multiply: function(onion,xml) { return contents.x * contents.y; },
+ repeat: function(onion,xml) {
   var result = &lt;&gt;&lt;/&gt;;
-  for (var i=0; i&lt;contents.count; i++)
-   result += onion.evaluate(contents.body);
+  for (var i=0; i&lt;xml.count; i++)
+   result.appendChild(onion.evaluateChildren(xml.body));
   return result;
  }
 
 });
 </pre>
-      <p>These functions take an optional XML object with the entire contents of the tag (or nothing) and should return a new XML object. <strong>Important Note:</strong> the contents are not automatically evaluated, if you need it evaluated, you can simply evaluate it with the provided Onion ML object.</p>
+      <p>These functions take an optional XML object with the entire XML tag and contents and should return a new XML object. <strong>Important Note:</strong> the contents are not automatically evaluated, if you need it evaluated, you can simply evaluate it with the provided Onion ML object.</p>
       <h2>Engine Background</h2>
       <p>Onion ML was designed so that it has very few moving parts. In fact, all tags are  simply predefined functional tags with special parameters.</p>
-      <p>Generic  tags are  defined as (&quot;tag&quot; is tag):</p>
-      <pre>tag = &quot;foo&quot;
+      <p>Generic  tags are  defined as a functional tag that calls Onion.evaluateChildren:</p>
+      <pre>Onion.prototype.getTag = function(tag) {
+  <span class="comment">// return tag if it is defined</span>
+  if (this.tags[tag])
+    return this.tags[tag];
+  <span class="comment">// otherwise return generic function</span>
 
-function(onion, contents, data) {
- var result = &lt;{tag}&gt;{onion.evaluate(contents, data)}&lt;/{tag}&gt;;
- for (var attr in contents.@)
-  result.@[attr] = contents.@[attr];
- return result;
+  return function(onion, xml, data) {
+    return onion.evaluateChildren(xml,data);
+  }
 }</pre>
-      <p>Where tag is the tag.</p>
-      <p>OnionML.evaluate is defined as:</p>
-      <pre>function(xml, data) {
- return (this.getTag(xml.name()))(this,xml.children(),data);
+      <p>Onion.evaluateChildren:</p>
+      <pre>Onion.prototype.evaluateChildren = function (xml, data) {<span class="comment">
+  // recursively call evaluate on child elements.</span> 
+  for each (var child in result.*)
+    if (child.nodeKind() == 'element')
+      child.replaceWith(this.evaluate(child,data));
+}</pre>
+<p>Onion.evaluate is defined as:</p>
+      <pre>Onion.prototype.evaluate = function(xml, data) {
+ <span class="comment">// get the associated tag function and call it</span>
+ return (this.getTag(xml.name()))(this,xml,data);
+
 }</pre>
       <p>XML-defined tags are defined as (args is an array of args used, tagxml is the XML of the tag):</p>
       <pre>args : Array
 tagxml : XML
 
-function (onion, tag, data) {
+function(onion, xml, data) {
 <span class="comment"> // copy the tag template XML</span>
  var result = tagxml.clone();
  
@@ -182,19 +192,24 @@ function (onion, tag, data) {
  for each (var arg in args) {
   <span class="comment">// find arguments from call to this tag function 
   // first check if attribute exists, otherwise use the child tag</span>
-  var tagValue = tag.@[arg] || tag.[arg];
+  var tagValue = xml.@[arg] || xml.[arg];
 
   <span class="comment">// replace all instances in template with new value</span>
   for each (var argInOutput in result..[arg])
-    argInOutput.replaceWith(tagValue);
- }
- <span class="comment">// recursively call evaluate on children.</span>
- for each (var child in result.children()) 
-   child.replaceWith(onion.evaluate(child,data));
-
- return result;
-}</pre>
-      <!-- InstanceEndEditable --></td>
+    Onion.replaceWith(argInOutput,tagValue);
+ }<span class="comment">
+ // recursively call evaluate on children.</span> 
+ return onion.evaluateChildren(result, data);
+}
+</pre>
+      <p>E4X does not support &quot;replaceWith&quot; so we wrote our own hackish version:</p>
+      <pre>Onion.replaceWith = function(oldnode,newnode) {
+  oldnode.parent().*[oldnode.childIndex()] = newnode;
+}
+</pre>
+      <p>Last of all, Onion's add method:</p>
+      <p>Onion.</p>
+    <!-- InstanceEndEditable --></td>
     <td rowspan="2" valign="top"><ul class="menu">
         <li><a href="./">About</a></li>
       <li><a href="download.html">Download</a></li>
@@ -206,7 +221,7 @@ function (onion, tag, data) {
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Monday, February 11, 2008<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Tuesday, February 12, 2008<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>

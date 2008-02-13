@@ -16,36 +16,120 @@ function Onion(xml) {
         this.add(xml);
 }
 
-Onion.TAG_NAMESPACE = new Namespace("http://alt.cellosoft.com/xml/onion/tag");
-Onion.O_NAMESPACE = new Namespace("http://alt.cellosoft.com/xml/onion/core");
+Onion.TAG = new Namespace("tag", "http://alt.cellosoft.com/xml/onion/tag");
+Onion.O = new Namespace("o", "http://alt.cellosoft.com/xml/onion/core");
+
+Onion.prototype.getTagFunction = function(tag) {
+	Alt.log("onion.getTagFunction("+tag);
+		
+	// return tag if it is defined
+	if (this.tags[tag])
+		return this.tags[tag];
+	
+	// otherwise return generic function
+	return function(onion, xml, data) {
+		return onion.evaluateChildren(xml,data);
+	}
+}
+
+/**
+ * Evaluates 
+ * @param {Object} xml
+ * @param {Object} data
+ */
+Onion.prototype.evaluateChildren = function (xml, data) {
+	Alt.log("evaluateChildren("+xml);
+	if (xml instanceof XML) {
+		// recursively call evaluate on child elements. 
+		for each (var child in xml.*) {
+			if (child.nodeKind) {
+				Alt.log("child = "+child)
+				if (child.nodeKind() == 'element')
+					Onion.replaceWith(child, this.evaluate(child, data));
+			}
+		}
+	}
+	return xml;
+}
+/**
+ * 
+ * @param {Object} xml
+ * @param {Object} data
+ */
+Onion.prototype.evaluate = function(xml, data) {
+	Alt.log("evaluate("+xml.name()+") => "+this.getTagFunction(xml.name()));
+	// get the associated tag function and call it
+	return (this.getTagFunction(xml.name()))(this,xml,data);
+}
+
+/**
+ * XML-defined tags are defined as (args is an array of args used, tagxml is the XML of the tag):
+ *
+ * @param {Object} onion
+ * @param {Object} xml
+ * @param {Object} data
+ */
+
+
+/**
+ * E4X does not support "replaceWith" so we wrote our own hackish version. 
+ * Replaces an XML node with another
+ * @param {Object} oldnode
+ * @param {Object} newnode
+ */
+
+Onion.replaceWith = function(oldnode,newnode) {
+	oldnode.parent().*[oldnode.childIndex()] = newnode;
+}
+
+Onion.makeTag = function (tagxml) {
+	var args = {};
+	var TAG = Onion.TAG;
+	for each (var node in tagxml..TAG::*)
+		args[node.name()] = true;
+	
+	return function(onion, xml, data) {
+		// copy the tag template XML
+		var result = tagxml.copy();
+		
+		// loop through each arg
+		for (var arg in args) {
+			// find arguments from call to this tag function 
+			// first check if attribute exists, otherwise use the child tag
+			var tagValue =  (arg=="all") ? 
+									(xml.*) : 
+									(xml.@[arg] || xml[arg]);
+			
+			// replace all instances in template with new value
+			for each (var argInOutput in result.descendants(arg))
+				Onion.replaceWith(argInOutput,tagValue);
+		}
+		// recursively call evaluate on children. 
+		return onion.evaluateChildren(result, data);
+	}
+}
 
 /**
  * Adds an XML object to this Onion ML object.
  * @param {XML} xml  the xml object
  */
 Onion.prototype.add = function(xml) {
-    /*
-    for each (var f in [
-        //'children','descendants','elements',
-        'parent','attributes',
-        'inScopeNamespaces',
-        'name',
-        'namespace',
-        'namespaceDeclarations',
-        'comments',
-        'hasComplexContent','hasSimpleContent',
-        'nodeKind','processingInstructions','text',
-        'normalize','toString','toXMLString',
-        'valueOf','length'
-    ])
-        Alt.log('xml.'+f+'()='+xml[f]());
-        */
-        
+	var TAG = Onion.TAG;
+	if (xml.namespace() == TAG) {
+		Alt.log("found tag: "+xml.localName());
+		this.tags[xml.localName()] = Onion.makeTag(xml);
+	} else for each (var child in xml.TAG::*) {
+		this.add(child);
+	}
+}
+	/*
+Onion.prototype.add = function(xml) {
 	for each (var o in xml.*) {
 		if (o.namespace() == Onion.TAG_NAMESPACE)
 			this.defineTag(o.localName().toString(),o);
 	}
 }
+
 Onion.prototype.getTag = function (tagName) {
     if (!this.tags[tagName]) {
         default xml namespace = Onion.O_NAMESPACE;
@@ -91,6 +175,7 @@ Onion.prototype.handle = function (tag, contents) {
  * @param {String} name the name of the tag
  * @param {XML} xml the xml body of this tag
  */
+/*
 Onion.prototype.defineTag = function(name, xml) {
 	this.tags[name] = new OnionTag(name, xml, this.tags[name]);
 }
@@ -104,3 +189,4 @@ OnionTag.prototype.handle = function (onion, contents) {
     for each (var tag in this.xml.children())
         onion.handle(tag, contents);
 }
+*/

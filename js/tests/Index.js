@@ -3,11 +3,11 @@ Alt.require('tests.Tester');
 response.write('<html><body>');
 
 function writeln(s) {
-	response.writeln(<>{s}<br/></>);
+	response.write(<>{s}<br/></>);
 }
 function writeColorln(color) {
 	return function(msg) {
-		response.writeln(<><span style={'color:'+color}>{msg}</span><br/></>);
+		response.write(<><span style={'color:'+color}>{msg}</span><br/></>);
 	}
 }
 

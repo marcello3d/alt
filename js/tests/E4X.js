@@ -29,9 +29,19 @@ tc.assertEqual('<foo><x><bar>a</bar><bar>b</bar></x></foo>..bar.length()',2);
 tc.assertEqual('<foo><x><bar>a</bar><bar>b</bar></x><bar>c</bar></foo>..bar.length()',3);
 // Nested tag .. selector search
 tc.assertEqual('<foo><x><bar>a</bar><bar>b<bar>c<bar>d</bar></bar></bar></x></foo>..bar.length()',4);
+tc.assertEqual('<foo><a/><b/><c/></foo>.*',<foo><a/><b/><c/></foo>.*);
 
 var array = ['a','b','c'];
 var i = 0;
 for each (var child in <foo><a/><b/><c/></foo>.children()) {
 	tc.assertEqual('child.name()',array[i++]);
 }
+
+var xml = <top><foo/><bar/></top>;
+function replaceWith(oldnode,newnode) {
+	oldnode.parent().*[oldnode.childIndex()] = newnode;
+}
+for each (var child in xml.*)
+	replaceWith(child,<buh/>);
+tc.assertEqual("xml", <top><buh/><buh/></top>);
+

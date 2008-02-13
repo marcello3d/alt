@@ -3,6 +3,23 @@
 					 xmlns:o="http://alt.cellosoft.com/xml/onion/core"
 					 xmlns:html="alt.onion.tags.html">
 
+<tag:mylayout>
+<html>
+ <head>
+  <title><tag:title/></title>
+  <style> ... </style>
+ </head>
+ <body>
+  <h1><tag:title/></h1>
+  <div id="contents"><tag:body/></div>
+  <div id="footer"><footer><tag:year/></footer></div>
+ </body>
+</html>
+</tag:mylayout>
+
+<tag:footer>Copyright <tag:all/> All rights reserved</tag:footer>
+
+<!--
  <tag:head use="html">
   <head>
    <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
@@ -27,5 +44,5 @@
    <body><o:tag-contents/></body>
   </html:html>
  </tag:site>
-
+-->
 </onion>
