@@ -19,7 +19,7 @@
       <h1>Onion ML</h1>
       <p>Onion ML is an XML template system designed with a bias toward modularity.</p>
       <p>Onion ML lets you easily custom XML tags to make modular content design simple and easy to mix with HTML. It is somewhat comparable to XSLT and JSF, but intended to be easier to understand.</p>
-      <p>You define custom tags either in Onion ML  XML files, or they can be defined as custom JavaScript functions which generate output.</p>
+      <p>You define custom tags either as markup in XML files or as custom JavaScript functions which generate output.</p>
       <p>Onion ML also provides several control flow methods necessary for dynamic content. Methods for iterating over data sets and conditionally displaying tags are core to Onion ML's functionality.</p>
       <h2>Introduction to Onion ML</h2>
       <p>Onion ML is a meta syntax language for XML/HTML. At its core it allows you to define XML tags, and as a result, define layouts, templates, widgets, and so on.</p>
@@ -75,7 +75,7 @@
  &lt;a href=&quot;@url&quot;&gt;&lt;arg:name/&gt;&lt;/a&gt;
 &lt;/tag:link&gt;
 </pre>
-      <p>[Note: the @ notation is not currently supported and under review...any ideas for a better <em>XML-valid </em>syntax?]</p>
+      <p>[Note: the @ notation is not currently supported and under review...any ideas for a better <em>XML-valid </em>syntax? Maybe use namespaces and have attributes in the form <code>set:href=&quot;url&quot;</code>?]</p>
       <p>This could then be used like so:<br>
       </p>
       <pre>&lt;link&gt;
@@ -87,7 +87,7 @@
 </pre>
       <p>If both an attribute and child tag are specified, behavior is undefined.<br>
       </p>
-      <h2>Processing Data</h2>
+      <h2>Processing Data [under construction]</h2>
       <p>Data is an important part of a template engine. While the XML format does not allow for logic, several special tags are defined to conditionally display content. For example, to display a list of users, you may do something like:</p>
       <pre>&lt;if data=&quot;users&quot;&gt;
  &lt;table&gt;
@@ -107,7 +107,7 @@
 &lt;/if&gt;
 </pre>
       <p>This demonstrates all three special tags: for, if, and else. </p>
-      <p>Alternative shorthand syntax [not currently supported]:</p>
+      <p>[Note: I am undecided on the syntax for these tags. I am also considering the idea of an alternative shorthand syntax (currently not supported):]</p>
       <pre>&lt;table o:if=&quot;users&quot;&gt;
  &lt;tr o:for=&quot;user&quot; o:data=&quot;users&quot;&gt;
   &lt;td&gt;&lt;data get=&quot;user.name&quot;/&gt;&lt;/td&gt; 
