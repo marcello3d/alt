@@ -16,7 +16,6 @@
 <table width="780" border="0" align="center" cellpadding="10" cellspacing="0">
   <tr>
     <td width="540" valign="top" class="main"><!-- InstanceBeginEditable name="body" -->
-      <p>[This is under construction...]</p>
       <h1>Onion ML</h1>
       <p>Onion ML is an XML template system designed with a bias toward modularity.</p>
       <p>Onion ML lets you easily custom XML tags to make modular content design simple and easy to mix with HTML. It is somewhat comparable to XSLT and JSF, but intended to be easier to understand.</p>
@@ -133,13 +132,12 @@ onion.add(
       <p>You  pass variables as an optional second argument:</p>
       <pre>onion.evaluate(&lt;mytag/&gt;, { name: &quot;Onion Man&quot; });</pre>
 <h2>Functional Tags </h2>
-      <p>You can specify tags as functions:</p>
+      <p>You can specify tags as functions in JavaScript:</p>
       <pre>var onion = new Onion;
 
 
 onion.add(&quot;date&quot;, function() {
   return new Date().toString()
-
 });
 
 onion.add({
@@ -153,7 +151,7 @@ onion.add({
 
 });
 </pre>
-      <p>These functions take an optional XML object with the entire XML tag and contents and should return a new XML object. <strong>Important Note:</strong> the contents are not automatically evaluated, if you need it evaluated, you can simply evaluate it with the provided Onion ML object.</p>
+      <p>These functions take an optional XML object with the entire XML tag and contents and should return a new XML object. <strong>Important Note:</strong> by design the contents are not automatically evaluate. You can evaluate contents with the provided Onion.evaluate and Onion.evaluateChildren methods.</p>
       <h2>Engine Background</h2>
       <p>Onion ML was designed so that it has very few moving parts. In fact, all tags are  simply standard functional tags.</p>
       <p>Generic  tags are  defined as a functional tag that call Onion.evaluateChildren:</p>
@@ -168,14 +166,14 @@ onion.add({
   }
 }</pre>
       <p>Onion.evaluateChildren:</p>
-      <pre>Onion.prototype.evaluateChildren = function (xml, data) {<br />	if (xml instanceof XML)<br />		// recursively call evaluate on child elements. <br />		for each (var child in xml.*)<br />			if (child.nodeKind)<br />				if (child.nodeKind() == 'element') <br />					Onion.replaceWith(child, this.evaluate(child, data));<br />	return xml;<br />}</pre>
+      <pre>Onion.prototype.evaluateChildren = function (xml, data) {<br />	if (xml instanceof XML)<br />	<span class="comment">	// recursively call evaluate on child elements. </span><br />		for each (var child in xml.*)<br />			if (child.nodeKind)<br />				if (child.nodeKind() == 'element') <br />					Onion.replaceWith(child, this.evaluate(child, data));<br />	return xml;<br />}</pre>
 <p>Onion.evaluate is defined as:</p>
       <pre>Onion.prototype.evaluate = function(xml, data) {
  <span class="comment">// get the associated tag function and call it</span>
  return (this.getTag(xml.localName()))(this,xml,data);
 }</pre>
       <p>XML-defined tags are defined as (args is an array of args used, tagxml is the XML of the tag):</p>
-      <pre>function(onion, xml, data) {<br />	// copy the tag template XML<br />	var result = tagxml.copy();<br />	<br />	// Replace all &lt;tag:*/&gt; with the passed arguments<br />	var TAG = Onion.TAG;<br />	for each (var node in result..TAG::*) {<br />		var arg = node.localName();<br />		// &lt;tag:all/&gt; returns everything, otherwise look for an attribute <br />		// or child node<br />		var tagValue = arg==&quot;all&quot; <br />						? xml.children() <br />						: (xml.@[arg].toString() || xml[arg].children());<br />		Onion.replaceWith(node, tagValue);<br />	}<br />	// Evaluate all children then knock off the top-level<br />	return onion.evaluateChildren(result, data).children();<br />}</pre>
+      <pre>function(onion, xml, data) {<br /><span class="comment">	// copy the tag template XML</span><br />	var result = tagxml.copy();<br />	<br /><span class="comment">	// Replace all &lt;tag:*/&gt; with the passed arguments</span><br />	var TAG = Onion.TAG;<br />	for each (var node in result..TAG::*) {<br />		var arg = node.localName();<br /><span class="comment">		// &lt;tag:all/&gt; returns everything, otherwise look for an attribute <br />		// or child node</span><br />		var tagValue = arg==&quot;all&quot; <br />						? xml.children() <br />						: (xml.@[arg].toString() || xml[arg].children());<br />		Onion.replaceWith(node, tagValue);<br />	}<br /><span class="comment">	// Evaluate all children then knock off the top-level</span><br />	return onion.evaluateChildren(result, data).children();<br />}</pre>
       <p>E4X does not support &quot;replaceWith&quot; so we wrote this helper function:</p>
       <pre>Onion.replaceWith = function(node,newnode) {<br />	node.parent().replace(node.childIndex(), newnode);<br />}</pre>
     <!-- InstanceEndEditable --></td>
