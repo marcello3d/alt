@@ -12,6 +12,10 @@ Alt.require("alt.onion.Exception");
 function Onion(xml) {
 	this.tags = {};
 	
+	XML.prettyPrinting = false;
+	XML.prettyIndent = false;
+	XML.ignoreWhitespace = false;
+	
     if (xml instanceof XML)
         this.add(xml);
 }
@@ -20,8 +24,6 @@ Onion.TAG = new Namespace("tag", "http://alt.cellosoft.com/xml/onion/tag");
 Onion.O = new Namespace("o", "http://alt.cellosoft.com/xml/onion/core");
 
 Onion.prototype.getTagFunction = function(tag) {
-	Alt.log("onion.getTagFunction("+tag);
-		
 	// return tag if it is defined
 	if (this.tags[tag])
 		return this.tags[tag];
@@ -38,21 +40,16 @@ Onion.prototype.getTagFunction = function(tag) {
  * @param {Object} data
  */
 Onion.prototype.evaluateChildren = function (xml, data) {
-	//Alt.log("evaluateChildren("+xml);
 	if (xml instanceof XML) {
 		// recursively call evaluate on child elements. 
-		for each (var child in xml.*) {
+		for each (var child in xml.*)
 			if (child.nodeKind) {
-				function writeln() {
-					
-				}
-				writeln("{{{{");
-				var x = child.toXMLString();
-				writeln("}}}}");
-				if (child.nodeKind() == 'element')
-					Onion.replaceWith(child, this.evaluate(child, data));
+				if (child.nodeKind() == 'element') 
+					child.parent().replace(child.childIndex(), this.evaluate(child, data));
+					//Onion.replaceWith(child, this.evaluate(child, data));
+				else if (child.nodeKind() == 'text')
+					Alt.log("Text=["+child.toXMLString()+"]")
 			}
-		}
 	}
 	return xml;
 }
@@ -62,7 +59,6 @@ Onion.prototype.evaluateChildren = function (xml, data) {
  * @param {Object} data
  */
 Onion.prototype.evaluate = function(xml, data) {
-	Alt.log("evaluate("+xml.localName()+")");
 	// get the associated tag function and call it
 	return (this.getTagFunction(xml.localName()))(this,xml,data);
 }
@@ -83,49 +79,39 @@ Onion.prototype.evaluate = function(xml, data) {
  * @param {Object} newnode
  */
 
-Onion.replaceWith = function(oldnode,newnode) {
-	oldnode.parent().*[oldnode.childIndex()] = newnode;
+Onion.replaceWith = function(node,newnode) {
+	node.parent().replace(node.childIndex(), newnode);
+	
+		
+	/*
+	// This is a gross hack because replace doesn't work with XMLLists (I think?)
+	var p = node.parent();
+	if (newnode instanceof XML && newnode.length() > 1)
+		for (var i = newnode.length()-1; i > 0; --i)
+			p.insertChildAfter(node,newnode[i]);
+	p.replace(node.childIndex(), newnode);
+	*/
+	//oldnode.parent().*[oldnode.childIndex()] = newnode;
+	//oldnode.replaceWith(newnode);
+	//oldnode.parent().children()[oldnode.childIndex()] = <>{newnode}</>;
+	//oldnode.parent().insertChildAfter(oldnode,newnode);//.*[oldnode.childIndex()] = newnode;
+	//delete oldnode.parent().children[oldnode.childIndex()];
+	//oldnode.name() = newnode.name();
 }
 
 Onion.makeTag = function (tagxml) {
-	/*
-	var args = {};
-	var TAG = Onion.TAG;
-	for each (var node in tagxml..TAG::*)
-		args[node.localName()] = node;*/
-	
 	return function(onion, xml, data) {
-		Packages.java.lang.System.err.println("in "+tagxml.name());
 		// copy the tag template XML
 		var result = tagxml.copy();
 		
-		
 		var TAG = Onion.TAG;
-		for each (var node in tagxml..TAG::*) {
+		for each (var node in result..TAG::*) {
 			var arg = node.localName();
-			var tagValue = arg=="all" ? 
-									xml.* : 
-									(xml.attributes(arg) || xml.child(arg));
-			Alt.log("arg:"+arg+" -["+xml+"]{"+xml.*+"}- "+tagValue);
-			
-			Onion.replaceWith(node,tagValue);
+			var tagValue = (arg=="all") ? xml.children() : xml.@[arg].toString() || xml[arg].children();
+			node.parent().replace(node.childIndex(), tagValue);
+			//Onion.replaceWith(node,tagValue);
 		}
-		// loop through each arg
-		/*
-		for (var arg in args) {
-			// find arguments from call to this tag function 
-			// first check if attribute exists, otherwise use the child tag
-			var tagValue =  (arg=="all") ? 
-									(xml.*) : 
-									(xml.@[arg] || xml[arg]);
-			Alt.log("arg:"+arg+" -- "+tagValue);
-			
-			// replace all instances in template with new value
-			for each (var argInOutput in result.descendants(arg))
-				Onion.replaceWith(argInOutput,tagValue);
-		}*/
-		// recursively call evaluate on children. 
-		return onion.evaluateChildren(result, data);
+		return onion.evaluateChildren(result, data).children();
 	}
 }
 
