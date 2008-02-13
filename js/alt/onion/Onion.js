@@ -18,19 +18,27 @@ function Onion(xml) {
 }
 
 Onion.TAG = new Namespace("tag", "http://alt.cellosoft.com/xml/onion/tag");
+Onion.ARG = new Namespace("arg", "http://alt.cellosoft.com/xml/onion/arg");
 Onion.O = new Namespace("o", "http://alt.cellosoft.com/xml/onion/core");
 
 /**
  * Adds an XML object to this Onion ML object.
  * @param {XML} xml  the xml object
  */
-Onion.prototype.add = function(xml) {
-	var TAG = Onion.TAG;
-	if (xml.namespace() == TAG) {
-		this.tags[xml.localName()] = Onion.makeTag(xml);
-	} else 
-		for each (var child in xml.TAG::*)
-			this.add(child);	
+Onion.prototype.add = function(o,func) {
+	if (o instanceof XML) {
+		var TAG = Onion.TAG;
+		if (o.namespace() == TAG)
+			this.add(o.localName(), Onion.makeTag(o));
+		else 
+			for each (var child in o.TAG::*)
+				this.add(child);
+	} else if (func) {
+		this.tags[o] = func;
+	} else if (o instanceof Object) {
+		for (var name in o)
+			this.tags[name] = o[name];
+	}
 }
 
 /**
@@ -105,11 +113,11 @@ Onion.makeTag = function (tagxml) {
 		// copy the tag template XML
 		var result = tagxml.copy();
 		
-		// Replace all <tag:*/> with the passed arguments
-		var TAG = Onion.TAG;
-		for each (var node in result..TAG::*) {
+		// Replace all <arg:*/> with the passed arguments
+		var ARG = Onion.ARG;
+		for each (var node in result..ARG::*) {
 			var arg = node.localName();
-			// <tag:all/> returns everything, otherwise look for an attribute 
+			// <arg:all/> returns everything, otherwise look for an attribute 
 			// or child node
 			var tagValue = arg=="all" 
 							? xml.children() 

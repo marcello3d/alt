@@ -1,46 +1,37 @@
 <?xml version="1.0"?>
-<onion version="1.0" xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" 
-					 xmlns:o="http://alt.cellosoft.com/xml/onion/core"
-					 xmlns:html="alt.onion.tags.html">
+<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" xmlns:arg="http://alt.cellosoft.com/xml/onion/arg">
 
 <tag:mylayout><html>
  <head>
-  <title><tag:title/></title>
-  <style> ... </style>
+  <title><arg:title/></title>
+  <styles fg="white" bg="black"/>
  </head>
  <body>
-  <h1><tag:title/></h1>
-  <div id="contents"><tag:body/></div>
-  <div id="footer"><footer><tag:year/></footer></div>
+  <h1><arg:title/></h1>
+  <div id="contents"><arg:body/></div>
+  <div id="footer"><footer><arg:year/></footer></div>
  </body>
 </html></tag:mylayout>
 
-<tag:footer>Copyright <tag:all/> All rights reserved</tag:footer>
+<tag:footer>Copyright <arg:all/> All rights reserved</tag:footer>
+<tag:styles><style>
+body {
+	color: <arg:fg/>;
+	background: <arg:bg/>;
+}
+body,h1,p {
+	font-family: verdana;
+}
+h1 { 
+	border-bottom: solid 2px <arg:fg/>; 
+}
+#contents {
+	margin: 1em;
+	
+}
+#footer {
+	font-size: 70%;
+}
+</style></tag:styles>
+	
 </onion>
-
-<!--
- <tag:head use="html">
-  <head>
-   <meta http-equiv="content-type" content="application/xhtml+xml; charset=utf-8" />
-   <title>Inspector</title>
-   <style type="text/css">
-    pre {
-        font-size: 0.8em;
-    }
-    p {
-        margin-top: 0;
-    }
-   </style>
-   <o:tag-contents/>
-  </head>
- </tag:head>
-
-
-
- <tag:site renderer="xhtml">
-  <html:html>
-   <head/>
-   <body><o:tag-contents/></body>
-  </html:html>
- </tag:site>
--->

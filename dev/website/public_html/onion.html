@@ -24,11 +24,11 @@
       <h2>Introduction to Onion ML</h2>
       <p>Onion ML is a meta syntax language for XML/HTML. At its core it allows you to define XML tags, and as a result, define layouts, templates, widgets, and so on.</p>
       <p>For example, to define a tag, you would write:</p>
-      <pre>&lt;tag:mytag&gt;This is my tag.&lt;/tag:mytag&gt;</pre>
+      <pre>&lt;tag:mytag&gt;This is &lt;i&gt;my&lt;/i&gt; tag.&lt;/tag:mytag&gt;</pre>
       <p>Then if you were to use this tag somewhere, for example:</p>
       <pre>&lt;p&gt;Check out my tag: &lt;mytag/&gt;&lt;/p&gt;</pre>
       <p>It would be rendered as:</p>
-      <pre>&lt;p&gt;Check out my tag: This is my tag.&lt;/p&gt;
+      <pre>&lt;p&gt;Check out my tag: This is &lt;i&gt;my&lt;/i&gt; tag.&lt;/p&gt;
 </pre>
       <p>Because you can use tags with-in tags, the power increase. For example, if you wanted to make a web-site layout, you might write the tag:</p>
       <pre>&lt;tag:mylayout&gt;
@@ -37,14 +37,14 @@
   &lt;title&gt;&lt;arg:title/&gt;&lt;/title&gt;
   &lt;style&gt; ... &lt;/style&gt;
  &lt;/head&gt;
- &lt;body&gt;<br />  &lt;h1&gt;&lt;tag:title/&gt;&lt;/h1&gt;
-  &lt;div id=&quot;contents&quot;&gt;&lt;tag:body/&gt;&lt;/div&gt;
-  &lt;div id=&quot;footer&quot;&gt;&lt;footer&gt;&lt;tag:year/&gt;&lt;/footer&gt;&lt;/div&gt;
+ &lt;body&gt;<br />  &lt;h1&gt;&lt;arg:title/&gt;&lt;/h1&gt;
+  &lt;div id=&quot;contents&quot;&gt;&lt;arg:body/&gt;&lt;/div&gt;
+  &lt;div id=&quot;footer&quot;&gt;&lt;copyright&gt;&lt;arg:year/&gt;&lt;/copyright&gt;&lt;/div&gt;
  &lt;/body&gt;
 &lt;/html&gt;
 &lt;/tag:mylayout&gt;
 
-&lt;tag:footer&gt;Copyright &lt;tag:all/&gt; All rights reserved&lt;/tag:footer&gt;</pre>
+&lt;tag:copyright&gt;Copyright &lt;arg:all/&gt; All rights reserved&lt;/tag:copyright&gt;</pre>
       <p>Now, to use this tag, you might have a page that looks like:</p>
       <pre>&lt;mylayout&gt;
  &lt;title&gt;Hello world!&lt;/title&gt;
@@ -69,12 +69,13 @@
       <h2>Tags</h2>
       <p>Tags are simply defined as <code>&lt;tag:name&gt; ... &lt;/tag:name&gt;</code>. This specifies a tag with the name &quot;name.&quot;</p>
       <p>Within tags you can reference any other tag. If it does not exist, it will be used as-is. </p>
-      <h2>Attributes [not supported yet]</h2>
+      <h2>Attributes</h2>
       <p>You can reference arguments in attributes with the @ sign. For example:</p>
       <pre>&lt;tag:link&gt;
  &lt;a href=&quot;@url&quot;&gt;&lt;arg:name/&gt;&lt;/a&gt;
 &lt;/tag:link&gt;
 </pre>
+      <p>[Note: the @ notation is not currently supported and under review...any ideas for a better <em>XML-valid </em>syntax?]</p>
       <p>This could then be used like so:<br>
       </p>
       <pre>&lt;link&gt;
@@ -82,17 +83,20 @@
  &lt;name&gt;Alt website&lt;/name&gt;
 &lt;/link&gt;</pre>
       <p>      Arguments can be passed as tags or attributes, for example, the following is equivalent short-hand for the four lines above:</p>
-      <pre>&lt;link url=&quot;http://alt.cellosoft.com/&quot; name=&quot;Alt website&quot;/&gt;</pre>
-      <h2>Processing Data [not supported yet]</h2>
+      <pre>&lt;link url=&quot;http://alt.cellosoft.com/&quot; name=&quot;Alt website&quot;/&gt;
+</pre>
+      <p>If both an attribute and child tag are specified, behavior is undefined.<br>
+      </p>
+      <h2>Processing Data</h2>
       <p>Data is an important part of a template engine. While the XML format does not allow for logic, several special tags are defined to conditionally display content. For example, to display a list of users, you may do something like:</p>
       <pre>&lt;if data=&quot;users&quot;&gt;
  &lt;table&gt;
 
   &lt;for item=&quot;user&quot; data=&quot;users&quot;&gt;
    &lt;tr&gt;
-    &lt;td&gt;&lt;arg&gt;user.name&lt;/arg&gt;&lt;/td&gt; 
-    &lt;td&gt;&lt;arg&gt;user.email&lt;/arg&gt;&lt;/td&gt;
-    &lt;td&gt;&lt;date&gt;&lt;arg&gt;user.registerDate&lt;/arg&gt;&lt;/date&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;get data=&quot;user.name&quot;/&gt;&lt;/td&gt; 
+    &lt;td&gt;&lt;get data=&quot;user.email/&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;date&gt;&lt;get data=&quot;user.registerDate&quot;/&gt;&lt;/date&gt;&lt;/td&gt;
    &lt;/tr&gt;
 
   &lt;/for&gt;
@@ -103,12 +107,12 @@
 &lt;/if&gt;
 </pre>
       <p>This demonstrates all three special tags: for, if, and else. </p>
-      <p>Alternative shorthand syntax:</p>
+      <p>Alternative shorthand syntax [not currently supported]:</p>
       <pre>&lt;table o:if=&quot;users&quot;&gt;
  &lt;tr o:for=&quot;user&quot; o:data=&quot;users&quot;&gt;
-  &lt;td&gt;&lt;arg&gt;user.name&lt;/arg&gt;&lt;/td&gt; 
-  &lt;td&gt;&lt;arg&gt;user.email&lt;/arg&gt;&lt;/td&gt;
-  &lt;td&gt;&lt;date&gt;&lt;arg&gt;user.registerDate&lt;/arg&gt;&lt;/date&gt;&lt;/td&gt;
+  &lt;td&gt;&lt;data get=&quot;user.name&quot;/&gt;&lt;/td&gt; 
+  &lt;td&gt;&lt;data get=&quot;user.email&quot;/&gt;&lt;/td&gt;
+  &lt;td&gt;&lt;date&gt;&lt;data get=&quot;user.registerDate&quot;/&gt;&lt;/date&gt;&lt;/td&gt;
  &lt;/tr&gt;
 &lt;/table&gt;
 
@@ -117,7 +121,7 @@
       <p>To use Onion ML in JavaScript you first make an OnionML object with  XML:</p>
       <pre>var onion = new Onion(
  &lt;onion&gt; 
-  &lt;tag:mytag&gt;woot, &lt;tag:contents/&gt;!&lt;/tag:mytag&gt; 
+  &lt;tag:mytag&gt;woot, &lt;arg:all/&gt;!&lt;/tag:mytag&gt; 
  &lt;/onion&gt;
 );
 
@@ -152,6 +156,42 @@ onion.add({
 });
 </pre>
       <p>These functions take an optional XML object with the entire XML tag and contents and should return a new XML object. <strong>Important Note:</strong> by design the contents are not automatically evaluate. You can evaluate contents with the provided Onion.evaluate and Onion.evaluateChildren methods.</p>
+      <h2>Advanced Functional Tags</h2>
+      <p>Functional tags give you a surprising amount of power for very little code, for example, one could write an import tag for loading in other xml files with tags (usage: &lt;import file=&quot;foo.xml&quot;/&gt;):</p>
+      <pre>onion.add(&quot;import&quot;, function(onion,xml) {
+   onion.add(XML.read(<a href="mailto:xml.@filename">xml.@filename</a>));
+   return &lt;&gt;&lt;/&gt;; 
+});
+</pre>
+      <p>Or the data processing outlined above could be implemented as:</p>
+      <pre><span class="comment">
+// this translates getItem({foo:{bar:1}},&quot;foo.bar&quot; to 1</span>
+function getItem(data,path) {
+  var path = path.toString().split(/\./);
+  while (path.length)
+    data = data[path.shift()];
+  return data;
+}
+onion.add({
+  get:   function(onion,xml,data) {
+           return getItem(data, xml.@data);
+         },
+  &quot;if&quot;:  function(onion,xml,data) {
+           if (getItem(data,xml.@data)) {
+             delete xml['else'];
+             return onion.evaluateChildren(xml).children();
+           } else
+             return onion.evaluateChildren(xml['else']).children();
+         },
+  &quot;for&quot;: function(onion,xml,data) {
+           var result = &lt;&gt;&lt;/&gt;;
+           for each (var item in getItem(data,xml.@data)) {
+             data[xml.@item] = item;
+             result += onion.evaluateChildren(xml.copy(),data).children();
+           }
+           return result;
+         }
+});</pre>
       <h2>Engine Background</h2>
       <p>Onion ML was designed so that it has very few moving parts. In fact, all tags are  simply standard functional tags.</p>
       <p>Generic  tags are  defined as a functional tag that call Onion.evaluateChildren:</p>
@@ -166,16 +206,16 @@ onion.add({
   }
 }</pre>
       <p>Onion.evaluateChildren:</p>
-      <pre>Onion.prototype.evaluateChildren = function (xml, data) {<br />	if (xml instanceof XML)<br />	<span class="comment">	// recursively call evaluate on child elements. </span><br />		for each (var child in xml.*)<br />			if (child.nodeKind)<br />				if (child.nodeKind() == 'element') <br />					Onion.replaceWith(child, this.evaluate(child, data));<br />	return xml;<br />}</pre>
+      <pre>Onion.prototype.evaluateChildren = function (xml, data) {<br />    if (xml instanceof XML)<br />    <span class="comment">    // recursively call evaluate on child elements. </span><br />        for each (var child in xml.*)<br />            if (child.nodeKind)<br />                if (child.nodeKind() == 'element') <br />                    Onion.replaceWith(child, this.evaluate(child, data));<br />    return xml;<br />}</pre>
 <p>Onion.evaluate is defined as:</p>
       <pre>Onion.prototype.evaluate = function(xml, data) {
  <span class="comment">// get the associated tag function and call it</span>
- return (this.getTag(xml.localName()))(this,xml,data);
+ return (this.getTagFunction(xml.localName()))(this,xml,data);
 }</pre>
       <p>XML-defined tags are defined as (args is an array of args used, tagxml is the XML of the tag):</p>
-      <pre>function(onion, xml, data) {<br /><span class="comment">	// copy the tag template XML</span><br />	var result = tagxml.copy();<br />	<br /><span class="comment">	// Replace all &lt;tag:*/&gt; with the passed arguments</span><br />	var TAG = Onion.TAG;<br />	for each (var node in result..TAG::*) {<br />		var arg = node.localName();<br /><span class="comment">		// &lt;tag:all/&gt; returns everything, otherwise look for an attribute <br />		// or child node</span><br />		var tagValue = arg==&quot;all&quot; <br />						? xml.children() <br />						: (xml.@[arg].toString() || xml[arg].children());<br />		Onion.replaceWith(node, tagValue);<br />	}<br /><span class="comment">	// Evaluate all children then knock off the top-level</span><br />	return onion.evaluateChildren(result, data).children();<br />}</pre>
+      <pre>function(onion, xml, data) {<br /><span class="comment">    // copy the tag template XML</span><br />    var result = tagxml.copy();<br />    <br /><span class="comment">    // Replace all &lt;arg:*/&gt; with the passed arguments</span><br />    var ARG = Onion.ARG;<br />    for each (var node in result..ARG::*) {<br />        var arg = node.localName();<br /><span class="comment">        // &lt;arg:all/&gt; returns everything, otherwise look for an attribute <br />        // or child node</span><br />        var tagValue = arg==&quot;all&quot; <br />                        ? xml.children() <br />                        : (xml.@[arg].toString() || xml[arg].children());<br />        Onion.replaceWith(node, tagValue);<br />    }<br /><span class="comment">    // Evaluate all children then knock off the top-level</span><br />    return onion.evaluateChildren(result, data).children();<br />}</pre>
       <p>E4X does not support &quot;replaceWith&quot; so we wrote this helper function:</p>
-      <pre>Onion.replaceWith = function(node,newnode) {<br />	node.parent().replace(node.childIndex(), newnode);<br />}</pre>
+      <pre>Onion.replaceWith = function(node,newnode) {<br />    node.parent().replace(node.childIndex(), newnode);<br />}</pre>
     <!-- InstanceEndEditable --></td>
     <td rowspan="2" valign="top"><ul class="menu">
         <li><a href="./">About</a></li>
