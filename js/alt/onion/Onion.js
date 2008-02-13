@@ -38,12 +38,17 @@ Onion.prototype.getTagFunction = function(tag) {
  * @param {Object} data
  */
 Onion.prototype.evaluateChildren = function (xml, data) {
-	Alt.log("evaluateChildren("+xml);
+	//Alt.log("evaluateChildren("+xml);
 	if (xml instanceof XML) {
 		// recursively call evaluate on child elements. 
 		for each (var child in xml.*) {
 			if (child.nodeKind) {
-				Alt.log("child = "+child)
+				function writeln() {
+					
+				}
+				writeln("{{{{");
+				var x = child.toXMLString();
+				writeln("}}}}");
 				if (child.nodeKind() == 'element')
 					Onion.replaceWith(child, this.evaluate(child, data));
 			}
@@ -57,9 +62,9 @@ Onion.prototype.evaluateChildren = function (xml, data) {
  * @param {Object} data
  */
 Onion.prototype.evaluate = function(xml, data) {
-	Alt.log("evaluate("+xml.name()+") => "+this.getTagFunction(xml.name()));
+	Alt.log("evaluate("+xml.localName()+")");
 	// get the associated tag function and call it
-	return (this.getTagFunction(xml.name()))(this,xml,data);
+	return (this.getTagFunction(xml.localName()))(this,xml,data);
 }
 
 /**
@@ -83,27 +88,42 @@ Onion.replaceWith = function(oldnode,newnode) {
 }
 
 Onion.makeTag = function (tagxml) {
+	/*
 	var args = {};
 	var TAG = Onion.TAG;
 	for each (var node in tagxml..TAG::*)
-		args[node.name()] = true;
+		args[node.localName()] = node;*/
 	
 	return function(onion, xml, data) {
+		Packages.java.lang.System.err.println("in "+tagxml.name());
 		// copy the tag template XML
 		var result = tagxml.copy();
 		
+		
+		var TAG = Onion.TAG;
+		for each (var node in tagxml..TAG::*) {
+			var arg = node.localName();
+			var tagValue = arg=="all" ? 
+									xml.* : 
+									(xml.attributes(arg) || xml.child(arg));
+			Alt.log("arg:"+arg+" -["+xml+"]{"+xml.*+"}- "+tagValue);
+			
+			Onion.replaceWith(node,tagValue);
+		}
 		// loop through each arg
+		/*
 		for (var arg in args) {
 			// find arguments from call to this tag function 
 			// first check if attribute exists, otherwise use the child tag
 			var tagValue =  (arg=="all") ? 
 									(xml.*) : 
 									(xml.@[arg] || xml[arg]);
+			Alt.log("arg:"+arg+" -- "+tagValue);
 			
 			// replace all instances in template with new value
 			for each (var argInOutput in result.descendants(arg))
 				Onion.replaceWith(argInOutput,tagValue);
-		}
+		}*/
 		// recursively call evaluate on children. 
 		return onion.evaluateChildren(result, data);
 	}
@@ -116,7 +136,7 @@ Onion.makeTag = function (tagxml) {
 Onion.prototype.add = function(xml) {
 	var TAG = Onion.TAG;
 	if (xml.namespace() == TAG) {
-		Alt.log("found tag: "+xml.localName());
+		//Alt.log("found tag: "+xml.localName());
 		this.tags[xml.localName()] = Onion.makeTag(xml);
 	} else for each (var child in xml.TAG::*) {
 		this.add(child);
