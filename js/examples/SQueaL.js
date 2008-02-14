@@ -1,3 +1,5 @@
+displaySource("SQueaL.js","sample-squeal.xml","HSQL.xml");
+
 Alt.require('alt.squeal.sql.Synchronize');
 Alt.require('alt.squeal.toHTML');
 Alt.require('alt.resource.XML');

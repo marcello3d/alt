@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" xmlns:arg="http://alt.cellosoft.com/xml/onion/arg">
 
+
+<!-- main layout -->
 <tag:mylayout><html>
  <head>
   <title><arg:title/></title>
@@ -9,11 +11,15 @@
  <body>
   <h1><arg:title/></h1>
   <div id="contents"><arg:body/></div>
-  <div id="footer"><footer><arg:year/></footer></div>
+  <p><a href="source">View the source of this page!</a></p>
+  <div id="footer"><copyright><arg:year/></copyright></div>
  </body>
 </html></tag:mylayout>
 
-<tag:footer>Copyright <arg:all/> All rights reserved</tag:footer>
+<!-- copyright -->
+<tag:copyright>Copyright <arg:all/> All rights reserved</tag:copyright>
+
+<!-- styles -->
 <tag:styles><style>
 body {
 	color: <arg:fg/>;
@@ -21,6 +27,9 @@ body {
 }
 body,h1,p {
 	font-family: verdana;
+}
+a {
+	color: <arg:fg/>
 }
 h1 { 
 	border-bottom: solid 2px <arg:fg/>; 

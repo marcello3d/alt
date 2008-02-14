@@ -1,3 +1,4 @@
+displaySource("SVN.js");
 
 SVNNodeKind = Packages.org.tmatesoft.svn.core.SVNNodeKind;
 SVNURL = Packages.org.tmatesoft.svn.core.SVNURL;

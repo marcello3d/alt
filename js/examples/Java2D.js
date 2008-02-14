@@ -1,3 +1,4 @@
+displaySource("Java2D.js");
 
 // Some helpful aliases
 //

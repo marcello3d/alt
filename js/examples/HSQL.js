@@ -1,3 +1,4 @@
+displaySource("HSQL.js","HSQL.xml");
 
 Alt.require('alt.resource.XML');
 

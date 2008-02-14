@@ -137,7 +137,7 @@
     <!-- =========================================================== -->
     <Set name="stopAtShutdown">true</Set>
     <!-- ensure/prevent Server: header being sent to browsers        -->
-    <Set name="sendServerVersion">false</Set>
+    <Set name="sendServerVersion">true</Set>
 
 </Configure>
 

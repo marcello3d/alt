@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" xmlns:arg="http://alt.cellosoft.com/xml/onion/arg">
+
+<!-- Main page -->
+<tag:page>
+<html>
+<headers>
+<title><arg:title/></title>
+</headers>
+<body onload="sh_highlightDocument()">
+<h1><arg:title/></h1>
+
+<arg:content/>
+<p>Syntax highlighting courtesty of <a href="http://shjs.sourceforge.net/index.html">SHJS</a>.</p>
+<p><a href="..">Back</a></p>
+</body>
+</html>
+</tag:page>
+
+<!-- Display source -->
+
+<tag:source>
+	<p>Source for <code><arg:filename/></code>:</p>
+	<pre class="sh_javascript"><arg:code/></pre>
+</tag:source>
+
+
+<!-- Headers -->
+
+<tag:headers>
+<head>
+<script type="text/javascript" src="/lib/SHJS/sh_main.min.js"> </script>
+<script type="text/javascript" src="/lib/SHJS/sh_javascript.min.js"> </script>
+<script type="text/javascript" src="/lib/SHJS/sh_xml.min.js"> </script>
+<link type="text/css" rel="stylesheet" href="/lib/SHJS/sh_style.css" />
+<style type="text/css">
+body, p, td, th, li {
+	font-family: Verdana, sans-serif;
+}
+
+big {
+	font-size: 18pt;
+	font-weight: bold;
+}
+
+pre {
+	font-size: 75%;
+	font-family: "Courier New", Courier, mono;
+	margin: 5px;
+	padding: 5px;
+	border: 1px dashed #CCCCCC;
+	background-color: #EEF;
+
+}
+a {
+	color: #cc3333;
+}
+ </style>
+<arg:all/>
+</head>
+</tag:headers>
+
+</onion>

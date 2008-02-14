@@ -12,9 +12,40 @@ function Onion(xml) {
 	XML.prettyPrinting = false;
 	XML.prettyIndent = false;
 	XML.ignoreWhitespace = false;
+
+
+	function getItem(data,path) {
+		var path = path.toString().split(/\./);
+		while (path.length)
+			data = data[path.shift()];
+		return data;
+	}
+	
+	this.add({
+		get:	function(onion,xml,data) {
+					return getItem(data, xml.@data);
+				},
+		"if":	function(onion,xml,data) {
+					if (getItem(data,xml.@data)) {
+						delete xml['else'];
+						return onion.evaluateChildren(xml).children();
+					} else
+						return onion.evaluateChildren(xml['else']).children();
+				},
+		"for":	function(onion,xml,data) {
+					var result = <></>;
+					for each (var item in getItem(data,xml.@data)) {
+						data[xml.@item] = item;
+						result += onion.evaluateChildren(xml.copy(),data).children();
+					}
+					return result;
+				}
+	});
+
 	
     if (xml instanceof XML)
         this.add(xml);
+	
 }
 
 Onion.TAG = new Namespace("tag", "http://alt.cellosoft.com/xml/onion/tag");
@@ -64,7 +95,10 @@ Onion.prototype.getTagFunction = function(tag) {
  */
 Onion.prototype.evaluate = function(xml, data) {
 	// get the associated tag function and call it
-	return (this.getTagFunction(xml.localName()))(this,xml,data);
+	var tag = this.getTagFunction(xml.localName());
+	if (tag instanceof XML)
+		return tag;
+	return tag(this,xml,data);
 }
 
 /**

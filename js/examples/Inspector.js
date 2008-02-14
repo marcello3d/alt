@@ -1,3 +1,5 @@
+displaySource("Inspector.js","Inspector.xml");
+
 Alt.require('alt.jsdoc.Inspector');
 Alt.require('alt.jsdoc.html.InspectorHTML');
 Alt.require('alt.resource.XML');

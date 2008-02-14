@@ -62,7 +62,7 @@ public class AltServlet extends HttpServlet {
     private GlobalScope globalScope;
     
     /** Version string */
-    public static final String NAME_VERSION = "AltServlet v0.05 alpha";
+    public static final String NAME_VERSION = "AltServlet/0.06a";
     
     private String mainScript = "alt.main.Main";
     
@@ -321,11 +321,12 @@ public class AltServlet extends HttpServlet {
     @Override
     public void service(final HttpServletRequest request, 
             			final HttpServletResponse response) {
-    	System.out.println(">>> got "+request.getRequestURL());
+    	System.out.println(">>> "+request.getMethod()+" "+request.getRequestURL());
         final long startTime = AltServlet.startTime = System.nanoTime();
         totalScriptTime = 0;
         totalOverheadTime = 0;
         measure(true);
+        response.setHeader("Server", NAME_VERSION);
         Context.call(new ContextAction() {
         	public Object run(Context cx ) {
 		        cx.setOptimizationLevel(optimization);

@@ -1,3 +1,4 @@
+displaySource("Upload.js","Upload.xml");
 
 var commons = Packages.org.apache.commons;
 var DiskFileItemFactory = commons.fileupload.disk.DiskFileItemFactory;
