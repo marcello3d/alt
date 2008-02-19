@@ -18,11 +18,15 @@ SourceDisplay.render = function(sources) {
 			<title>Displaying source for: {files}</title>
 			<content></content>
 		</page>;
-	for each (var source in sources)
+	var types = { js: "javascript" };
+	for each (var source in sources) {
+		var type = /[^\.]+$/.exec(source.filename);
+		if (types[type]) type = types[type];
 		page.content.source += <source> 
 							<filename>{source.filename}</filename>
 							<code>{source.code}</code>
+							<type>{type}</type>
 						</source>;
-	Alt.log(page.toXMLString());
+	}
 	return onion.evaluate(page);
 }

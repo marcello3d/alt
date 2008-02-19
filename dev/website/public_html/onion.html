@@ -70,12 +70,10 @@
       <p>Tags are simply defined as <code>&lt;tag:name&gt; ... &lt;/tag:name&gt;</code>. This specifies a tag with the name &quot;name.&quot;</p>
       <p>Within tags you can reference any other tag. If it does not exist, it will be used as-is. </p>
       <h2>Attributes</h2>
-      <p>You can reference arguments in attributes with the @ sign. For example:</p>
+      <p>You can set attributes with the special &lt;set:attribute&gt; tag. For example:</p>
       <pre>&lt;tag:link&gt;
- &lt;a href=&quot;@url&quot;&gt;&lt;arg:name/&gt;&lt;/a&gt;
-&lt;/tag:link&gt;
-</pre>
-      <p>[Note: the @ notation is not currently supported and under review...any ideas for a better <em>XML-valid </em>syntax? Maybe use namespaces and have attributes in the form <code>set:href=&quot;url&quot;</code>?]</p>
+ &lt;a&gt;&lt;set:href&gt;&lt;arg:url/&gt;&lt;/set:href&gt;&lt;arg:name/&gt;&lt;/a&gt;
+&lt;/tag:link&gt;</pre>
       <p>This could then be used like so:<br>
       </p>
       <pre>&lt;link&gt;
@@ -85,8 +83,9 @@
       <p>      Arguments can be passed as tags or attributes, for example, the following is equivalent short-hand for the four lines above:</p>
       <pre>&lt;link url=&quot;http://alt.cellosoft.com/&quot; name=&quot;Alt website&quot;/&gt;
 </pre>
-      <p>If both an attribute and child tag are specified, behavior is undefined.<br>
-      </p>
+      <p>If both an attribute and child tag are specified, behavior is undefined.</p>
+      <p>Both of the examples above will evaluate to:</p>
+      <pre>&lt;a href=&quot;http://alt.cellosoft.com/&quot;&gt;Alt website&lt;/a&gt;</pre>
       <h2>Processing Data [under construction]</h2>
       <p>Data is an important part of a template engine. While the XML format does not allow for logic, several special tags are defined to conditionally display content. For example, to display a list of users, you may do something like:</p>
       <pre>&lt;if data=&quot;users&quot;&gt;
@@ -228,9 +227,18 @@ onion.add({
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Wednesday, February 13, 2008<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Saturday, February 16, 2008<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-500492-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 </body>
 <!-- InstanceEnd --></html>

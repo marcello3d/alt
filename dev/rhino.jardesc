@@ -11,7 +11,7 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="false" exportOutputFolder="false">
-        <javaElement handleIdentifier="=rhinocvs/src"/>
-        <javaElement handleIdentifier="=rhinocvs/xmlimplsrc"/>
+        <javaElement handleIdentifier="=rhino/src"/>
+        <javaElement handleIdentifier="=rhino/xmlimplsrc"/>
     </selectedElements>
 </jardesc>

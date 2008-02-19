@@ -1,5 +1,5 @@
 ### Eclipse Workspace Patch 1.0
-#P rhinocvs
+#P rhino1.6r7
 Index: src/org/mozilla/javascript/Parser.java
 ===================================================================
 RCS file: /cvsroot/mozilla/js/rhino/src/org/mozilla/javascript/Parser.java,v

@@ -129,7 +129,7 @@ Resources.loadResource = function(resourceName, constructor, useCache) {
 
 	if (useCache) {
 		// Store in cache
-		resource.cache.put(constructor,{
+		resource.cache.put(resourceName,{
 			versionTag: newTag,
 			object: newObject
 		});

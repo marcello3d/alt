@@ -22,6 +22,7 @@
       <ul>
         <li>SQueaL
           <ul>
+            <li><em>Rewrite needed</em><em>!</em></li>
             <li>SQL Schema
               <ul>
                 <li>Finalize XML format </li>
@@ -39,23 +40,13 @@
         </li>
         <li>Onion ML
           <ul>
-            <li>Finalize XML format</li>
-            <li>Finish API </li>
-            <li>Define core html, layout managers  </li>
+            <li><em>Finalize format for data processing and attributes</em></li>
             <li>Form control (along with SQueaL types/Dictator) </li>
-            <li>Custom renderers
-              <ul>
-                <li>HTML</li>
-                <li>XML</li>
-                <li>JavaScript</li>
-                <li>AJAX </li>
-              </ul>
-            </li>
           </ul>
         </li>
         <li>Dictator
           <ul>
-            <li>GET/POST/HEAD/etc. handling</li>
+            <li><em>Documentation!</em></li>
             <li>Form control (along with SQueaL types/Onion ML) </li>
             <li>Cache control</li>
             <li>Static file sending/custom file pushers</li>
@@ -107,7 +98,7 @@
                     </li>
               </ul>
             </li>
-            <li>            Rhino has a method for counting byte codes. It only works in interpreted mode, but you could pretend these errors only happen in development environment.</li>
+            <li>            Rhino has a method for counting byte codes. It only works in interpreted mode, but you could pretend these errors only happen in development environment. Or we can always run in interpreted mode.</li>
           </ul>
         </li>
         <li>Detecting user abort</li>
@@ -137,6 +128,7 @@
           <ul>
               <li>Support for Jetty's continuations features, with some kind of means to pause scripts during runtime while waiting for some event. </li>
             <li>This would be useful for long running scripts with lots of wait/blocking time.</li>
+            <li>We could combine this with Rhino's continuation support and allow proper continuations.</li>
           </ul>
         </li>
         <li>Debugger
@@ -145,7 +137,7 @@
             <li>It would  be nice to integrate some kind of debugger, but I am not sure what the best approach here is.
               <ul>
                 <li>AltGUI could be revamped to integrate some form of debugger.</li>
-                <li> One cool idea is to somehow inject into the standard java/eclipse debugger. So that you can debug both java and javascript in the same standard interface.</li>
+                <li> One cool idea is to somehow inject into the standard java/eclipse debugger. So that you can debug both java and javascript in the same standard interface. (IDEAL!)</li>
               </ul>
             </li>
           </ul>
@@ -153,9 +145,8 @@
       </ul>
       <h2>Other/Misc.</h2>
       <ul>
-        <li>Ant build script to generate releases </li>
+        <li>Ant build script to generate releases</li>
         <li>Improved AltGUI</li>
-        <li>Rhino rewrite to use javax.xml instead of XMLBeans </li>
         <li>Benchmarking/profiling/optimization
           <ul>
             <li>Compare interpreted/optimized modes</li>
@@ -175,9 +166,18 @@
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Sunday, August 20, 2006<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Thursday, February 14, 2008<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-500492-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 </body>
 <!-- InstanceEnd --></html>

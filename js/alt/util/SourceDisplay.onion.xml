@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" xmlns:arg="http://alt.cellosoft.com/xml/onion/arg">
+<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" xmlns:arg="http://alt.cellosoft.com/xml/onion/arg" xmlns:set="http://alt.cellosoft.com/xml/onion/set">
 
 <!-- Main page -->
 <tag:page>
@@ -11,6 +11,7 @@
 <h1><arg:title/></h1>
 
 <arg:content/>
+
 <p>Syntax highlighting courtesty of <a href="http://shjs.sourceforge.net/index.html">SHJS</a>.</p>
 <p><a href="..">Back</a></p>
 </body>
@@ -21,7 +22,7 @@
 
 <tag:source>
 	<p>Source for <code><arg:filename/></code>:</p>
-	<pre class="sh_javascript"><arg:code/></pre>
+	<pre><set:class>sh_<arg:type/></set:class><arg:code/></pre>
 </tag:source>
 
 

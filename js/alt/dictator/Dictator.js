@@ -188,6 +188,8 @@ Dictator.prototype.filter = function(script) {
  * @private
  */
 Dictator.prototype.handleException = function(ex) {
+	if (ex instanceof DictatorHandledNotification)
+		return;
 	// Make new scope that prototypes the old scope with exception 
 	// as a member of the new scope.
 	var exScope = { 
@@ -199,10 +201,12 @@ Dictator.prototype.handleException = function(ex) {
 	try {
 		Alt.evaluate(this.errorScript, exScope);
 	} catch (ex2) {
+		if (ex2 instanceof DictatorHandledNotification) return;
 	    if (this.errorScript != this.defaultErrorScript) {
 	        try {
 	           Alt.evaluate(this.defaultErrorScript, exScope);
 	        } catch (ex3) {
+				if (ex3 instanceof DictatorHandledNotification) return;
 	            throw [ex,ex2,ex3];
 	        }
 	    } else
@@ -210,6 +214,8 @@ Dictator.prototype.handleException = function(ex) {
 	}
 	this.setHandled();
 }
+
+function DictatorHandledNotification() {}
 /**
  * @private
  */
@@ -222,6 +228,8 @@ Dictator.prototype.setHandled = function() {
 	
 	// Store handled flag
 	this.handled = true;
+	
+	throw new DictatorHandledNotification;
 }
 
 /**

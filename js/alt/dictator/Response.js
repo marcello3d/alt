@@ -24,6 +24,13 @@ function Response(dictator) {
 	this.allowed = {};
 	this.allow(HTTP.GET, HTTP.POST, HTTP.HEAD, HTTP.OPTIONS);
 	
+	
+	this.cache = {
+	    type: Response.CACHE_PRIVATE,
+	    seconds: 300,
+	    store: true
+	};
+	
     this.setContentType('text/html; charset=UTF-8');
     this.setStatus(HTTP.OK);
   
@@ -41,6 +48,7 @@ Response.prototype.setStatus = function(s) {
     this.response.status = s;
 }
 
+/*
 Response.prototype.getCache = function() {
     if (!this.cache)
     	this.cache = {
@@ -49,12 +57,10 @@ Response.prototype.getCache = function() {
     	    store: true
     	};
     return this.cache;
-}
+}*/
 Response.prototype.redirect = function(u) {
 	this.response.sendRedirect(u);
 }
-
-
 
 /**
  * This function tells Dictator to allow certain HTTP methods by your script.
@@ -95,7 +101,6 @@ Response.prototype.start = function(contentType, statusCode) {
     if (this.started)
         throw new Exception('Dictator already started!');
     this.started = true;
-    
     if (!this.allowed[this.request.method]) {
         this.sendError(this.request.protocol.match(/1.1$/) ? 
                                  HTTP.METHOD_NOT_ALLOWED :
@@ -120,16 +125,23 @@ Response.prototype.start = function(contentType, statusCode) {
 	        return;
     }
     this.response.setDateHeader("Date", java.lang.System.currentTimeMillis());
+	
     if (this.cache === false) {
-        // No caching at all
+        // Don't allow caching
         this.response.setHeader("Cache-Control","no-cache,no-store,max-age=-1");
-    } else if (this.cache instanceof Number) {
+    } 
+	if (this.cache == +this.cache) {
         // Cache for x seconds, assume private
         this.response.setHeader("Cache-Control","private,max-age="+this.cache);
-    } else if (this.cache instanceof String) {
+    } 
+	if (this.cache instanceof String) {
         // Cache specific string
         this.response.setHeader("Cache-Control",this.cache);
-    }
+    } 
+	if (this.cache.type) {
+		// Cache object
+        this.response.setHeader("Cache-Control",this.cache.type+",max-age="+this.cache.seconds);
+	}
 }
 
 Response.prototype.getWriter = function() {
@@ -185,7 +197,10 @@ Response.prototype.write = function(o) {
     if (o) this.writer.print(o);  
 }
 Response.prototype.writeln = function(o) {
-    this.writer.println(o);
+	if (arguments.length==0)
+		this.writer.println();
+    else
+		this.writer.println(o);
 }
 Response.prototype.flush = function() {
     this.response.flushBuffer();

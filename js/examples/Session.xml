@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html>
 <head>
 <title>Session Example</title>
 </head>
@@ -13,6 +11,8 @@
 <form action="." method="post">  
 <p>
 <label for="setstring">Set string:</label> <input id="setstring" name="string" size="30" />
+<input name="hidden" type="hidden" value="secret stuff"/>
+<input name="file" type="file"/>
 </p>
 <p><input type="submit" name="submit" value="Update" /></p>
 </form>

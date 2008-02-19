@@ -8,7 +8,7 @@ Alt.require('alt.resource.XML');
 
 var xml = Resources.load('Upload.xml');
 
-default xml namespace = 'http://www.w3.org/1999/xhtml';
+//default xml namespace = 'http://www.w3.org/1999/xhtml';
 
 var div = xml..div.(@id=="content");
 

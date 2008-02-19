@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
-<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" xmlns:arg="http://alt.cellosoft.com/xml/onion/arg">
+<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" 
+xmlns:arg="http://alt.cellosoft.com/xml/onion/arg"
+xmlns:set="http://alt.cellosoft.com/xml/onion/set">
 
 
 <!-- main layout -->
@@ -15,6 +17,21 @@
   <div id="footer"><copyright><arg:year/></copyright></div>
  </body>
 </html></tag:mylayout>
+
+
+
+<tag:link>
+	 <a>
+	 	<set:href><arg:url/></set:href>
+		<arg:name/>
+	 </a>
+</tag:link>
+
+<tag:make-clean-url>
+	....
+</tag:make-clean-url>
+
+<link url="foo" name="foo" />
 
 <!-- copyright -->
 <tag:copyright>Copyright <arg:all/> All rights reserved</tag:copyright>

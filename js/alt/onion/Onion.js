@@ -1,3 +1,9 @@
+
+/* Needed for parsing xml */
+XML.prettyPrinting = false;
+XML.prettyIndent = false;
+XML.ignoreWhitespace = false;
+
 /**
  * Constructs a new Onion ML object.
  * @class
@@ -9,10 +15,6 @@
 function Onion(xml) {
 	this.tags = {};
 	
-	XML.prettyPrinting = false;
-	XML.prettyIndent = false;
-	XML.ignoreWhitespace = false;
-
 
 	function getItem(data,path) {
 		var path = path.toString().split(/\./);
@@ -50,6 +52,7 @@ function Onion(xml) {
 
 Onion.TAG = new Namespace("tag", "http://alt.cellosoft.com/xml/onion/tag");
 Onion.ARG = new Namespace("arg", "http://alt.cellosoft.com/xml/onion/arg");
+Onion.SET = new Namespace("set", "http://alt.cellosoft.com/xml/onion/set");
 Onion.O = new Namespace("o", "http://alt.cellosoft.com/xml/onion/core");
 
 /**
@@ -112,8 +115,13 @@ Onion.prototype.evaluateChildren = function (xml, data) {
 		// recursively call evaluate on child elements. 
 		for each (var child in xml.*)
 			if (child.nodeKind)
-				if (child.nodeKind() == 'element') 
-					Onion.replaceWith(child, this.evaluate(child, data));
+				if (child.nodeKind() == 'element') {
+					if (child.name().uri == Onion.SET) {
+						xml.@[child.localName()] = this.evaluateChildren(child,data).children().toXMLString();
+						Onion.replaceWith(child, '');
+					} else
+						Onion.replaceWith(child, this.evaluate(child, data));
+				}
 	return xml;
 }
 

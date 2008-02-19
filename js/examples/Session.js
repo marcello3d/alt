@@ -2,7 +2,7 @@ displaySource("Session.js","Session.xml");
 
 Alt.require('alt.resource.XML');
 
-default xml namespace = 'http://www.w3.org/1999/xhtml';
+//default xml namespace = 'http://www.w3.org/1999/xhtml';
 var xml = Resources.load('Session.xml');
 
 var session = request.session;
@@ -29,5 +29,5 @@ xml..span.(@id=="string")[0] = sessiondata.string;
 xml..input.(@name=="string").@value = sessiondata.string;
 
 //response.allow(HTTP.POST);
-response.start('application/xhtml+xml; charset=utf-8');
+response.start('text/html; charset=utf-8');
 response.write(xml);

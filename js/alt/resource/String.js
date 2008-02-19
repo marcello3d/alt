@@ -11,7 +11,7 @@ function StringResource(resource) {
 		str.append(line);
 		str.append("\n");
 	}
-	this.str = str.toString();
+	this.str = str.toString()+"";
 }
 StringResource.prototype = new Resource;
 

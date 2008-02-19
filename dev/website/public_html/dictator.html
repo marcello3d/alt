@@ -23,7 +23,19 @@
       <p>Dictator provides a standard environment for each request execution with immediate access to the SQueaL, Onion ML, and Dictator modules. It provides means to define index pages, child pages, and 404 pages using a simple set of directives.</p>
       <p>Unlike the SQueaL and Onion ML modules, Dictator does not use XML to define control structures. The reasoning is because based on user authentication, the programmer should be able easily define what child pages are available from a single point. </p>
       <h2>Quick Tutorial</h2>
-      <p><em>To come... </em></p>
+      <p>Alt creates a global Dictator object in the request scope with the name <code>dictator</code> which handles control flow. It then executes the Index.js script in the root JavaScript directory.</p>
+      <p>Dictator parses the URI and splits it up based on forward-slash characters.</p>
+      <p>Let us add the <code>dictator.map</code> function to our Index.js file:</p>
+      <pre>dictator.map({
+ '':          'mysite.Index',
+ 'users':     'mysite.Users',
+ 'forums':    'mysite.forums.Index,
+ 'google':    dictator.Redirect('http://google.com/'),
+ 'api':       'alt.jsdoc.html.Main',
+ 'debug':     'alt.debug.Main'
+});</pre>
+      <p>This tells Dictator to look at the &quot;next&quot; piece of the URI and map it to a particular script. For example, here, assuming Alt was running on port 4500 and mapped to /* on example.com, going to http://example.com/ would load the srcipt <code>mysite.Index</code> and going to http://example.com/users/ would load the script <code>mysite.Users</code>. </p>
+      <p>Dictator has a built in index listing based on calls to map, so going to http://example.com/ would simply list the </p>
     <!-- InstanceEndEditable --></td>
     <td rowspan="2" valign="top"><ul class="menu">
         <li><a href="./">About</a></li>
@@ -36,9 +48,18 @@
   </tr>
   <tr>
     <td align="right" valign="top" class="small">page last updated: 
-    <!-- #BeginDate format:fcAm1 -->Saturday, August 19, 2006<!-- #EndDate --></td>
+    <!-- #BeginDate format:fcAm1 -->Sunday, February 17, 2008<!-- #EndDate --></td>
   </tr>
 </table>
 <p align="right"><a href="http://www.cellosoft.com/"><img src="http://images.cellosoft.com/marcello/projects/alt/copyright.png" width="319" height="19" border="0" id="copyright" alt="copyright © 2006 cellosoft" /></a></p>
+<script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-500492-2");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
 </body>
 <!-- InstanceEnd --></html>
