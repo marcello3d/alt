@@ -1,21 +1,9 @@
 <?xml version="1.0"?>
-<html>
-<head>
-<title>Session Example</title>
-</head>
-<body>
-<h1>Session Example</h1>
-<p><b>Your session id:</b> <span id="sessionid"/></p>
-<p><b>Your session hits on this page:</b> <span id="sessionhits"/></p>
-<p><b>Your session string (from form below):</b> <span id="string"/></p>
-<form action="." method="post">  
-<p>
-<label for="setstring">Set string:</label> <input id="setstring" name="string" size="30" />
-<input name="hidden" type="hidden" value="secret stuff"/>
-<input name="file" type="file"/>
-</p>
-<p><input type="submit" name="submit" value="Update" /></p>
-</form>
-<p><a href="..">Back to examples index</a></p>
-</body>
-</html>
+<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" 
+xmlns:arg="http://alt.cellosoft.com/xml/onion/arg"
+xmlns:set="http://alt.cellosoft.com/xml/onion/set">
+
+<tag:session-page>
+</tag:session-page>
+
+</onion>

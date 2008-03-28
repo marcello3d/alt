@@ -27,6 +27,7 @@ dictator.map({
 	Delight: 	'examples.Delight',
 	SQueaL: 	'examples.SQueaL',
 	OnionML:    'examples.OnionML',
+	Form:		'examples.Form',
 	HSQL:		'examples.HSQL',
 	Timeout:    'examples.Timeout',
 	chat:       'examples.chat.Main',

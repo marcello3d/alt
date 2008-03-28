@@ -3,9 +3,10 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="js"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="jetty/lib/jetty-6.1.5.jar"/>
-	<classpathentry kind="lib" path="jetty/lib/jetty-util-6.1.5.jar"/>
-	<classpathentry kind="lib" path="jetty/lib/servlet-api-2.5-6.1.5.jar"/>
-	<classpathentry kind="lib" path="js/WEB-INF/lib/rhino.jar" sourcepath="/rhino/src"/>
+	<classpathentry kind="lib" path="jetty/lib/jetty-6.1.7.jar"/>
+	<classpathentry kind="lib" path="jetty/lib/jetty-util-6.1.7.jar"/>
+	<classpathentry kind="lib" path="jetty/lib/servlet-api-2.5-6.1.7.jar"/>
+	<classpathentry kind="lib" path="lib/h2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rhino"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

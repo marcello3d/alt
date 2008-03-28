@@ -1,4 +1,5 @@
 
+Alt.require('alt.dictator.Session');
 Alt.require('alt.dictator.Path');
 Alt.require('alt.dictator.HTTP');
 Alt.require('alt.dictator.Response');
@@ -38,6 +39,9 @@ Dictator.prototype.handle = function(scope) {
 	this.request = scope.request;
 	this.response = scope.response;
 	this.scope = scope;
+	
+	this.session = new Session(this.request, 'dictator');
+	
 	// Make path object
 	this.path = new Path(this.request);
 	

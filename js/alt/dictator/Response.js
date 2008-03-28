@@ -130,15 +130,15 @@ Response.prototype.start = function(contentType, statusCode) {
         // Don't allow caching
         this.response.setHeader("Cache-Control","no-cache,no-store,max-age=-1");
     } 
-	if (this.cache == +this.cache) {
+	else if (this.cache == parseInt(this.cache)) {
         // Cache for x seconds, assume private
         this.response.setHeader("Cache-Control","private,max-age="+this.cache);
     } 
-	if (this.cache instanceof String) {
+	else if (this.cache instanceof String) {
         // Cache specific string
         this.response.setHeader("Cache-Control",this.cache);
     } 
-	if (this.cache.type) {
+	else if (this.cache.type) {
 		// Cache object
         this.response.setHeader("Cache-Control",this.cache.type+",max-age="+this.cache.seconds);
 	}

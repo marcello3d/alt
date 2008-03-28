@@ -1,4 +1,4 @@
-displaySource("OnionML.js",'OnionML.onion.xml');
+displaySource("OnionML.js",'OnionML.onion.xml','/alt/onion/Onion.js');
 
 Alt.require("alt.resource.XML");
 
