@@ -40,12 +40,13 @@ Dictator.prototype.handle = function(scope) {
 	this.response = scope.response;
 	this.scope = scope;
 	
-	this.session = new Session(this.request, 'dictator');
+	this.session = new Session('alt.dictator', this.request);
 	
 	// Make path object
 	this.path = new Path(this.request);
 	
 	// Replace response object with our own
+	
 	this.scope.response = new Response(this); 
 	
 	// Handle the script

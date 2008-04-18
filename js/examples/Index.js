@@ -31,7 +31,8 @@ dictator.map({
 	HSQL:		'examples.HSQL',
 	Timeout:    'examples.Timeout',
 	chat:       'examples.chat.Main',
-	SVN:        'examples.SVN'
+	SVN:        'examples.SVN',
+	GuestBook:  'examples.guestbook.Index'
 });
 
 if (!dictator.handled) {

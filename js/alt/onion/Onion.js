@@ -16,10 +16,14 @@ function Onion(xml) {
 	this.tags = {};
 	
 
-	function getItem(data,path) {
-		var path = path.toString().split(/\./);
+	function getItem(originaldata,originalpath) {
+		var path = originalpath.toString().split(/\./);
+		var data = originaldata;
 		while (path.length)
-			data = data[path.shift()];
+			if (!data)
+				throw new alt.Exception("Cannot read "+originalpath+" from "+originaldata.toSource());
+			else
+				data = data[path.shift()];
 		return data;
 	}
 	
@@ -36,10 +40,17 @@ function Onion(xml) {
 				},
 		"for":	function(onion,xml,data) {
 					var result = <></>;
-					for each (var item in getItem(data,xml.@data)) {
-						data[xml.@item] = item;
-						result += onion.evaluateChildren(xml.copy(),data).children();
-					}
+					var items = getItem(data,xml.@data);
+					if (items instanceof Array)
+						for (var i=0; i<items.length; i++) {
+							data[xml.@item] = items[i];
+							result += onion.evaluateChildren(xml.copy(),data).children();
+						}
+					else 
+						for each (var item in items) {
+							data[xml.@item] = item;
+							result += onion.evaluateChildren(xml.copy(),data).children();
+						}
 					return result;
 				}
 	});

@@ -122,15 +122,18 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @throws IOException  if there was an error loading
      */
     public synchronized boolean update(Context cx) throws IOException {
-        //System.out.println("update : "+this);
-        
-        // If script has been modified, or if any of the cascading dependencies 
-        //  were modified, evaluate this script.
-        if (isModified() || checkDependencies(cx)) {
-            evaluate(cx, getModule());
-            return true;
+        boolean oldMeasure = AltServlet.measure(true);
+        try {
+	        // If script has been modified, or if any of the cascading dependencies 
+	        //  were modified, evaluate this script.
+	        if (isModified() || checkDependencies(cx)) {
+	            evaluate(cx, getModule());
+	            return true;
+	        }
+	        return false;
+        } finally {
+            AltServlet.measure(oldMeasure);
         }
-        return false;
     }
     /**
      * Forces the script to reload (without checking dependencies).  This really
@@ -142,6 +145,8 @@ public class JavaScriptResource implements JavaScript,MutableResource {
      * @throws IOException  if there was an error loading
      */
     public Object evaluate(Context cx, Scriptable scope) throws IOException {
+        boolean oldMeasure = AltServlet.measure(true);
+        
         //System.out.println("evaluate : "+this);
         // Set current script
         JavaScript previousScript = AltServlet.setCurrentScript(cx,this);
@@ -155,10 +160,12 @@ public class JavaScriptResource implements JavaScript,MutableResource {
         
         // Update modification time.
         evaluationTime = System.currentTimeMillis();
-        
+
+        AltServlet.measure(false);
         // Evaluate the script
         Object returnValue = evaluate(cx, scope, compiledScript);
-        
+
+        AltServlet.measure(oldMeasure);
         
         // Restore previous current script
         AltServlet.setCurrentScript(cx,previousScript);
@@ -225,7 +232,7 @@ public class JavaScriptResource implements JavaScript,MutableResource {
     
     /**
      * Checks dependencies and loads them as needed, returning true if any of
-     * the cascading dependecies were reloaded (thus requiring the current
+     * the cascading dependencies were reloaded (thus requiring the current
      * script to reload).
      * @param cx  javascript Context
      * @return true if a cascading dependency was loaded

@@ -1,6 +1,7 @@
 Alt.log("Request: from "+request.remoteAddr + " "+request.method+" "+
 		request.requestURI);
 // Define some paths
+
 dictator.map({
 	examples:  'examples.Index',
 	tests:     'tests.Index',

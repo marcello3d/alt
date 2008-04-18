@@ -64,12 +64,19 @@ public class FileResource extends URLResource {
         return new FileInputStream(file);
     }
 
+    private Object tag = null;
+    private long lastCheck = 0;
     /**
      * @see MutableResource#getVersionTag()
      */
     @Override
     public Object getVersionTag() {
-        return file.lastModified();
+    	long t = System.currentTimeMillis();
+    	if (tag==null || lastCheck<t-1000) {
+    		tag = file.lastModified();
+    		lastCheck = t;
+    	}
+    	return tag;
     }
     
     /**

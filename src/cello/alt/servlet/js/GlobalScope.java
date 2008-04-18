@@ -90,8 +90,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         defineProperty("Servlet", servletClass, AltServlet.PROTECTED);
         
         // Add require as a global method
-        defineProperty("require", altClass.get("require",altClass),
-                AltServlet.PROTECTED);
+        //defineProperty("require", altClass.get("require",altClass),
+          //      AltServlet.PROTECTED);
 
         rootModule = new RootModule(this);
     }
@@ -244,6 +244,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 Object[] args, Function funObj) throws ScriptNotFoundException,
                 IOException {
             boolean oldMeasure = AltServlet.measure(true);
+            
+            long t = System.nanoTime();
 
             // Read arguments
             String scriptName = Context.toString(args[0]);
@@ -252,8 +254,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             if (args.length>=2)
                 cascade = (Boolean)args[1];
 
-
-            // Get the current script (the one that called require())
+                      // Get the current script (the one that called require())
             JavaScript currentScript = AltServlet.getCurrentScript(cx);
 
             // This should only be null if this method is called from outside of
@@ -265,14 +266,15 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             ScriptLoader loader = currentScript.getScriptLoader();
             
             JavaScript s = loader.loadScript(scriptName);
-            
+
             // Add the dependency
             currentScript.addDependency(s, cascade);
+
             // Update the dependency
             AltServlet.measure(false);
         	s.update(cx);
             AltServlet.measure(oldMeasure);
-        
+
 
             return s;
         }

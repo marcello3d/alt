@@ -1,6 +1,15 @@
 Alt.require('alt.resource.XML');
 
-var xml = Resources.load("/alt/dictator/IndexPage.xml");
+var xml = //Resources.load("/alt/dictator/IndexPage.xml");
+<html>
+ <head><title>Index listing</title></head>
+ <body>
+  <h2 id="title">Index listing</h2>
+  <ul><li><a href="..">..</a></li></ul>
+ </body>
+</html>;
+
+
 
 var title = "Index for "+dictator.path.current;
 
