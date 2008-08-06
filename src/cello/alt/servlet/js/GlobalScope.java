@@ -62,7 +62,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
      * @param server  the server
      */
     public GlobalScope(AltServlet server) {
-        Context.call(new ContextAction() {
+    	server.getContextFactory().call(new ContextAction() {
 			public Object run(Context cx) {
 		        cx.initStandardObjects(GlobalScope.this);
 				return null;
@@ -245,7 +245,7 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
                 IOException {
             boolean oldMeasure = AltServlet.measure(true);
             
-            long t = System.nanoTime();
+            //long t = System.nanoTime();
 
             // Read arguments
             String scriptName = Context.toString(args[0]);

@@ -59,6 +59,7 @@ public class AltServlet extends HttpServlet {
     private static final long serialVersionUID = 2280866936332806360L;
     private MultiScriptLoader loader = new MultiScriptLoader();
    
+    private ContextFactory contextFactory;
     private GlobalScope globalScope;
     
     /** Version string */
@@ -127,8 +128,9 @@ public class AltServlet extends HttpServlet {
         optimization = Integer.parseInt(
         		getInitParameter("rhino.optimization","-1"));
         System.out.println("Rhino optimization: "+optimization);
+        contextFactory = new DynamicFactory();
         if (!ContextFactory.hasExplicitGlobal())
-            ContextFactory.initGlobal(new DynamicFactory());
+            ContextFactory.initGlobal(contextFactory);
         
         
     }
@@ -327,7 +329,7 @@ public class AltServlet extends HttpServlet {
         totalOverheadTime = 0;
         measure(true);
         response.setHeader("Server", NAME_VERSION);
-        Context.call(new ContextAction() {
+        contextFactory.call(new ContextAction() {
         	public Object run(Context cx ) {
 		        cx.setOptimizationLevel(optimization);
 		        cx.putThreadLocal("altServlet",AltServlet.this);
@@ -369,4 +371,12 @@ public class AltServlet extends HttpServlet {
         System.out.println("--- total script = "+(totalScriptTime*1e-6)+"ms");
         System.out.println("<<< handled in "+(time*1e-6)+"ms");
     }
+
+
+    /**
+     * @return this servlet's contextfactory
+     */
+	public ContextFactory getContextFactory() {
+		return contextFactory;
+	}
 }

@@ -8,42 +8,55 @@ function Form(id) {
 	this.id = id;
 	this.fields = [];
 	this.authcode = parseInt(Math.random() * 1e9);
+	this.method = "POST";
+	this.submitted = false;
 	this.addField(new Hidden('form-id', 'Authentication', this.authcode));
-	Form.forms[this.id] = this;
+	this.empty = true; 
 }
 
 Form.prototype.addField = function(field) {
 	this.fields.push(field);
+	this.empty = false;
 }
 
 Form.prototype.getXML = function() {
-	var xml = <form method="post" />;
+	var xml = <form method={this.method} />;
 	for each (var field in this.fields)
 		if (field.getXML)
 			xml.appendChild(field.getXML());
 			
 	return xml;
 }
-
-Form.forms = {};
-
-Form.getForm = function(request) {
-	if (request.method != "POST") 
-		return null;
-	var formId = request.getParameter('form-id');
-	if (Form.forms[formId])
-		return Form.forms[formId];
-	return false; 
+Form.getForm = function(id) {
+	
+	var session = Alt.getRequestScope().dictator.session;
+	
+	
+	if (session.data.forms == null) {
+		session.data.forms = {}; 
+	} else {
+		var formId = Alt.getRequestScope().request.getParameter('form-id');
+		var form = session.data.forms[formId];
+		if (form && form.id == id && Alt.getRequestScope().request.method == form.method) {
+			form.submitted = true;
+			return form;
+		}
+	}
+	var form = new alt.form.Form(id);
+	session.data.forms[form.authcode] = form;
+	return form; 
 }
 Form.prototype.validate = function(dataSource) {
-	this.validated = true;
+	var request = Alt.getRequestScope().request;
+	var validated = true;
 	
 	// Validate each field
-	for each (var field in this.form.fields)
+	for each (var field in this.fields)
 		if (field.validate) {
-			field.setValue(dataSource[field.id]);
+			field.setValue(dataSource ? dataSource[field.id] : request.getParameter(field.id));
 			field.validated = field.validate();
-			if (!field.validated)
+			Alt.log("field("+field.id+"):"+field.validated);
+			if (field.validated !== true)
 				validated = false;
 		}
 	return validated;
@@ -56,7 +69,7 @@ Form.prototype.validate = function(dataSource) {
 function Field(id, label, value) {
 	this.id = id;
 	this.label = label;
-	this.value = value;
+	this.value = value || '';
 	this.validated = false;
 }
 Field.prototype.setValue = function(value) {
@@ -70,10 +83,16 @@ function InputField(id, label, value) {
 }
 InputField.prototype = new Field;
 InputField.prototype.getXML = function() {
-	return <>
+	var x = <>
 		<label for={this.id}>{this.label}</label>
 		<input name={this.id} id={this.id} type={this.type} value={this.value} />
 		</>;
+	if (this.validated)
+		x += <><b>Error! {this.validated}</b></>
+	return x;
+}
+InputField.prototype.validate = function() {
+	return true;
 }
 
 /**
@@ -113,7 +132,7 @@ function Password(id, label, value) {
 	Text.call(this,id,label,value);
 	this.type = 'password';
 }
-Password.protototype = new Text;
+Password.prototype = new Text;
 
 function Submit(id,label) {
 	InputField.call(this,id,label,label);

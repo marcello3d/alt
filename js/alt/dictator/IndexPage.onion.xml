@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" 
+xmlns:arg="http://alt.cellosoft.com/xml/onion/arg"
+xmlns:set="http://alt.cellosoft.com/xml/onion/set">
+
+
+<!-- main layout -->
+<tag:listing><html>
+ <head>
+  <title>Index for <arg:directory/></title>
+  <styles fg="white" bg="black"/>
+ </head>
+ <body>
+  <h1>Index for <arg:directory/></h1>
+  <ul>
+   <for item="child" data="children">
+    <li><a><set:href><get data="child"/>/</set:href><get data="child"/></a></li>
+   </for>
+  </ul>
+ </body>
+</html></tag:listing>
+
+
+
+<!-- styles -->
+<tag:styles><style type="text/css">
+body {
+	color: <arg:fg/>;
+	background: <arg:bg/>;
+}
+body,h1,p,input,textarea {
+	font-family: verdana;
+}
+body,p,input,textarea {
+	font-size: 12pt;
+}
+a {
+	color: <arg:fg/>
+}
+h1 { 
+	border-bottom: solid 2px <arg:fg/>; 
+}
+#contents {
+	padding: 1em;
+	border-top: solid 2px <arg:fg/>;
+	border-bottom: solid 2px <arg:fg/>;
+	
+}
+#footer {
+	font-size: 70%;
+}
+</style></tag:styles>
+	
+</onion>

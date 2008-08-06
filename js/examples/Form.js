@@ -3,23 +3,49 @@ displaySource("Form.js",'Example.onion.xml','/alt/form/Form.js');
 Alt.require("alt.resource.XML");
 Alt.require("alt.form.Form");
 
-var Session = 
-
-
-var form = new alt.form.Form('examples.Form');
-form.addField(new alt.form.Text('name','Name','Name'));
-form.addField(new alt.form.Submit('submit','Submit','Submit'));
-
+var session = dictator.session;
 
 var onion = new Onion(Resources.load('Example.onion.xml'));
 
+onion.add('results','Please submit the form below.');
+
+var form = alt.form.Form.getForm('examples.Form');
+
+
+	function dump(o) {
+		var s = '';
+		for (var x in o)
+			s += 'o['+x+'] = '+o[x]+'\n';
+		return s;
+	}
+	
+	
+	
+if (form.submitted) {
+	if (form.validate())
+		onion.add('results','SUCCESS!');
+	else
+		onion.add('results','FAILED TO DO SOMETHING!');
+} else {
+	var f;
+	form.addField(f = new alt.form.Text('name', 'Name', 'Name'));
+	form.addField(f = new alt.form.Text('age', 'Age'));
+	f.validate = function() {
+		return this.value.match(/[0-9]+/);
+	}
+	form.addField(f = new alt.form.Submit('submit', 'Submit', 'Submit'));
+}
+
+
+
 var site = onion.evaluate(
-<mylayout>
+<example-page>
  <title>Form test</title>
  <body>
+    <div style="border: solid 2px; padding: 5px; margin-bottom: 1em"><results/></div>
  	{form.getXML()}
-</body>
-</mylayout>);
+ </body>
+</example-page>);
 
 
 

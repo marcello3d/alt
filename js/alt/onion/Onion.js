@@ -79,7 +79,7 @@ Onion.prototype.add = function(o,func) {
 			for each (var child in o.TAG::*)
 				this.add(child);
 	} else if (func) {
-		this.tags[o] = func;
+		this.tags[o] = func instanceof Function ? func : function() { return func };
 	} else if (o instanceof Object) {
 		for (var name in o)
 			this.tags[name] = o[name];

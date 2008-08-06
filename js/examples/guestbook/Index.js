@@ -143,6 +143,7 @@ var postsToShow = store.query({
 	order: [['time',-1]]
 });
 
+
 // generate site
 var site = onion.evaluate(
 	<guestbook>

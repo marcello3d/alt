@@ -46,7 +46,6 @@ Dictator.prototype.handle = function(scope) {
 	this.path = new Path(this.request);
 	
 	// Replace response object with our own
-	
 	this.scope.response = new Response(this); 
 	
 	// Handle the script
@@ -195,6 +194,7 @@ Dictator.prototype.filter = function(script) {
 Dictator.prototype.handleException = function(ex) {
 	if (ex instanceof DictatorHandledNotification)
 		return;
+		
 	// Make new scope that prototypes the old scope with exception 
 	// as a member of the new scope.
 	var exScope = { 
@@ -205,6 +205,7 @@ Dictator.prototype.handleException = function(ex) {
 	// Evaluate the error script
 	try {
 		Alt.evaluate(this.errorScript, exScope);
+		this.setHandled();
 	} catch (ex2) {
 		if (ex2 instanceof DictatorHandledNotification) return;
 	    if (this.errorScript != this.defaultErrorScript) {
@@ -217,10 +218,13 @@ Dictator.prototype.handleException = function(ex) {
 	    } else
 	       throw ex+","+ex.rhinoException;
 	}
-	this.setHandled();
 }
 
 function DictatorHandledNotification() {}
+DictatorHandledNotification.prototype = new alt.dictator.Exception;
+DictatorHandledNotification.prototype.toString = function(){
+	return "[alt.dictator.DictatorHandledNotification]";
+}
 /**
  * @private
  */
@@ -235,6 +239,10 @@ Dictator.prototype.setHandled = function() {
 	this.handled = true;
 	
 	throw new DictatorHandledNotification;
+}
+
+Dictator.getRequestInstance = function() {
+	return Alt.getRequestScope().dictator;
 }
 
 /**
