@@ -29,6 +29,8 @@ if (request.getParameter('erase')) {
 			string: 'Initial string'
 		};
 	}
+	if (!session.data.hits)
+		session.data.hits = 0;
 	session.data.hits++;
 	
 	var newString = request.getParameter('string');

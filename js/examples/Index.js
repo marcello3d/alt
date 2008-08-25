@@ -22,14 +22,14 @@ dictator.map({
 	tests: 		dictator.Redirect('/tests/'),
 	inspector: 	'examples.Inspector',
 	upload: 	'examples.Upload',
-	dbtest: 	'examples.DBTest',
+	//dbtest: 	'examples.DBTest',
 	session: 	'examples.Session',
-	Dictator: 	'examples.Dictator',
-	Delight: 	'examples.Delight',
-	SQueaL: 	'examples.SQueaL',
+	//Dictator: 	'examples.Dictator',
+	//Delight: 	'examples.Delight',
+	//SQueaL: 	'examples.SQueaL',
 	OnionML:    'examples.OnionML',
 	Form:		'examples.Form',
-	HSQL:		'examples.HSQL',
+	//HSQL:		'examples.HSQL',
 	Timeout:    'examples.Timeout',
 	chat:       'examples.chat.Main',
 	SVN:        'examples.SVN',
@@ -38,19 +38,32 @@ dictator.map({
 
 if (!dictator.handled) {
 
+
+
 	Alt.require('alt.resource.XML');
 	
-	var xml = Resources.load("/alt/dictator/IndexPage.xml");
+	var onion = new Onion(Resources.load('/alt/dictator/IndexPage.onion.xml'));
 	
-	var title = "Examples";
+	onion.add(
+		<tag:index-list xmlns:tag={Onion.TAG} xmlns:set={Onion.SET}>
+		   <for item="child" data="children">
+		    <li><a><set:href><get data="child"/>/</set:href><get data="child"/></a> 
+				<span style="font-size:80%">(<a><set:href><get data="child"/>/source/</set:href>source</a>)</span></li>
+		   </for>
+		</tag:index-list>
+	);
 	
-	xml..head.title = title;
-	xml..body.h2 = title;
-	
+	var paths = [];
 	for (var page in dictator.recordedPaths)
-		xml..ul.appendChild(<li><a href={page+'/'}>{page}</a> (<a href={page+'/source'}>source</a>)</li>);
+		paths.push(page);
 	
-	response.writer.print(xml.toXMLString());
+	
+	var site = onion.evaluate(
+		<listing directory={dictator.path.current} />, 
+		// Data
+		{ children: paths }
+	);
+	response.write(site.toString());
 	
 	dictator.setHandled();
 }

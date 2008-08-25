@@ -13,14 +13,16 @@ xmlns:set="http://alt.cellosoft.com/xml/onion/set">
  <body>
   <h1>Index for <arg:directory/></h1>
   <ul>
-   <for item="child" data="children">
-    <li><a><set:href><get data="child"/>/</set:href><get data="child"/></a></li>
-   </for>
+  	<index-list/>
   </ul>
  </body>
 </html></tag:listing>
 
-
+<tag:index-list>
+   <for item="child" data="children">
+    <li><a><set:href><get data="child"/>/</set:href><get data="child"/></a></li>
+   </for>
+</tag:index-list>
 
 <!-- styles -->
 <tag:styles><style type="text/css">

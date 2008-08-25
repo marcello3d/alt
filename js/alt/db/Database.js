@@ -17,6 +17,20 @@ Database.get = function(dbconn) {
 function DataStore(dbconn) {
 	this.dbconn = dbconn;
 	try {
+		
+//		var st = dbconn.createStatement();
+//		st.executeUpdate('CREATE TABLE IF NOT EXISTS dataStore (' +
+//		' id IDENTITY PRIMARY KEY,' +
+//		' parent BIGINT NULL,' +
+//		' name VARCHAR NULL,' +
+//		' type TINYINT NOT NULL,'+
+//		' stringValue VARCHAR NULL,' +
+//		' intValue INT NULL,' +
+//		' dateValue DATETIME NULL' +
+//		')');
+//		st.executeUpdate('ALTER TABLE dataStore ADD FOREIGN KEY(parent) REFERENCES dataStore ON DELETE CASCADE')
+//		st.executeUpdate('INSERT INTO dataStore SET parent=NULL,type=1,name="root"');
+		
 		/*
 		 * TYPE:
 		 *  0 - none
@@ -25,18 +39,27 @@ function DataStore(dbconn) {
 		 *  3 - int
 		 *  4 - date
 		 */
+		
 		var st = dbconn.createStatement();
-		st.executeUpdate('CREATE TABLE IF NOT EXISTS dataStore (' +
+		st.executeUpdate('CREATE TABLE IF NOT EXISTS data (' +
 		' id IDENTITY PRIMARY KEY,' +
-		' parent BIGINT NULL,' +
-		' name VARCHAR NULL,' +
 		' type TINYINT NOT NULL,'+
 		' stringValue VARCHAR NULL,' +
 		' intValue INT NULL,' +
 		' dateValue DATETIME NULL' +
 		')');
-		st.executeUpdate('ALTER TABLE dataStore ADD FOREIGN KEY(parent) REFERENCES dataStore ON DELETE CASCADE')
-		st.executeUpdate('INSERT INTO dataStore SET parent=NULL,type=1,name="root"');
+		// insert root node
+		st.executeUpdate('INSERT INTO data (id,type) VALUES(1,1)');
+		
+		st.executeUpdate('CREATE TABLE IF NOT EXISTS links (' +
+		' parent BIGINT NOT NULL,' +
+		' child BIGINT NULL,' +
+		' name VARCHAR NULL,' +
+		' index BIGINT NOT NULL' +
+		')');
+		st.executeUpdate('ALTER TABLE links ADD FOREIGN KEY(parent) REFERENCES data ON DELETE CASCADE')
+		st.executeUpdate('ALTER TABLE links ADD FOREIGN KEY(child) REFERENCES data ON DELETE SET NULL')
+		
 	} catch (ex) {}
 	this.store = new DataNode(1);
 }
