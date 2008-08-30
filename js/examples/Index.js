@@ -22,7 +22,7 @@ dictator.map({
 	tests: 		dictator.Redirect('/tests/'),
 	inspector: 	'examples.Inspector',
 	upload: 	'examples.Upload',
-	//dbtest: 	'examples.DBTest',
+	dbtest: 	'examples.DBTest',
 	session: 	'examples.Session',
 	//Dictator: 	'examples.Dictator',
 	//Delight: 	'examples.Delight',

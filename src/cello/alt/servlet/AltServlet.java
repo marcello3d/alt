@@ -112,8 +112,7 @@ public class AltServlet extends HttpServlet {
      */
     @Override
     public void init() {
-        globalScope = new GlobalScope(this);
-        loader.setModuleProvider(globalScope);
+        contextFactory = new DynamicFactory();
         
         ServletContext context = getServletContext();
 
@@ -128,11 +127,12 @@ public class AltServlet extends HttpServlet {
         optimization = Integer.parseInt(
         		getInitParameter("rhino.optimization","-1"));
         System.out.println("Rhino optimization: "+optimization);
-        contextFactory = new DynamicFactory();
         if (!ContextFactory.hasExplicitGlobal())
             ContextFactory.initGlobal(contextFactory);
         
-        
+
+        globalScope = new GlobalScope(this);
+        loader.setModuleProvider(globalScope);
     }
     
     /**
@@ -332,6 +332,7 @@ public class AltServlet extends HttpServlet {
         contextFactory.call(new ContextAction() {
         	public Object run(Context cx ) {
 		        cx.setOptimizationLevel(optimization);
+		        cx.setLanguageVersion(170);
 		        cx.putThreadLocal("altServlet",AltServlet.this);
 		        // Convert Java objects to JavaScript objects...
 		        cx.getWrapFactory().setJavaPrimitiveWrap(false);

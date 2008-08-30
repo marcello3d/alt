@@ -82,11 +82,11 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         // Two properties of global: a self pointer
         defineProperty("global", this, AltServlet.PROTECTED);
         //  and a "static" class for managing Rhino
-        AltClass altClass = new AltClass(server);
+        AltClass altClass = new AltClass(this,server);
         defineProperty("Alt", altClass, AltServlet.PROTECTED);
         
         // Static class for managing servlet
-        ServletClass servletClass = new ServletClass(server);
+        ServletClass servletClass = new ServletClass(this, server);
         defineProperty("Servlet", servletClass, AltServlet.PROTECTED);
         
         // Add require as a global method
@@ -169,13 +169,15 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
 
         /**
          * Constructs a new ServletClass object
+         * @param scope 
          * @param server  the RhinoServlet
          */
-        private ServletClass(AltServlet server) {
-            defineProperty("context", new NativeJavaInterface(this, 
+        private ServletClass(GlobalScope scope, AltServlet server) {
+        	//setParentScope(scope);
+            defineProperty("context", new NativeJavaInterface(scope, 
                     server.getServletContext(), ServletContext.class), 
                     AltServlet.PROTECTED);
-            defineProperty("config", new NativeJavaInterface(this, 
+            defineProperty("config", new NativeJavaInterface(scope, 
                     server.getServletConfig(), ServletConfig.class), 
                     AltServlet.PROTECTED);
    
@@ -197,10 +199,12 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
         
         /**
          * Constructs a new RhinoClass object
+         * @param global 
          * @param server
          */
-        private AltClass(AltServlet server) {
+        private AltClass(GlobalScope global, AltServlet server) {
             this.server = server;
+            setParentScope(global);
             defineFunctionProperties( 
                     new String[] {  "require",
                                     "evaluate",
@@ -396,6 +400,8 @@ public class GlobalScope extends ImporterTopLevel implements ModuleProvider {
             // a JavaScript evaluate() method
             if (currentScript == null)
                 throw new RuntimeException("Current script is undefined!");
+            
+            
             
             // Get the resource relative to the current script
             return Context.javaToJS(currentScript.getResource(resourceName),

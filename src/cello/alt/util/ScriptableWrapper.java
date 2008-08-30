@@ -50,8 +50,10 @@ public class ScriptableWrapper extends ScriptableObject {
 	private Scriptable wrappedScriptable = null;
 	private String getFunctionName = "$get";
 	private String putFunctionName = "$put";
+	private String deleteFunctionName = "$delete";
     private Function getFunction = null;
     private Function putFunction = null;
+    private Function deleteFunction = null;
     
     /**
      * Constructs a new ScriptableWrapper
@@ -94,10 +96,11 @@ public class ScriptableWrapper extends ScriptableObject {
      * @param objectToWrap
      * @param getFunction  a String or Function
      * @param putFunction a String or Function
+     * @param deleteFunction a String or Function
      * @return the constructed object
      */
     public static ScriptableWrapper construct(Scriptable objectToWrap,
-            Object getFunction, Object putFunction) {
+            Object getFunction, Object putFunction, Object deleteFunction) {
         ScriptableWrapper sc = new ScriptableWrapper();
         
         sc.wrappedScriptable = objectToWrap;
@@ -111,6 +114,11 @@ public class ScriptableWrapper extends ScriptableObject {
             sc.putFunction = (Function)putFunction;
         else if (putFunction instanceof String)
             sc.putFunctionName = (String)putFunction;
+           
+        if (deleteFunction instanceof Function)
+            sc.deleteFunction = (Function)deleteFunction;
+        else if (putFunction instanceof String)
+            sc.deleteFunctionName = (String)deleteFunction;
         return sc;
     }
     /**
@@ -126,7 +134,8 @@ public class ScriptableWrapper extends ScriptableObject {
             Function ctorObj, boolean inNewExpr) {
         return construct((Scriptable)args[0], 
                 args.length>1 ? args[1] : null, 
-                args.length>2 ? args[2] : null);
+                args.length>2 ? args[2] : null, 
+                args.length>3 ? args[3] : null);
     }
 	
 	/**
@@ -145,7 +154,7 @@ public class ScriptableWrapper extends ScriptableObject {
 	@Override
     public Object get(String name, Scriptable start) {
         Context context = Context.enter();
-            try {
+        try {
     		// Check if current class has a field of this name
     		Object o = super.get(name, start);
     		if (wrappedScriptable==null || (o!=null && !(o instanceof UniqueTag)))
@@ -214,15 +223,54 @@ public class ScriptableWrapper extends ScriptableObject {
         		func = (Function)put;
             }
     		try {
-    			Object o = func.call(context,start.getParentScope(),wrappedScriptable,new Object[]{name,value});
+    			Object ret = func.call(context,start.getParentScope(),wrappedScriptable,new Object[]{name,value});
     			// If the function returns false, we use the default set function
-    			if (!Boolean.FALSE.equals(o))
+    			if (!Boolean.FALSE.equals(ret))
     				return;
     		} catch (JavaScriptException jse) {
                 // continue
     		}
     		// Otherwise we put the variable directly
     		wrappedScriptable.put(name, wrappedScriptable, value);
+        } finally {
+            Context.exit();
+        }
+	}
+
+	/**
+	 * @see org.mozilla.javascript.ScriptableObject#delete(java.lang.String)
+	 */
+	@Override
+	public void delete(String name) {
+        Context context = Context.enter();
+        try {
+    		// We do not want to delete variables directly from this object
+    		if (wrappedScriptable==null) {
+    			super.delete(name);
+    			return;
+    		}
+    		
+            // Get the "delete" function
+            Function func = deleteFunction;
+            
+            if (func==null) {
+        		Object del = super.getProperty(wrappedScriptable, deleteFunctionName);
+        		if (del==null || !(del instanceof Function))
+        			return;
+        		
+                // Execute the function
+        		func = (Function)del;
+            }
+    		try {
+    			Object o = func.call(context,func.getParentScope(),wrappedScriptable,new Object[]{name});
+    			// If the function returns false, we use the default set function
+    			if (!Boolean.FALSE.equals(o))
+    				return;
+    		} catch (JavaScriptException jse) {
+                // continue
+    		}
+    		// Otherwise we delete the variable directly
+    		wrappedScriptable.delete(name);
         } finally {
             Context.exit();
         }

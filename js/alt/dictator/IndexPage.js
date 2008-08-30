@@ -6,7 +6,6 @@ var paths = [];
 for (var page in dictator.recordedPaths)
 	paths.push(page);
 
-
 var site = onion.evaluate(
 	<listing directory={dictator.path.current} />, 
 	// Data

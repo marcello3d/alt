@@ -2,6 +2,8 @@ displaySource("Index.js",'GuestBook.onion.xml');
 
 Alt.require("alt.resource.XML");
 
+response.cache = false;
+
 var onion = new Onion(Resources.load('GuestBook.onion.xml'));
 
 // Make the datastore if we don't have it --- just a javascript array!
