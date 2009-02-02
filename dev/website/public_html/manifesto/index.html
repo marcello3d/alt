@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>The Alt Manifesto</title>
+  <style type="text/css">
+    html { 
+	  background: #FEFBDF;
+	  color: black; 
+	}
+	body {
+	  margin: 0 auto;
+	  width: 40em;
+	  background: white; 
+	  padding: 5em 2em;
+	  border: solid #EEE9BF;
+	  border-width: 0 1em;
+	}
+    body,p,li { 
+	  font-family:Georgia, "Times New Roman", Times, serif; 
+	  text-align: justify;
+	  line-height: 1.5;
+	}
+	h1,h2,h3,h4 {
+	letter-spacing:-0.05em;
+	}
+    li { margin-bottom: .5em; }
+    ul { margin-bottom: 1em; }
+	a { color:#363 }
+	#toc {
+		text-align: right;
+		position: absolute;
+		padding: 1em;
+		top: 1em;
+		left: 1em;
+		width: 10em;
+		font-size: 75%;
+	}
+	
+	span.prefix {
+		font-size: 75%;
+	}
+  </style>
+</head>
+<body>
+<h1>The Alt Manifesto</h1>
+<p>Written by <a href="http://marcello.cellosoft.com/">Marcello Bastéa-Forte</a><br>
+Version 1.0 - February 1st, 2009</p>
+<h2>Introduction<br>
+</h2>
+<p> The Alternative Web Framework is a design experiment to simplify the process of developing web applications.</p>
+
+<p>While the goals for the framework are loftier than what can be reasonably developed by one person, they give a benchmark for success.</p>
+<h2>50,000 feet: The Main Goal</h2>
+
+<p>The high level goal is a <em><b>simple</b></em> (but not limited) framework that can be <b>easily learned</b> while  remaining <b>flexible and scalable</b>.</p>
+<h2>10,000 feet: The Six Design Goals</h2>
+
+<p>There are a few specific goals that help meet the main goal<sup>[1]</sup>:<br>
+</p>
+<ol>
+  <li>Reduce the number of prerequisites</li>
+  <ul>
+    <li>The fewer languages the developer has to know, the better. Ideally? One language.<br>
+    </li>
+  </ul>
+  <li>Documentation before implementation</li>
+  <ul>
+    <li>Writing documentation with tutorials and example code before the code works helps understand requirements from the user's perspective.</li>
+  </ul>
+  <li>Simple API</li>
+  <ul>
+    <li>No one component of the framework should take more than <b>three printed pages</b> to describe 90% of the functionality.</li>
+    <li>The user should be able to <b>understand</b> in the <b>first page</b> why the approach makes sense and find it reasonable.</li>
+    <li>The fewer APIs to learn, the better<sup>[2]</sup>.</li>
+  </ul>
+  <li>Support creativity and interactive programming</li>
+  <ul>
+    <li>Creativity arises from the ability to prototype multiple ideas quickly.</li>
+    <li>By providing mechanisms for faster feedback, programmers can fail early and often, and develop experimentally.</li>
+  </ul>
+  <li>Formalize scalability from day 1.</li>
+  <ul>
+    <li>Code should not care (much) about scalability. It should be possible to design an API such that hardware scalability is abstracted.</li>
+    <li>The user should be thinking the same way when designing a small app as when designing a big app.</li>
+  </ul>
+  <li>Open<sup>[3]</sup>
+    <ul>
+      <li>Web frameworks should be open and free. Maybe people have good ideas and systems can always be improved.</li>
+      <li>There should be no reason not to use the system. The more people that use it, the more likely it will be improved (and with some luck, those improvements making it back to the original system for everyone else to benefit).</li>
+    </ul>
+  </li>
+</ol>
+
+<p>[1] Guidelines not rules!<br>
+  [2]
+But don't hide functionality. We are not Apple.<br>
+[3] And I mean properly open, not GPL.<br>
+</p>
+<h2>5,000 feet: The Techniques</h2>
+<p>(This section is incomplete.)</p>
+<h3>The Language: JavaScript</h3>
+<ul>
+  <li>To do interesting web applications, you'll be using JavaScript anyway. Why use a <em>different </em>language on the server-side?</li>
+</ul>
+<h3>The Data Model: JavaScript Objects</h3>
+<ul>
+  <li>Forget everything you know about SQL, tables, relational databases, indexes, </li>
+  <li>JavaScript works with JavaScript Objects (which are essentially ordered hash maps). </li>
+  <li>Let's use that as the data store. </li>
+  <li>You don't honestly care how things are indexed or stored on disk anymore, do you? You just want it to work and work fast.</li>
+  <li>Provide mechanism for atomic code blocks for caching, synchronization, and rollback support.</li>
+  <li>Many current database frameworks are designed such that data structures created in code (such as Java, Python, etc.) can be mapped to databases. Why not take that abstraction a step further and enforce it?</li>
+  <li>Versioned database?</li>
+</ul>
+<h3>Other Topics</h3>
+<h4>Integrated Version Control</h4>
+<ul>
+  <li>Version Control in general is invaluable to programmers, so integrating removes barrier to entry on version control.</li>
+  <li>Integrating version control
+    lets us:
+    <ul>
+      <li>Link deployment to specific versions/branches across one system or a cluster of systems.</li>
+      <li>Deploy multiple versions/branches on the same system.</li>
+      </ul>
+  </li>
+</ul>
+<h2>Current Thoughts</h2>
+<p>Alt actually <a href="http://alt.cellosoft.com/">exists today</a>. It started as a PHP project (<a href="http://marcello.cellosoft.com/projects/squeal/">SQueaL</a>) in attempt to simplify working with databases. After a grad school break from Alt, the original design felt flawed (<a href="#criticisms">see below</a>) and this manifesto came of those criticisms. I look forward to continuing evolving and massaging the framework until it meets the requirements.</p>
+<h3>Other Projects</h3>
+<p>Since the Alt project was started, similar projects (Google App Engine, Aptana Jaxer, AppJet, etc.) have been announced and released, but they all fall short in one or more of the design goals described above.</p>
+<p>The closest project I have seen is the (currently unreleased) <a href="http://etherpad.com/ep/blog/posts/etherpad-and-appjet">new version of Appjet</a>. If it ever is released as open source, it sounds like a good candidate for this manifesto, or at least a starting point.</p>
+<h3><a name="criticisms"></a>My Criticism of the Current Alt Framework</h3>
+<ol>
+  <li>Why use XML? That's learning another language. E4X is really cool, but also a pain to work with, and doesn't work on (most) client-side browsers.</li>
+  <li>Arguably, considering XHTML/HTML, is inevitable, so for layout it makes some sense. For a database schema? Not so much.</li>
+  <li>Why have a database schema? </li>
+</ol>
+<h2>Contact</h2>
+<p>That's it for now. </p>
+<p>Send me your thoughts! </p>
+<p><a href="mailto:marcello@cellosoft.com">marcello@cellosoft.com</a></p>
+<!--
+<div id="toc"></div>
+<script type="text/javascript" src="mootools-1.2.1-core-yc.js"></script>
+<script type="text/javascript" src="toc.js"></script>
+-->
+</body>
+</html>

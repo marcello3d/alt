@@ -10,6 +10,7 @@
 	<classpathentry kind="lib" path="lib/svnkit.jar"/>
 	<classpathentry kind="lib" path="lib/commons-fileupload-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/commons-io-1.3.2.jar"/>
-	<classpathentry kind="lib" path="lib/rhino.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rhino"/>
+	<classpathentry kind="lib" path="lib/jdbm-1.0.jar" sourcepath="/Users/marcello/Downloads/_Firefox/jdbm-1.0/src/main"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
