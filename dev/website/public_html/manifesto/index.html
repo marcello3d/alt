@@ -37,7 +37,13 @@
 		width: 10em;
 		font-size: 75%;
 	}
-	
+	.wip {
+		background: #ffe;
+		padding: 0.5em 2em;
+		margin: -0.5em -2em;
+		border: dashed #EEE9BF;
+		border-width: 1px 0;
+	}
 	span.prefix {
 		font-size: 75%;
 	}
@@ -46,7 +52,7 @@
 <body>
 <h1>The Alt Manifesto</h1>
 <p>Written by <a href="http://marcello.cellosoft.com/">Marcello Bastéa-Forte</a><br>
-Version 0.1 - February 1st, 2009</p>
+Version 0.2 - February 2nd, 2009</p>
 <h2>Introduction<br>
 </h2>
 <p> The Alternative Web Framework is a design experiment to simplify the process of developing web applications.</p>
@@ -55,7 +61,7 @@ Version 0.1 - February 1st, 2009</p>
 <h2>50,000 feet: The Main Goal</h2>
 
 <p>The high level goal is a <em><b>simple</b></em> framework that can be <b>easily learned</b> while  remaining <b>flexible and scalable</b>.</p>
-<h2>10,000 feet: The Six Design Goals</h2>
+<h2>10,000 feet: The Five Design Goals</h2>
 
 <p>There are a few specific goals that help meet the main goal<sup>[1]</sup>:<br>
 </p>
@@ -71,7 +77,7 @@ Version 0.1 - February 1st, 2009</p>
   </ul>
   <li>Simple API</li>
   <ul>
-    <li>No one component of the framework should take more than <b>three printed pages</b> to describe 90% of the functionality.</li>
+    <li>No one component of the framework should take more than <b>three printed pages</b> to describe 90% of the functionality. (<a href="javascript:print()">example</a>)</li>
     <li>The user should be able to <b>understand</b> in the <b>first page</b> why the approach makes sense and find it reasonable.</li>
     <li>The fewer APIs to learn, the better<sup>[2]</sup>.</li>
   </ul>
@@ -85,21 +91,24 @@ Version 0.1 - February 1st, 2009</p>
     <li>Code should not care (much) about scalability. It should be possible to design an API such that hardware scalability is abstracted.</li>
     <li>The user should be thinking the same way when designing a small app as when designing a big app.</li>
   </ul>
-  <li>Open<sup>[3]</sup>
+</ol>
+And though not strictly a design rule, let's add...
+<ol>
+  <li value="6">Open<sup>[3]</sup>
     <ul>
-      <li>Web frameworks should be open and free. Maybe people have good ideas and systems can always be improved.</li>
-      <li>There should be no reason not to use the system. The more people that use it, the more likely it will be improved (and with some luck, those improvements making it back to the original system for everyone else to benefit).</li>
+      <li>Small web frameworks work best when open and free.</li>
+	  <li>Free leads to use, and open leads to contribution.</li>
     </ul>
   </li>
 </ol>
 
 <p>[1] Guidelines not rules!<br>
-  [2]
-But don't hide functionality. We are not Apple.<br>
-[3] And I mean properly open, not GPL.<br>
+[2] But don't hide functionality. We are not Apple.<br>
+[3] And I mean properly open, not GPL. (Don't kill me.)<br>
 </p>
 <h2>5,000 feet: The Techniques</h2>
 <p>(This section is a work in progress.)</p>
+<div class="wip">
 <h3>The Language: JavaScript</h3>
 <ul>
   <li>To do interesting web applications, you'll be using JavaScript anyway. Why use a <em>different </em>language on the server-side?</li>
@@ -115,6 +124,19 @@ But don't hide functionality. We are not Apple.<br>
   <li>Versioned database?</li>
 </ul>
 <h3>Other Topics</h3>
+<!--
+<p>Plugins, libraries, and features.</p>
+<h4>Client-Server Interaction</h4>
+<ul>
+	<li>It is important that the divide between client and server code be minimal.</li>
+	<li>You should be writing the same kind of code on both sides.</li>
+</ul>
+<h4>Data Interaction/Security</h4>
+<ul>
+	<li>This is kind of an umbrella </li>
+	<li>You need to write code to validate data</li>
+</ul>
+-->
 <h4>Integrated Version Control</h4>
 <ul>
   <li>Version Control in general is invaluable to programmers, so integrating removes barrier to entry on version control.</li>
@@ -126,6 +148,7 @@ But don't hide functionality. We are not Apple.<br>
       </ul>
   </li>
 </ul>
+</div>
 <h2>Current Thoughts</h2>
 <p>Alt actually <a href="http://alt.cellosoft.com/">exists today</a>. It started as a PHP project (<a href="http://marcello.cellosoft.com/projects/squeal/">SQueaL</a>) in attempt to simplify working with databases. After a grad school break from Alt, the original design felt flawed (<a href="#criticisms">see below</a>) and this manifesto came of those criticisms. I look forward to continuing evolving and massaging the framework until it meets the requirements.</p>
 <h3>Other Projects</h3>
