@@ -1,27 +1,29 @@
 ///////////////////////////////////////////////////////////////////////////////
-Object.prototype.forEach = function(fun,thisp) {
+Object.prototype.forEach = function Object$forEach(fun,thisp) {
 	for (var key in this) {
 		var value = this[key];
 		if (value !== Object.prototype[key]) {
 			fun.call(thisp, key, value, this);
 		}
 	}
-}
-Object.prototype.extend = function(map) {
+};
+Object.prototype.extend = function Object$extend(map) {
 	map.forEach(function(key,value) {
 		this[key] = value;
 	},this);
+	return this;
 };
-Object.prototype.extendMissing = function(map) {
+Object.prototype.extendMissing = function Object$extendMissing(map) {
 	map.forEach(function(key,value) {
 		if (!(key in this)) {
 			this[key] = value;
 		}
 	},this);
+	return this;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-Array.from = function(arrayLike) {
+Array.from = function Array$from(arrayLike) {
 	var array = new Array(arrayLike.length);
 	for (var i=0; i<arrayLike.length; i++) {
 		array[i] = arrayLike[i];
@@ -29,7 +31,7 @@ Array.from = function(arrayLike) {
 	return array;
 };
 Array.prototype.extendMissing({
-	forEach: function(fun, thisp) {
+	forEach: function Array$forEach(fun, thisp) {
 		var len = this.length;
 		for (var i = 0; i < len; i++) {
 			if (i in this) {
@@ -38,7 +40,7 @@ Array.prototype.extendMissing({
 		}
 	},
 
-	map: function(fun, thisp) {
+	map: function Array$map(fun, thisp) {
 		var length = this.length;
 		var result = new Array(length);
 		for (var i = 0; i < length; i++) {
@@ -48,7 +50,7 @@ Array.prototype.extendMissing({
 		}
 		return result;
 	},
-	filter: function(fun, thisp) {
+	filter: function Array$filter(fun, thisp) {
 		var length = this.length;
 		var result = [];
 		for (var i = 0; i < length; i++) {
@@ -65,22 +67,25 @@ Array.prototype.extendMissing({
 
 ///////////////////////////////////////////////////////////////////////////////
 Function.prototype.extend({
-	extend: function(constructor,methods) {
-		var proto = new this;
-		proto.constructor = constructor;
+	subclass: function Function$subclass(methods) {
+		var constructor = (methods && methods.constructor !== Object && methods.constructor) 
+			|| function Function$DefaultConstructor(){};
 		constructor.parent = this;
-		constructor.prototype = proto;
-		
+		constructor.prototype = new this;
 		if (methods) {
-			methods.forEach(function(key,value) {
-				value.parent = this.prototype[key];
-				proto[key]=value;
-			},this);
+			constructor.addMethods(methods);
 		}
-		
+		constructor.prototype.constructor = constructor;
 		return constructor;
 	},
-	link: function(instance) {
+	addMethods: function Function$addMethods(methods) {
+		methods.forEach(function(name,func) {
+			func.parent = this.parent.prototype[name];
+			this.prototype[name]=func;
+		},this);
+		return this;
+	},
+	link: function Function$link(instance) {
 		var f = this;
 		return function() {
 			f.apply(instance,Array.from(arguments));

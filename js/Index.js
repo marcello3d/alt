@@ -9,4 +9,3 @@ dictator.map({
 	debug:     'alt.debug.Main',
 	lib: 		'lib.Main'
 });
-

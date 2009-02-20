@@ -7,7 +7,7 @@
 function Form(id) {
 	this.id = id;
 	this.fields = [];
-	this.authcode = parseInt(Math.random() * 1e9);
+	this.authcode = parseInt((new java.util.Random()).nextInt());
 	this.method = "POST";
 	this.submitted = false;
 	this.addField(new Hidden('form-id', 'Authentication', this.authcode));
@@ -54,10 +54,13 @@ Form.prototype.validate = function(dataSource) {
 	for each (var field in this.fields)
 		if (field.validate) {
 			field.setValue(dataSource ? dataSource[field.id] : request.getParameter(field.id));
-			field.validated = field.validate();
-			Alt.log("field("+field.id+"):"+field.validated);
-			if (field.validated !== true)
-				validated = false;
+			try {
+				field.validated = !!field.validate();
+			} catch (error) {
+				field.validationError = error;
+				field.validated = validated = false;
+			}
+			Alt.log("field("+field.id+"):"+field.validated +" ("+field.validationError+")");
 		}
 	return validated;
 }
@@ -87,8 +90,9 @@ InputField.prototype.getXML = function() {
 		<label for={this.id}>{this.label}</label>
 		<input name={this.id} id={this.id} type={this.type} value={this.value} />
 		</>;
-	if (this.validated)
-		x += <><b>Error! {this.validated}</b></>
+	if (this.validationError) {
+		x += <><b>Error! {this.validationError}</b></>
+	}
 	return x;
 }
 InputField.prototype.validate = function() {
@@ -106,8 +110,9 @@ function Hidden(id,label,desiredValue) {
 }
 Hidden.prototype = new InputField;
 Hidden.prototype.validate = function(value) {
-	if (this.value != this.desiredValue)
-		return this.label+' is invalid.';
+	if (this.value != this.desiredValue) {
+		throw this.label+' is invalid.';
+	}
 	return true;
 }
 Hidden.prototype.getXML = function() {

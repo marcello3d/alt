@@ -7,7 +7,6 @@ var session = dictator.session;
 
 var onion = new Onion(Resources.load('Example.onion.xml'));
 
-onion.add('results','Please submit the form below.');
 
 var form = alt.form.Form.getForm('examples.Form');
 
@@ -20,18 +19,22 @@ var form = alt.form.Form.getForm('examples.Form');
 	}
 	
 	
-	
+var results = 'Please submit the form below.';
+
 if (form.submitted) {
 	if (form.validate())
-		onion.add('results','SUCCESS!');
+		results = 'SUCCESS!';
 	else
-		onion.add('results','FAILED TO DO SOMETHING!');
+		results = 'FAILED TO DO SOMETHING!';
 } else {
 	var f;
 	form.addField(f = new alt.form.Text('name', 'Name', 'Name'));
 	form.addField(f = new alt.form.Text('age', 'Age'));
-	f.validate = function() {
-		return this.value.match(/[0-9]+/);
+	f.clientValidate = f.validate = function() {
+		if (!this.value.match(/[0-9]+/)) {
+			throw "Not an age.";
+		}
+		return true;
 	}
 	form.addField(f = new alt.form.Submit('submit', 'Submit', 'Submit'));
 }
@@ -42,7 +45,7 @@ var site = onion.evaluate(
 <example-page>
  <title>Form test</title>
  <body>
-    <div style="border: solid 2px; padding: 5px; margin-bottom: 1em"><results/></div>
+    <div style="border: solid 2px; padding: 5px; margin-bottom: 1em">{results}</div>
  	{form.getXML()}
  </body>
 </example-page>);

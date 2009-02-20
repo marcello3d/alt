@@ -1,3 +1,5 @@
+function HTMLPrototype() {}
+
 function escapeHTML(s) {
     if (!s) return s;
     if (typeof s != "string")
@@ -13,55 +15,49 @@ function escapeHTML(s) {
 }
 String.prototype.toHTMLString = function() {
 	return escapeHTML(this);
-};
+}
 Array.prototype.toHTMLString = function() {
 	var s = '';
 	this.forEach(function(child) {
-		if (child) {
-			s += child.toHTMLString ? child.toHTMLString() : escapeHTML(child);
-		}
+		s += child.toHTMLString ? child.toHTMLString() : escapeHTML(child);
 	});
 	return s;
-};
-
-var HTMLPrototype = Object.subclass({
+}
+Object.extend(HTMLPrototype.prototype, {
 	toHTMLString: function() {
 		var s = "<"+this.tag;
-		this.attributes.forEach(function(key,value) {
+		Object.forEach(this.attributes,function(key,value) {
 			s += " "+key+"=\""+escapeHTML(value)+"\"";
 		});
 		if (!this.children.length && !this.separateClose) {
 			s += "/";
 		} else {
 			s += ">";
-			s += this.children.toHTMLString();
-			s += "</"+this.tag;
+			s += children.toHTMLString();
+			s += "</"+this.tag+">";
 		}
 		s += ">";
 		return s;
 	}
 });
 function makeTagFunction(name) {
-	function initialize() {
+	var constructor = function() {
 		this.tag = name;
 		this.attributes = {};
 		this.children = [];
 		for (var i=0; i<arguments.length; i++) {
 			var arg = arguments[i];
-			if (!(arg instanceof HTMLPrototype) && typeof arg == "object") {
-				this.attributes.extend(arg);
+			if (!(arg instanceof HTMLPrototype) && !(arg instanceof String)) {
+				for (var x in arg) {
+					this.attributes[x] = arg[x];
+				}
 			} else {
 				this.children.push(arg);
 			}
 		}
-	}
-	var constructor = HTMLPrototype.subclass();
-	
-	return function() {
-		var o = new constructor;
-		initialize.apply(o,Array.from(arguments));
-		return o;
 	};
+	constructor.prototype = new HTMLPrototype;
+	return constructor;
 }
 var html = {};
 
@@ -72,8 +68,7 @@ var html = {};
  'object','embed',
  'h1','h2','h3','h4','h5','h6',
  'p','div','br',
- 'strong','em','b','u','i','strike','pre',
- 'hr',
+ 'strong','em','b','u','i','strike'
  'sub','sup',
  'span',
  'a',
@@ -85,3 +80,7 @@ var html = {};
 	 html[name] = makeTagFunction(name);
  });
 html.textarea.separateClose = true;
+var output = [
+	new html.p(	"Here is some text, ", new html.strong("and some bold text"),". "),
+	new html.p(	"Every good boy deserves a ", new html.a({href:'http://2draw.net/',title:'what?'},"link"), ".")
+];
