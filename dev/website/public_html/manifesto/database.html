@@ -52,17 +52,18 @@ var postsByDate = posts.sort(function(a,b) {
     return b.date.getTime() - a.date.getTime();
 });
 
-// Get the number of posts written by Fred  
+// Get the posts written by Fred  
 var postsByFred = posts.filter(function(post) {
     return post.author.name == "Fred";
-}).length;
+});
 
 // Slice the latest 10 posts
 var latest10 = postsByDate.slice(0,10);
 </pre> 
 <p>The methods above (<code>sort</code>, <code>filter</code>, <code>slice</code>) return DataView objects.  These 
-read-only DataViews do not perform any computation until you actually query the fields:</p>
+read-only DataViews do not perform any computation until you actually retrieve data:</p>
 <pre class="sh_javascript">
+response.writeln("posts fred has written: "+ postsByFred.length); 
 // Print out each post
 latest10.forEach(function (post) {
     response.writeln(post.title + " by " + post.author.name);
