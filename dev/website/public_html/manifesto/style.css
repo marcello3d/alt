@@ -1,0 +1,45 @@
+html { 
+  background: #FEFBDF;
+  color: black; 
+}
+body {
+  margin: 0 auto;
+  width: 40em;
+  background: white; 
+  padding: 5em 2em;
+  border: solid #EEE9BF;
+  border-width: 0 1em;
+}
+body,p,li { 
+  font-family:Georgia, "Times New Roman", Times, serif; 
+  text-align: justify;
+  line-height: 1.5;
+}
+h1,h2,h3,h4 {
+letter-spacing:-0.05em;
+}
+li { margin-bottom: .5em; }
+ul { margin-bottom: 1em; }
+a { color:#363 }
+#toc {
+	text-align: right;
+	position: absolute;
+	padding: 1em;
+	top: 1em;
+	left: 1em;
+	width: 10em;
+	font-size: 75%;
+}
+.wip {
+	background: #ffe;
+	padding: 0.5em 2em;
+	margin: -0.5em -2em;
+	border: dashed #EEE9BF;
+	border-width: 1px 0;
+}
+pre {
+	
+}
+span.prefix {
+	font-size: 75%;
+}

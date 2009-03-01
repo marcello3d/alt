@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title>The Alt Database</title>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" type="text/css" href="../js/sh_style.css">
+  <script type="text/javascript" src="../js/sh_main.min.js"></script>
+  <script type="text/javascript" src="../js/sh_javascript.min.js"></script>
+</head>
+<body>
+<h1>The Alt Database</h1>
+<p>Written by <a href="http://marcello.cellosoft.com/">Marcello Bastéa-Forte</a><br>
+Version 0.1 - February 28th, 2009</p>
+<h2>Introduction<br></h2>
+<p>To demonstrate the Alt database, we will build a blog.
+<h2>Writing to the Database</h2>
+<p>The database is made up of DataObjects.  These objects look and act like regular JavaScript objects, but...</p> 
+<ol>
+	<li>...can contains any property you need.</li>
+	<li>...can be both an array and a hashmap.</li>
+</ol>
+<pre class="sh_javascript">
+// Get the posts database
+var posts = alt.db.altBlog.posts;
+</pre>
+<p>In the above code, <code>alt.db.altBlog</code> and <code>alt.db.altBlog.posts</code> both evaluate to virtual
+DataObjects.</p>
+<p>These virtual DataObjects do not actually exist until you attempt to store values in them:</p>
+<pre class="sh_javascript">
+// Create a user
+alt.db.altBlog.users.fred = { name: "Fred" };
+
+var user = alt.db.altBlog.users.fred;
+
+// Add a new post using the Array-like push method 
+var newPost = posts.push({
+    date:    new Date,
+    author:  user,
+    title:  "Rocking out my new Alt blog",
+    body:   "..."
+});
+</pre>
+<p>The author and post are defined as free-form JavaScript objects.  They get implicitly converted to DataObjects when
+added to the existing DataObjects.</p>
+<h2>Reading from the Database</h2>
+<p>You can perform Array-like queries on DataObjects (even if they are virtual).</p>
+<pre class="sh_javascript">
+// Get posts sorted by date in reverse 
+var postsByDate = posts.sort(function(a,b) {
+    return b.date.getTime() - a.date.getTime();
+});
+
+// Get the number of posts written by Fred  
+var postsByFred = posts.filter(function(post) {
+    return post.author.name == "Fred";
+}).length;
+
+// Slice the latest 10 posts
+var latest10 = postsByDate.slice(0,10);
+</pre> 
+<p>The methods above (<code>sort</code>, <code>filter</code>, <code>slice</code>) return DataView objects.  These 
+read-only DataViews do not perform any computation until you actually query the fields:</p>
+<pre class="sh_javascript">
+// Print out each post
+latest10.forEach(function (post) {
+    response.writeln(post.title + " by " + post.author.name);
+    response.writeln(post.body);
+});
+</pre>
+<h2>Holy inefficiency batman! This can't be good!</h2>
+<p>If you are wondering how this can be done efficiently, you are indeed a sharp one.  Surely databases cannot be this
+simple!</p>
+<p>There are two tricks we can use to make this run well.</p>
+<ol>
+	<li>Delayed execution.
+	<ul>
+		<li>When the user writes <code>posts.sort(...).filter(...).slice(...)</code>, we queue up the operations into
+		DataView objects that are all sent to the database engine when the user calls forEach or accesses the length
+		property.</li>
+		<li>The database then evaluates the sort, filter, slice, etc. functions upon the data (in whatever order it
+		prefers&mdash;when interchangeable).  The database can take advantage of any indices to speed up the 
+		operation.</li>
+	</ul></li>
+	
+	<li>Auto-indices
+	<ul>
+		<li>In the process of evaluating a sort or filter, the database server has the option of creating an index of
+		the resultant data.</li>
+		<li>By dynamically profiling what sorts and filters are slow or frequently accessed at runtime, the database 
+		server can create and delete indices (or views) on the fly for performance/space reasons.</li> 
+	</ul>
+	</li>
+</ol>
+
+<h2>Contact</h2>
+<p>That's it for now. </p>
+<p>Send me your thoughts! </p>
+<p><a href="mailto:marcello@cellosoft.com">marcello@cellosoft.com</a></p>
+<script type="text/javascript">sh_highlightDocument()</script>
+</body>
+</html>
