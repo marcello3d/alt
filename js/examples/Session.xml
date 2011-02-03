@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<onion xmlns:tag="http://alt.cellosoft.com/xml/onion/tag" 
-xmlns:arg="http://alt.cellosoft.com/xml/onion/arg"
-xmlns:set="http://alt.cellosoft.com/xml/onion/set">
-
-<tag:session-page>
-</tag:session-page>
-
-</onion>
