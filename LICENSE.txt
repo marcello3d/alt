@@ -1,6 +1,6 @@
 Alt Framework License 1.0
 
-Copyright (C) 2005-2006 Marcello Bastéa-Forte and Cellosoft
+Copyright (C) 2005-2011 Marcello Bastea-Forte and Cellosoft
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the
@@ -17,7 +17,3 @@ freely, subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
-
---
-
-See 3RDPARTY.txt for library license notes.
